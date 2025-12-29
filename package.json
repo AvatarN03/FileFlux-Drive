@@ -1,6 +1,6 @@
 {
-  "name": "cyancloud_2",
-  "version": "0.1.0",
+  "name": "fileflux",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,18 +9,36 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "axios": "^1.13.2",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.8.0",
+    "clsx": "^2.1.1",
+    "deep-email-validator": "^0.1.21",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.556.0",
+    "motion": "^12.23.26",
     "next": "16.0.7",
+    "node-email-verifier": "^4.0.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-toastify": "^11.0.5",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

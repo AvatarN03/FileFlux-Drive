@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <g data-name="File Upload">
+    
+    <!-- Upload Arrow -->
+    <path
+      d="M42.924 34.383a1 1 0 0 0-.217-1.09l-10-10a1 1 0 0 0-1.414 0l-10 10A1 1 0 0 0 22 35h5v15a1 1 0 0 0 2 0V34a1 1 0 0 0-1-1h-3.586L32 25.414 39.586 33H36a1 1 0 0 0-1 1v16a1 1 0 0 0 2 0V35h5a1 1 0 0 0 .924-.617z
+         M28 53a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1z
+         M32 53a1 1 0 0 0-1 1v9a1 1 0 0 0 2 0v-9a1 1 0 0 0-1-1z
+         M36 53a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1z"
+      fill="#e70b0b"
+    />
+
+    <!-- File Icon (Thicker Stroke + Filled) -->
+    <path
+      d="m50.707 9.293-9-9A1.112 1.112 0 0 0 41 0H14a1 1 0 0 0-1 1v46a1 1 0 0 0 1 1h10a1 1 0 0 0 0-2h-9V2h25v8a1 1 0 0 0 1 1h8v35h-9a1 1 0 0 0 0 2h10a1 1 0 0 0 1-1V10a1.092 1.092 0 0 0-.293-.707zM42 9V3.414L47.586 9z"
+      fill="#caa22b"
+      stroke="#b17608ff"
+      stroke-width="2.5"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>
