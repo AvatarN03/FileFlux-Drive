@@ -1,4 +1,4 @@
-import { ActionButtonProps } from "@/types/file";
+import { ActionButtonProps } from "@/types/ui";
 
 
 const ActionButton = ({

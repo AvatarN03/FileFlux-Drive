@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { ChevronRight } from "lucide-react";
+import { ItemNameDisplayProps } from "@/types/ui";
 
-import { ItemNameDisplayProps } from "@/types/file";
 
 
 

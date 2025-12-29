@@ -1,5 +1,5 @@
 import { FolderIcon } from "lucide-react";
-import { MoveModalProps } from "@/types/file";
+import { MoveModalProps } from "@/types/ui";
 
 
 

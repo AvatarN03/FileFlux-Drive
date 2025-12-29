@@ -1,4 +1,4 @@
-import { MobileActionMenuProps } from "@/types/file";
+import { MobileActionMenuProps } from "@/types/ui";
 
 
 const MobileActionMenu = ({ children, onClose }: MobileActionMenuProps) => {
