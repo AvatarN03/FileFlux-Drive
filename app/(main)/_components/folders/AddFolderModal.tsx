@@ -1,6 +1,7 @@
-import { AddFolderModalProps } from "@/types/file";
+import { AddFolderModalProps } from "@/types/ui";
 
-const AddFolderModal = ({
+
+const AddFolderModal =  ({
   value,
   onChange,
   onAdd,
@@ -9,7 +10,7 @@ const AddFolderModal = ({
 }: AddFolderModalProps) => {
   return (
     <div
-      className="w-screen h-screen fixed inset-0 bg-black/50 flex justify-center items-center z-50"
+      className="w-screen  h-screen fixed inset-0 bg-black/50 flex justify-center items-center z-50"
       onClick={onClose}
     >
       <div
