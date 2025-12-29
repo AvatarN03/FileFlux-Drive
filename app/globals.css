@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --color-peach: #fcde9c;
-    --color-brown: #ffa552;
-    --color-violet: #381d2a;
-    --color-green: #c4d6b0;
-    --color-ember: #ba5624;
-  }
+
+@theme {
+  --color-peach: #fcde9c;
+  --color-brown: #ffa552;
+  --color-violet: #381d2a;
+  --color-green: #c4d6b0;
+  --color-ember: #ba5624;
 }
 
 @layer base {
