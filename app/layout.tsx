@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Providers } from "./provider";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -13,8 +14,8 @@ const sora = Sora({
 export const metadata: Metadata = {
   title: "FileFlux - FileUploader Platform",
   description: "The ultimate file uploader platform.",
-  icons:{
-    icon:"logo.png"
+  icons: {
+    icon: "logo.png"
   }
 };
 
@@ -26,8 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={`${sora.className} antialiased`}>
-       {children}
-       <ToastContainer/>
+        <Providers>{children}
+
+          <ToastContainer />
+        </Providers>
       </body>
     </html>
   );

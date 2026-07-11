@@ -2,10 +2,12 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { LoaderCircle } from "lucide-react";
 
-import useAuthStore  from "@/context/useAuthStore";
+import useAuthStore from "@/context/useAuthStore";
+import { signupSchema } from "@/lib/validations/auth";
+import toastC from "@/lib/toast";
+import { TOAST_MESSAGES } from "@/constant";
 
 const SignupForm = () => {
   const [name, setName] = useState<string>("");
@@ -17,6 +19,21 @@ const SignupForm = () => {
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
+    const parsed = signupSchema.safeParse({
+      name,
+      email,
+      password,
+    });
+
+    if (!parsed.success) {
+      toastC({
+        type: "error",
+        data: TOAST_MESSAGES.FIELDS_INVALID,
+      });
+      return;
+    }
+
+    await signup(parsed.data);
 
     const result = await signup({ name, email, password });
 
@@ -25,7 +42,7 @@ const SignupForm = () => {
       router.push("/dashboard");
     } else {
       console.error("Signup failed:", result.error);
-    
+
     }
   }
 
@@ -33,7 +50,7 @@ const SignupForm = () => {
     <form className="space-y-6 w-full h-full">
       {/* Name */}
       <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="name" className="text-base">
+        <label htmlFor="name" className="text-xl">
           Name
         </label>
         <input
@@ -41,15 +58,15 @@ const SignupForm = () => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Your full name"
-           className="px-3 py-2 bg-brown rounded-md outline-0 border-0 text-violet font-medium"
+          placeholder="Ex. Ramu Naidu"
+          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
 
       {/* Email */}
       <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="email" className="text-base">
+        <label htmlFor="email" className="text-xl">
           Email
         </label>
         <input
@@ -58,14 +75,14 @@ const SignupForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-           className="px-3 py-2 bg-brown rounded-md outline-0 border-0 text-violet font-medium"
+          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
 
       {/* Password */}
       <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="password" className="text-base">
+        <label htmlFor="password" className="text-xl">
           Password
         </label>
         <input
@@ -74,14 +91,14 @@ const SignupForm = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-           className="px-3 py-2 bg-brown rounded-md outline-0 border-0 text-violet font-medium"
+          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
 
       {/* Sign Up Button */}
       <button
-         className="w-full  text-base rounded-md cursor-pointer px-3 py-2 font-semibold bg-violet text-peach hover:text-ember"
+        className="w-full  text-base rounded-md cursor-pointer px-3 py-2 font-semibold bg-ember text-peach hover:text-green hover:bg-ember/80 transition-colors duration-300 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-violet disabled:text-peach/80"
         onClick={handleSignup}
         disabled={isLoading}
       >

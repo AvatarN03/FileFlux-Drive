@@ -10,6 +10,7 @@ import {
   timestamp,
   pgEnum,
   index,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { timestamps } from "./helper";
@@ -18,10 +19,10 @@ import { timestamps } from "./helper";
 export const usersTable = pgTable(
   "users",
   {
-    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    id: uuid("id").defaultRandom().primaryKey(),
     name: varchar("name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
-    password: varchar("password", { length: 255 }).notNull(),
+    password: varchar("password", { length: 255 }),
     avatarUrl: text("avatar_url"),
     emailVerified: boolean("email_verified").default(false).notNull(),
     lastLoginAt: timestamp("last_login_at"),
@@ -45,14 +46,14 @@ export const usersTable = pgTable(
 export const folders = pgTable(
   "folders",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
 
-    parentId: integer("parent_id").references((): AnyPgColumn => folders.id, {
+    parentId: uuid("parent_id").references((): AnyPgColumn => folders.id, {
       onDelete: "cascade",
     }),
 
-    userId: integer("user_id")
+    userId: uuid("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
 
@@ -77,7 +78,7 @@ export const folders = pgTable(
 export const files = pgTable(
   "files",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
 
     name: text("name").notNull(),
 
@@ -95,11 +96,11 @@ export const files = pgTable(
 
     thumbnailUrl: text("thumbnail_url"),
 
-    folderId: integer("folder_id").references(() => folders.id, {
+    folderId: uuid("folder_id").references(() => folders.id, {
       onDelete: "cascade",
     }),
 
-    userId: integer("user_id")
+    userId: uuid("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
 
@@ -141,15 +142,15 @@ export const activities = pgTable(
   {
     id: serial("id").primaryKey(),
 
-    userId: integer("user_id")
+    userId: uuid("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
 
-    fileId: integer("file_id").references(() => files.id, {
+    fileId: uuid("file_id").references(() => files.id, {
       onDelete: "cascade",
     }),
 
-    folderId: integer("folder_id").references(() => folders.id, {
+    folderId: uuid("folder_id").references(() => folders.id, {
       onDelete: "cascade",
     }),
 
@@ -165,13 +166,13 @@ export const activities = pgTable(
 
 // SHARES
 export const shares = pgTable("shares", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
 
-  fileId: integer("file_id").references(() => files.id, {
+  fileId: uuid("file_id").references(() => files.id, {
     onDelete: "cascade",
   }),
 
-  folderId: integer("folder_id").references(() => folders.id, {
+  folderId: uuid("folder_id").references(() => folders.id, {
     onDelete: "cascade",
   }),
 
@@ -185,7 +186,7 @@ export const shares = pgTable("shares", {
 
   allowDownloads: boolean("allow_downloads").default(true).notNull(),
 
-  createdBy: integer("created_by")
+  createdBy: uuid("created_by")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
 
@@ -202,6 +203,31 @@ export const shares = pgTable("shares", {
 ]
 );
 
+// VERIFICATION
+export const verificationTokens = pgTable(
+  "verification_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => usersTable.id, {
+        onDelete: "cascade",
+      }),
+
+    token: text("token").notNull().unique(),
+
+    expiresAt: timestamp("expires_at").notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("verification_tokens_user_idx").on(table.userId),
+    index("verification_tokens_token_idx").on(table.token),
+    index("verification_tokens_expires_idx").on(table.expiresAt),
+  ]
+);
+
 // RELATIONS
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
@@ -212,6 +238,8 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
   activities: many(activities),
 
   shares: many(shares),
+
+  verificationTokens: many(verificationTokens),
 }));
 
 export const foldersRelations = relations(folders, ({ one, many }) => ({
@@ -283,3 +311,14 @@ export const sharesRelations = relations(shares, ({ one }) => ({
     references: [folders.id],
   }),
 }));
+
+
+export const verificationTokensRelations = relations(
+  verificationTokens,
+  ({ one }) => ({
+    user: one(usersTable, {
+      fields: [verificationTokens.userId],
+      references: [usersTable.id],
+    }),
+  })
+);

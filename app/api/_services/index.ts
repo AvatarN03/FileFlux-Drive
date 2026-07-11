@@ -1,55 +1,99 @@
 import { cookies } from "next/headers";
+import crypto from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { folders } from "@/db/schema";
+import { folders, usersTable, verificationTokens } from "@/db/schema";
 import { FolderPathNode } from "@/types/file";
 import { verifyToken } from "@/lib/validations/jwtServices";
 import cloudinary from "@/lib/cloudinary";
 
-export async function getAuthUser() {
+export async function verifyAuth(): Promise<{ id: string }> {
   const cookieStore = await cookies();
-  const tokenCookie = cookieStore.get("FP-accessToken");
+  console.log("touch-1")
 
-  if (!tokenCookie?.value) {
+  const token = cookieStore.get("FP-accessToken")?.value;
+
+  if (!token) {
     throw new Error("UNAUTHORIZED");
   }
 
-  try {
-    return verifyToken(tokenCookie.value).value as { id: number };
-  } catch {
+  const verified = verifyToken(token);
+
+  if (!verified.valid || !verified.value) {
     throw new Error("UNAUTHORIZED");
   }
+
+  return verified.value as { id: string };
 }
 
-export async function buildFolderPath(
-  folderId: number,
-  userId: number
-): Promise<{ id: number; name: string }[]> {
-  const path: { id: number; name: string }[] = [];
-  let currentId: number | null = folderId;
+export async function getAuthUser() {
+  const { id } = await verifyAuth();
+    console.log("touch-2")
 
-  while (currentId !== null) {
-    const folder: FolderPathNode | undefined = await db.query.folders.findFirst(
-      {
-        where: and(eq(folders.id, currentId), eq(folders.user_id, userId)),
-        columns: {
-          id: true,
-          name: true,
-          parentId: true,
-        },
-      }
-    );
 
-    if (!folder) break;
+  const [user] = await db
+    .select(publicUserSelect)
+    .from(usersTable)
+    .where(eq(usersTable.id, id));
 
-    path.unshift({ id: folder.id, name: folder.name });
-    currentId = folder.parentId;
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
   }
 
-  return path;
+  return user;
 }
+
+export async function generateEmailVerification(userId: string) {
+  // Random secure token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // Expires in 24 hours
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+  // Remove any previous unexpired verification tokens
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.userId, userId));
+
+  // Save new token
+  await db.insert(verificationTokens).values({
+    userId,
+    token,
+    expiresAt,
+  });
+
+  return token;
+}
+
+// export async function buildFolderPath(
+//   folderId: number,
+//   userId: number
+// ): Promise<{ id: number; name: string }[]> {
+//   const path: { id: number; name: string }[] = [];
+//   let currentId: number | null = folderId;
+
+//   while (currentId !== null) {
+//     const folder: FolderPathNode | undefined = await db.query.folders.findFirst(
+//       {
+//         where: and(eq(folders.id, currentId), eq(folders.user_id, userId)),
+//         columns: {
+//           id: true,
+//           name: true,
+//           parentId: true,
+//         },
+//       }
+//     );
+
+//     if (!folder) break;
+
+//     path.unshift({ id: folder.id, name: folder.name });
+//     currentId = folder.parentId;
+//   }
+
+//   return path;
+// }
 
 export async function deleteFromCloudinary(publicId: string) {
   try {
@@ -76,6 +120,7 @@ export async function deleteFromCloudinary(publicId: string) {
 
 // utils/verifyEmail.ts
 import emailValidator from "node-email-verifier";
+import { publicUserSelect } from "@/db/selection";
 
 export async function verifyEmailAddress(email: string) {
   try {

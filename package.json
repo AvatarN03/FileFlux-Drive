@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@react-oauth/google": "^0.13.5",
+    "@tanstack/react-query": "^5.101.2",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
@@ -17,6 +19,7 @@
     "deep-email-validator": "^0.1.21",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.0",
+    "google-auth-library": "^10.9.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.556.0",
     "motion": "^12.23.26",
@@ -30,6 +33,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/eslint-plugin-query": "^5.101.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",

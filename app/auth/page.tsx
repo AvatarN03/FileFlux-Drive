@@ -1,26 +1,30 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { motion } from "motion/react";
-
+import Logo from "../(main)/_components/Logo";
 import LoginForm from "./_component/LoginForm";
 import SignupForm from "./_component/SignupForm";
 
 import useAuthStore from "@/context/useAuthStore";
-import Logo from "../(main)/_components/Logo";
+import { GoogleLogin } from "@react-oauth/google";
+import toastC from "@/lib/toast";
+import { CredentialResponse } from "@react-oauth/google";
+
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const continueTo = searchParams.get("continueTo");
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);
   };
 
-  const { continueTo }: { continueTo: string } = useParams();
   // useEffect(() => {
   //   checkAuth();
   // }, []);
@@ -36,60 +40,106 @@ const AuthPage = () => {
     router.push(redirectPath);
   }, [isLoading, isAuthenticated, continueTo, router]);
 
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    try {
+      if (!credentialResponse.credential) {
+        toastC({ data: "Unable to login.", type: "error" });
+        return;
+      }
+
+      const res = await fetch("/api/auth/google", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          credential: credentialResponse.credential,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        toastC({ data: data.error, type: "error" });
+        return;
+      }
+
+      await checkAuth();
+
+      router.push("/dashboard");
+    } catch {
+      toastC({ data: "Google Sign In failed", type: "error" });
+    }
+  };
+
   return (
-    <div className="h-screen w-screen bg-gradient-62 flex items-center justify-center p-1 sm:p-8 relative z-30 overflow-hidden">
-      {/* Blur layer - isolated at the back */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="w-96 aspect-square rounded-full bg-ember blur-[80px] absolute top-0 -right-32 opacity-80" />
-        <div className="w-96 h-96 rounded-full bg-ember blur-[80px] absolute bottom-0 -left-32 opacity-70" />
+    <div className="h-screen w-screen bg-gradient-62">
+      <div className="flex items-center justify-center max-w-480 mx-auto h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full h-full">
+          {/* Left: Form Section */}
+          <div className="col-span-full md:col-span-1 lg:col-span-1 p-4 md:p-10 flex flex-col justify-center lg:justify-start text-green bg-neutral-900 max-w-lg m-auto md:m-0 rounded-2xl md:rounded-none shadow-lg h-fit w-full md:h-full">
+            <div className="my-8">
+              <Logo />
+            </div>
+
+            <div className="flex flex-col gap-2 text-center mb-8">
+              <h1 className="text-2xl font-medium ">
+                {isLogin ? "Welcome Back" : "Create an Account"}
+              </h1>
+              <p className="mb-6 font-light tracking-wider text-sm text-peach">
+                Login to continue managing your files.
+              </p>
+            </div>
+
+            <div>{isLogin ? <LoginForm /> : <SignupForm />}</div>
+            <div className="mt-6">
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-700" />
+                </div>
+
+                <div className="relative flex justify-center">
+                  <span className="bg-neutral-900 px-4 text-xs text-neutral-400">
+                    OR
+                  </span>
+                </div>
+              </div>
+
+              <GoogleLogin
+                theme="filled_blue"
+                shape="pill"
+                size="large"
+                width="100%"
+                onSuccess={handleGoogleSuccess}
+                onError={() => toastC({ data: "Google Sign In failed", type: "error" })}
+              />
+            </div>
+
+            <div className="text-center text-sm mt-8 flex items-center justify-center">
+              <p className="font-light">
+                {isLogin ? "Don't have an Account?" : "Already have an Account?"}
+              </p>
+              <button
+                onClick={handleSwitch}
+                className="font-semibold hover:underline cursor-pointer mx-1 underline underline-offset-2 hover:text-brown"
+              >
+                {isLogin ? "Sign Up" : "Login"}
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Image Section */}
+          <div className="hidden md:block md:col-span-1 lg:col-span-3 overflow-hidden relative h-full shadow-lg  rounded-r-md">
+            <Image
+              src="/auth_img.png"
+              alt="auth-img"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
       </div>
-
-      {/* Main Card - Above blur layer */}
-      <motion.div
-        initial={{ scale: 2, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1, }}
-       
-        className="relative z-10 flex w-full max-w-3xl lg:max-w-4xl h-auto md:max-h-[80vh] bg-peach rounded-2xl overflow-hidden shadow-xl"
-      >
-        {/* Left: Form Section */}
-        <div className="w-full md:w-1/2 p-4 md:p-10 flex flex-col justify-center text-ember">
-          <div className="my-8">
-            <Logo />
-          </div>
-
-          <h1 className="text-2xl font-medium mb-4">
-            {isLogin ? "Welcome Back" : "Create an Account"}
-          </h1>
-          <p className="mb-6 font-normal tracking-wider text-base">
-            Login to continue tracking your expenses.
-          </p>
-
-          <div>{isLogin ? <LoginForm /> : <SignupForm />}</div>
-
-          <div className="text-center text-base mt-8 flex items-center justify-center">
-            <p>
-              {isLogin ? "Don't have an Account?" : "Already have an Account ?"}
-            </p>
-            <button
-              onClick={handleSwitch}
-              className="font-semibold hover:underline cursor-pointer mx-1"
-            >
-              {isLogin ? "Sign Up" : "Login"}
-            </button>
-          </div>
-        </div>
-
-        {/* Right: Image Section */}
-        <div className="hidden md:block w-1/2 h-full my-auto">
-          <Image
-            width={900}
-            height={900}
-            src="/auth_img.png"
-            alt="auth-img"
-            className="w-full h-full object-cover rounded-r-2xl"
-          />
-        </div>
-      </motion.div>
     </div>
   );
 };

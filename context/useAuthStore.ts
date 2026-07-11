@@ -28,7 +28,7 @@ const useAuthStore = create<UseAuthProps>()(
             const res = await axios.post<ApiResponse<User>>(
               API_ENDPOINTS.LOGIN,
               credentials,
-              { withCredentials: true }
+              { withCredentials: true },
             );
 
             if (res.data.success && res.data.user) {
@@ -39,42 +39,27 @@ const useAuthStore = create<UseAuthProps>()(
                   isLoading: false,
                 },
                 false,
-                "login/success"
+                "login/success",
               );
 
-              toastC({
-                type: "success",
-                data: TOAST_MESSAGES.LOGIN_SUCCESS,
-              });
-
-              return { success: true };
+              return {
+                success: true,
+                user: res.data.user,
+              };
             }
 
             set({ isLoading: false }, false, "login/failed");
 
-            const errorMsg = res.data.error || TOAST_MESSAGES.LOGIN_FAILED;
-            toastC({
-              type: "error",
-              data: TOAST_MESSAGES.LOGIN_FAILED,
-            });
-
             return {
               success: false,
-              error: errorMsg,
+              error: TOAST_MESSAGES.LOGIN_FAILED,
             };
           } catch (error) {
             set({ isLoading: false }, false, "login/error");
 
-            const errorMsg =
-              getErrorMessage(error) || TOAST_MESSAGES.LOGIN_FAILED;
-            toastC({
-              type: "error",
-              data: errorMsg,
-            });
-
             return {
               success: false,
-              error: errorMsg,
+              error: getErrorMessage(error) || TOAST_MESSAGES.LOGIN_FAILED,
             };
           }
         },
@@ -86,9 +71,8 @@ const useAuthStore = create<UseAuthProps>()(
             const res = await axios.post<ApiResponse<User>>(
               API_ENDPOINTS.SIGNUP,
               credentials,
-              { withCredentials: true }
+              { withCredentials: true },
             );
-            console.log(res.data);
 
             if (res.data.success && res.data.user) {
               set(
@@ -98,42 +82,24 @@ const useAuthStore = create<UseAuthProps>()(
                   isLoading: false,
                 },
                 false,
-                "signup/success"
+                "signup/success",
               );
 
-              toastC({
-                type: "success",
-                data: TOAST_MESSAGES.SIGNUP_SUCCESS,
-              });
-
-              return { success: true };
+              return { success: true, user: res.data.user };
             }
 
             set({ isLoading: false }, false, "signup/failed");
 
-            const errorMsg = TOAST_MESSAGES.SIGNUP_FAILED;
-            toastC({
-              type: "error",
-              data: errorMsg,
-            });
-
             return {
               success: false,
-              error: errorMsg,
+              error: TOAST_MESSAGES.SIGNUP_FAILED,
             };
           } catch (error) {
             set({ isLoading: false }, false, "signup/error");
 
-            const errorMsg =
-              getErrorMessage(error) || TOAST_MESSAGES.SIGNUP_FAILED;
-            toastC({
-              type: "error",
-              data: errorMsg,
-            });
-
             return {
               success: false,
-              error: errorMsg,
+              error: getErrorMessage(error) || TOAST_MESSAGES.SIGNUP_FAILED,
             };
           }
         },
@@ -145,7 +111,7 @@ const useAuthStore = create<UseAuthProps>()(
             await axios.post<ApiResponse>(
               API_ENDPOINTS.LOGOUT,
               {},
-              { withCredentials: true }
+              { withCredentials: true },
             );
             set(
               {
@@ -154,7 +120,7 @@ const useAuthStore = create<UseAuthProps>()(
                 isLoading: false,
               },
               false,
-              "logout/success"
+              "logout/success",
             );
 
             clearAuthStorage();
@@ -175,7 +141,7 @@ const useAuthStore = create<UseAuthProps>()(
                 isLoading: false,
               },
               false,
-              "logout/error"
+              "logout/error",
             );
 
             clearAuthStorage();
@@ -192,8 +158,10 @@ const useAuthStore = create<UseAuthProps>()(
           try {
             const res = await axios.get<ApiResponse<User>>(
               API_ENDPOINTS.CHECK_AUTH,
-              { withCredentials: true }
+              { withCredentials: true },
             );
+
+            console.log("Auth check response:", res.data);
 
             if (res.data.success && res.data.user) {
               set(
@@ -203,7 +171,7 @@ const useAuthStore = create<UseAuthProps>()(
                   isLoading: false,
                 },
                 false,
-                "checkAuth/success"
+                "checkAuth/success",
               );
             } else {
               set(
@@ -213,7 +181,7 @@ const useAuthStore = create<UseAuthProps>()(
                   isLoading: false,
                 },
                 false,
-                "checkAuth/notAuthenticated"
+                "checkAuth/notAuthenticated",
               );
               clearAuthStorage();
 
@@ -230,7 +198,7 @@ const useAuthStore = create<UseAuthProps>()(
                 isLoading: false,
               },
               false,
-              "checkAuth/error"
+              "checkAuth/error",
             );
 
             clearAuthStorage();
@@ -253,7 +221,7 @@ const useAuthStore = create<UseAuthProps>()(
                 isLoading: false,
               },
               false,
-              "deleteAccount/success"
+              "deleteAccount/success",
             );
 
             clearAuthStorage();
@@ -283,13 +251,13 @@ const useAuthStore = create<UseAuthProps>()(
           user: state.user,
           isAuthenticated: state.isAuthenticated,
         }),
-      }
+      },
     ),
     {
       name: "auth-store",
       enabled: process.env.NODE_ENV === "development",
-    }
-  )
+    },
+  ),
 );
 
 export default useAuthStore;

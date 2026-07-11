@@ -7,7 +7,8 @@ import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { signupSchema } from "@/lib/validations/auth";
 import { signingToken } from "@/lib/validations/jwtServices";
-import {  verifyEmailAddress } from "../../_services";
+import { generateEmailVerification, verifyEmailAddress } from "../../_services";
+import { publicUserSelect } from "@/db/selection";
 
 export async function POST(req: Request) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     if (!emailCheck.valid) {
       return NextResponse.json(
         { error: "Invalid email address" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     if (disifyData.disposable) {
       return NextResponse.json(
         { error: "Temporary email addresses are not allowed" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
     if (!validation || (typeof validation === "object" && !validation.valid)) {
       return NextResponse.json(
         { error: "Invalid email address" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
     if (existingUser.length > 0) {
       return NextResponse.json(
         { error: "User already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,13 +82,16 @@ export async function POST(req: Request) {
         email,
         password: hash,
       })
-      .returning();
+      .returning(publicUserSelect);
+
+    const token = await generateEmailVerification(newUser.id);
+
+    // TODO: Implement email sending logic here
+    // await sendVerificationEmail(newUser.email, token);
 
     const accessToken = signingToken({
       data: {
         id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
       },
       expireDays: "12h",
     });
@@ -95,13 +99,9 @@ export async function POST(req: Request) {
     const response = NextResponse.json(
       {
         success: true,
-        user: {
-          id: newUser.id,
-          name: newUser.name,
-          email: newUser.email,
-        },
+        user: newUser,
       },
-      { status: 201 }
+      { status: 201 },
     );
 
     response.cookies.set("FP-accessToken", accessToken, {
@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     console.error(error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

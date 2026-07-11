@@ -10,6 +10,13 @@
 }
 
 @layer base {
+
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+
   body {
     width: 100%;
     overflow-x: hidden;
@@ -34,9 +41,32 @@
 }
 
 @layer utilities {
+  /* dot pattern combined with your existing gradient */
   .bg-gradient-62 {
-    background: linear-gradient(60deg, var(--color-brown), var(--color-peach));
+    background-image:
+      radial-gradient(circle, rgba(56, 29, 42, 0.25) 1.5px, transparent 1.5px),
+      linear-gradient(60deg, var(--color-brown), var(--color-peach));
+    background-size: 18px 18px, 100% 100%;
+    background-position: 0 0, 0 0;
   }
+
+  /* alt: square grid pattern instead of dots */
+  .bg-gradient-62-grid {
+    background-image:
+      linear-gradient(rgba(56, 29, 42, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56, 29, 42, 0.1) 1px, transparent 1px),
+      linear-gradient(60deg, var(--color-brown), var(--color-peach));
+    background-size: 24px 24px, 24px 24px, 100% 100%;
+  }
+
+  /* alt: diagonal / checkered squares (denser, more "pattern"-y) */
+  .bg-gradient-62-checker {
+    background-image:
+      repeating-conic-gradient(rgba(56, 29, 42, 0.08) 0% 25%, transparent 0% 50%),
+      linear-gradient(60deg, var(--color-brown), var(--color-peach));
+    background-size: 20px 20px, 100% 100%;
+  }
+
 
   .max-7 {
     max-width: var(--container-7xl);
