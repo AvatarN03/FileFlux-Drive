@@ -5,9 +5,11 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { folders, usersTable, verificationTokens } from "@/db/schema";
-import { FolderPathNode } from "@/types/file";
+
 import { verifyToken } from "@/lib/validations/jwtServices";
 import cloudinary from "@/lib/cloudinary";
+
+import { FolderPathNode } from "@/types/file";
 
 export async function verifyAuth(): Promise<{ id: string }> {
   const cookieStore = await cookies();

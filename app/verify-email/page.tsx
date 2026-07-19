@@ -1,17 +1,22 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
-import Logo from "@/app/(main)/_components/Logo";
 import Image from "next/image";
-import useAuthStore from "@/context/useAuthStore";
+import { useRouter } from "next/navigation";
+
+import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
+
+import { useAuth } from "@/hooks/useAuth";
+
+import Logo from "@/app/(main)/_components/Logo";
+
 import { formatTime } from "@/lib/formatTime";
 
-type ResendState = "idle" | "sending" | "sent" | "error";
+import { ResendState } from "@/types/auth";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, resendVerification } = useAuth();
 
   const [resendState, setResendState] = useState<ResendState>("idle");
   const [resendMessage, setResendMessage] = useState<string | null>(null);
@@ -39,26 +44,21 @@ const VerifyEmailPage = () => {
     setResendMessage(null);
 
     try {
-      const res = await fetch("/api/auth/resend-verification", {
-        method: "POST"
-      });
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setResendState("error");
-        setResendMessage(data?.error || "Couldn't resend that email. Try again shortly.");
-        if (res.status === 429 && data?.retryAfterMs) {
-          startCooldown(data.retryAfterMs);
-        }
-        return;
-      }
+      const data = await resendVerification();
 
       setResendState("sent");
-      setResendMessage(null);
-      startCooldown(data?.cooldownMs ?? 60000);
-    } catch {
+      startCooldown(data.cooldownMs);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       setResendState("error");
-      setResendMessage("Something went wrong. Check your connection and try again.");
+
+      setResendMessage(
+        error.error ?? "Couldn't resend email."
+      );
+
+      if (error.retryAfterMs) {
+        startCooldown(error.retryAfterMs);
+      }
     }
   };
 
@@ -109,12 +109,12 @@ const VerifyEmailPage = () => {
 
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-2 mb-8 text-xs text-gray-300 max-w-xs mx-auto whitespace-nowrap">
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-slate-300" strokeWidth={2} />
+            <span className="flex items-center gap-1.5 text-emerald-400 ">
+              <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
               Account created
             </span>
             <span className="w-full h-px bg-gray-700" />
-            <span className="flex items-center gap-1.5 text-gray-200 font-medium">
+            <span className="flex items-center gap-1.5 text-peach font-medium">
               <MailCheck className="w-3.5 h-3.5" strokeWidth={2} />
               Verify email
             </span>
@@ -155,7 +155,7 @@ const VerifyEmailPage = () => {
                 <button
                   onClick={handleResend}
                   disabled={cooldown > 0 || resendState === "sending"}
-                  className="text-sm font-medium text-peach hover:text-brand-hover disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                  className="text-sm font-medium cursor-pointer text-peach hover:text-brown disabled:text-gray-500 disabled:cursor-not-allowed transition-colors px-4 py-2 rounded-md bg-neutral-800 border border-violet hover:border-green"
                 >
                   {resendState === "sending"
                     ? "Sending..."

@@ -1,12 +1,16 @@
-// app/auth/verify-email/[token]/page.tsx
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import Logo from "@/app/(main)/_components/Logo";
-import useAuthStore from "@/context/useAuthStore";
 
-type Status = "verifying" | "success" | "error";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+
+import { useAuth } from "@/hooks/useAuth";
+
+import Logo from "@/app/(main)/_components/Logo";
+
+import { Status } from "@/types/auth";
+
 
 const VerifyEmailTokenPage = () => {
   const [status, setStatus] = useState<Status>("verifying");
@@ -14,7 +18,7 @@ const VerifyEmailTokenPage = () => {
   const hasRun = useRef(false);
   const router = useRouter();
   const params = useParams<{ token: string }>();
-  const { checkAuth } = useAuthStore();
+  const { verifyEmail } = useAuth();
 
   useEffect(() => {
     // Guard against React strict-mode double-invoking effects in dev,
@@ -32,34 +36,41 @@ const VerifyEmailTokenPage = () => {
       }
 
       try {
-        const res = await fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
-          method: "POST",
-        });
 
-        const data = await res.json().catch(() => null);
+        const result = await verifyEmail(token);
 
-        if (!res.ok) {
+
+        if (!result.success) {
           setStatus("error");
-          setMessage(data?.message || "This link is invalid or has expired.");
+          setMessage(
+            "This link is invalid or has expired."
+          );
           return;
         }
 
+
         setStatus("success");
-        // Refresh whatever auth/session state the app holds so the user
-        // is immediately recognized as verified without a manual reload.
-        await checkAuth();
+
 
         setTimeout(() => {
           router.push("/dashboard");
         }, 1800);
-      } catch {
+
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+
         setStatus("error");
-        setMessage("Something went wrong. Check your connection and try again.");
+        setMessage(
+          error?.message ||
+          "Something went wrong. Check your connection and try again."
+        );
+
       }
     };
 
     verify();
-  }, [params?.token, checkAuth, router]);
+  }, [params?.token, verifyEmail, router]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-950 px-4">
@@ -110,9 +121,9 @@ const VerifyEmailTokenPage = () => {
               </p>
               <button
                 onClick={() => router.push("/auth")}
-                className="text-sm font-medium text-brand hover:text-brand-hover transition-colors"
+                className="text-sm font-medium text-peach hover:text-brown transition-colors cursor-pointer"
               >
-                Back to login
+                Back to Dashboard
               </button>
             </>
           )}

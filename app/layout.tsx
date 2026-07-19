@@ -12,8 +12,10 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "FileFlux - FileUploader Platform",
-  description: "The ultimate file uploader platform.",
+  title: "FileFlux - Drive",
+  description: "A cloud storage solution for your files and folders.",
+  keywords: ["cloud storage", "file management", "folders", "files", "drive"],
+  authors: [{ name: "AvatarN03" }],
   icons: {
     icon: "logo.png"
   }

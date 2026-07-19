@@ -1,12 +1,12 @@
-// app/api/auth/google/route.ts
-
 import { NextResponse } from "next/server";
+
 import { OAuth2Client } from "google-auth-library";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
+
 import { signingToken } from "@/lib/validations/jwtServices";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

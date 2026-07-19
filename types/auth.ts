@@ -49,3 +49,8 @@ export interface ApiError {
   error?: string;
   message?: string;
 }
+
+
+export type ResendState = "idle" | "sending" | "sent" | "error";
+
+export type Status = "verifying" | "success" | "error";

@@ -4,22 +4,23 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { GoogleLogin } from "@react-oauth/google";
+import { CredentialResponse } from "@react-oauth/google";
+
+import { useAuth } from "@/hooks/useAuth";
+
 import Logo from "../(main)/_components/Logo";
 import LoginForm from "./_component/LoginForm";
 import SignupForm from "./_component/SignupForm";
 
-import useAuthStore from "@/context/useAuthStore";
-import { GoogleLogin } from "@react-oauth/google";
 import toastC from "@/lib/toast";
-import { CredentialResponse } from "@react-oauth/google";
-
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const { isAuthenticated, checkAuth, isLoading, user } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLogin, setIsLogin] = useState(true);
   const continueTo = searchParams.get("continueTo");
+  const { isAuthenticated, isLoading, user, googleLogin } = useAuth();
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);
@@ -43,35 +44,45 @@ const AuthPage = () => {
     router.push(redirectPath);
   }, [isLoading, isAuthenticated, user, continueTo, router]);
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = async (
+    credentialResponse: CredentialResponse
+  ) => {
+
     try {
+
       if (!credentialResponse.credential) {
-        toastC({ data: "Unable to login.", type: "error" });
+        toastC({
+          data: "Unable to login.",
+          type: "error"
+        });
         return;
       }
 
-      const res = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          credential: credentialResponse.credential,
-        }),
-      });
 
-      const data = await res.json();
+      const result = await googleLogin(
+        credentialResponse.credential
+      );
 
-      if (!data.success) {
-        toastC({ data: data.error, type: "error" });
+
+      if (!result.success) {
+        toastC({
+          data: result.error,
+          type: "error"
+        });
         return;
       }
 
-      await checkAuth();
 
       router.push("/dashboard");
+
+
     } catch {
-      toastC({ data: "Google Sign In failed", type: "error" });
+
+      toastC({
+        data: "Google Sign In failed",
+        type: "error"
+      });
+
     }
   };
 
@@ -118,15 +129,15 @@ const AuthPage = () => {
               />
             </div>
 
-              <p className="font-light text-sm my-4 whitespace-nowrap text-center">
-                {isLogin ? "Don't have an Account?" : "Already have an Account?"}
+            <p className="font-light text-sm my-4 whitespace-nowrap text-center">
+              {isLogin ? "Don't have an Account?" : "Already have an Account?"}
               <button
                 onClick={handleSwitch}
                 className="font-semibold hover:underline cursor-pointer mx-1 underline underline-offset-2 hover:text-brown"
-                >
+              >
                 {isLogin ? "Sign Up" : "Login"}
               </button>
-                </p>
+            </p>
           </div>
 
           {/* Right: Image Section */}

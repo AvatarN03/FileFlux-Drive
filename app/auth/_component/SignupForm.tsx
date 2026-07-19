@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 
-import useAuthStore from "@/context/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
+
 import { signupSchema } from "@/lib/validations/auth";
 import toastC from "@/lib/toast";
+
 import { TOAST_MESSAGES } from "@/constant";
 
 const SignupForm = () => {
@@ -13,7 +15,7 @@ const SignupForm = () => {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
 
-  const { signup, isLoading } = useAuthStore();
+  const { signup, isLoading } = useAuth();
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();

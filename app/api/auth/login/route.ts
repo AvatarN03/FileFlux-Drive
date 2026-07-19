@@ -5,11 +5,14 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
+import { publicUserSelect } from "@/db/selection";
+
 import { loginSchema } from "@/lib/validations/auth";
 import { signingToken } from "@/lib/validations/jwtServices";
-import { publicUserSelect } from "@/db/selection";
-import { generateEmailVerification } from "../../_services";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
+
+import { generateEmailVerification } from "../../_services";
+
 import { COOLDOWN_MS } from "@/constant";
 
 

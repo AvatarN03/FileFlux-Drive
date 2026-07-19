@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
+
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { validate } from "deep-email-validator";
 
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
+import { publicUserSelect } from "@/db/selection";
+
 import { signupSchema } from "@/lib/validations/auth";
 import { signingToken } from "@/lib/validations/jwtServices";
-import { generateEmailVerification, verifyEmailAddress } from "../../_services";
-import { publicUserSelect } from "@/db/selection";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
+
+import { generateEmailVerification, verifyEmailAddress } from "../../_services";
 
 export async function POST(req: Request) {
   try {

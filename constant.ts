@@ -154,6 +154,8 @@ export const API_ENDPOINTS = {
   SIGNUP: "/api/auth/signup",
   LOGOUT: "/api/auth/logout",
   CHECK_AUTH: "/api/auth/protected",
+  VERIFICATION_MAIL: "/api/auth/resend-verification",
+  VERIFY_EMAIL: "/api/auth/verify-email",
   DELETE_ACCOUNT: "/api/auth/delete",
   CHECK_STORAGE: "/api/files/checkStorage",
   UPLOAD: "/api/files/upload",

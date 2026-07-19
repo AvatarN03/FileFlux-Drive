@@ -3,16 +3,17 @@
 import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 
-import useAuthStore from "@/context/useAuthStore";
+import { useAuth } from "@/hooks/useAuth";
+
+import { loginSchema } from "@/lib/validations/auth";
 import toastC from "@/lib/toast";
 import { TOAST_MESSAGES } from "@/constant";
-import { loginSchema } from "@/lib/validations/auth";
 
 const LoginForm = () => {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
 
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading } = useAuth();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();

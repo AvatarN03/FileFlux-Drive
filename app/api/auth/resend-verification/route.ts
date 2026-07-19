@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
-import { generateEmailVerification, getAuthUser } from "../../_services";
-import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
-import { COOLDOWN_MS } from "@/constant";
+
+import { eq } from "drizzle-orm";
+
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+
+import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
+
+import { generateEmailVerification, getAuthUser } from "../../_services";
+
+import { COOLDOWN_MS } from "@/constant";
 
 
 export async function POST() {
