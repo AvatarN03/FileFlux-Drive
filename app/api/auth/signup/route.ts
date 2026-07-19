@@ -9,6 +9,7 @@ import { signupSchema } from "@/lib/validations/auth";
 import { signingToken } from "@/lib/validations/jwtServices";
 import { generateEmailVerification, verifyEmailAddress } from "../../_services";
 import { publicUserSelect } from "@/db/selection";
+import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
 
 export async function POST(req: Request) {
   try {
@@ -81,13 +82,13 @@ export async function POST(req: Request) {
         name,
         email,
         password: hash,
+        lastVerificationEmailSentAt: new Date(),
       })
       .returning(publicUserSelect);
 
     const token = await generateEmailVerification(newUser.id);
 
-    // TODO: Implement email sending logic here
-    // await sendVerificationEmail(newUser.email, token);
+    await sendVerificationEmail(newUser.email, token);
 
     const accessToken = signingToken({
       data: {

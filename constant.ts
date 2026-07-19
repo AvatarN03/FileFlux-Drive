@@ -163,6 +163,7 @@ export const TOAST_MESSAGES = {
   LOGIN_SUCCESS: "Login successful 🎉",
   LOGIN_FAILED: "Login failed",
   SIGNUP_SUCCESS: "Account created successfully 🎉",
+  FIELDS_INVALID: "Field/s are invalid",
   SIGNUP_FAILED: "Signup failed",
   LOGOUT_SUCCESS: "Logged out successfully 👋",
   LOGOUT_FAILED: "Logout failed",
@@ -173,3 +174,5 @@ export const TOAST_MESSAGES = {
 } as const;
 
 export const STORAGE_KEY = "FP-storage";
+
+export const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes in milliseconds

@@ -2,7 +2,7 @@
 export type ApiResponse<T = unknown> = {
   success: boolean;
   status?: number;
-  user?: T;            // renamed from `user` → more reusable
+  user?: T; // renamed from `user` → more reusable
   error?: string;
 };
 
@@ -15,9 +15,14 @@ export interface AuthCredentials {
 
 // User model
 export interface User {
+  id: string;
   name: string;
   email: string;
-  createdAt: string; // keep string (API safe)
+  emailVerified: boolean;
+  storageUsed: number;
+  storageLimit: number;
+  lastLoginAt: Date;
+  createdAt: Date;
 }
 
 // Auth store / hook interface

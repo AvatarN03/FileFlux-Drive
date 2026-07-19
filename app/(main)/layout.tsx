@@ -20,7 +20,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // ✅ Run auth check once
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -41,10 +41,9 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }
 
   const linkClass = (path: string) =>
-    `p-1 rounded flex items-center gap-1 ${
-      pathname === path
-        ? "bg-violet text-peach"
-        : "text-violet hover:bg-brown bg-brown/70"
+    `p-1 rounded flex items-center gap-1 ${pathname === path
+      ? "bg-violet text-peach"
+      : "text-violet hover:bg-brown bg-brown/70"
     }`;
 
   return (

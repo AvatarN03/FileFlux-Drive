@@ -26,6 +26,7 @@ export const usersTable = pgTable(
     avatarUrl: text("avatar_url"),
     emailVerified: boolean("email_verified").default(false).notNull(),
     lastLoginAt: timestamp("last_login_at"),
+    lastVerificationEmailSentAt: timestamp("last_verification_email_sent_at"),
     storageUsed: bigint("storage_used", {
       mode: "number",
     })

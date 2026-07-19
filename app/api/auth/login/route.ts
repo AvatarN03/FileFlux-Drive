@@ -9,6 +9,9 @@ import { loginSchema } from "@/lib/validations/auth";
 import { signingToken } from "@/lib/validations/jwtServices";
 import { publicUserSelect } from "@/db/selection";
 import { generateEmailVerification } from "../../_services";
+import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
+import { COOLDOWN_MS } from "@/constant";
+
 
 
 export async function POST(req: Request) {
@@ -26,21 +29,32 @@ export async function POST(req: Request) {
 
     const { email, password } = parsed.data;
 
-    const existingUser = await db
+    const [existingUser] = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, email));
-    if (existingUser.length === 0) {
+    if (!existingUser) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 },
       );
     }
 
-    const user = existingUser[0];
+    if (!existingUser.password) {
+      return NextResponse.json(
+        {
+          error:
+            "This account uses Google Sign-In. Continue with Google, or set a password from your account settings first.",
+        },
+        { status: 401 },
+      );
+    }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      existingUser.password,
+    );
     if (!isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid email or password" },
@@ -48,25 +62,40 @@ export async function POST(req: Request) {
       );
     }
 
+    const now = new Date();
+
+    const updateData: {
+      lastLoginAt: Date;
+      lastVerificationEmailSentAt?: Date;
+    } = {
+      lastLoginAt: now,
+    };
+
+    if (!existingUser.emailVerified) {
+      const canSend =
+        !existingUser.lastVerificationEmailSentAt ||
+        now.getTime() - existingUser.lastVerificationEmailSentAt.getTime() >=
+          COOLDOWN_MS;
+
+      if (canSend) {
+        const token = await generateEmailVerification(existingUser.id);
+
+        await sendVerificationEmail(existingUser.email, token);
+
+        updateData.lastVerificationEmailSentAt = now;
+      }
+    }
+
     const [updatedUser] = await db
       .update(usersTable)
-      .set({
-        lastLoginAt: new Date(),
-      })
-      .where(eq(usersTable.id, user.id))
+      .set(updateData)
+      .where(eq(usersTable.id, existingUser.id))
       .returning(publicUserSelect);
-
-    if (!user.emailVerified) {
-    const token = await generateEmailVerification(user.id);
-
-    // TODO: Implement email sending logic here
-    // await sendVerificationEmail(user.email, token);
-    }
 
     // Generate access token
     const accessToken = signingToken({
       data: {
-        id: user.id,
+        id: existingUser.id,
       },
       expireDays: "12h",
     });

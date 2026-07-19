@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
 
 import useAuthStore from "@/context/useAuthStore";
@@ -13,7 +12,6 @@ const SignupForm = () => {
   const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const router = useRouter();
 
   const { signup, isLoading } = useAuthStore();
 
@@ -33,16 +31,23 @@ const SignupForm = () => {
       return;
     }
 
-    await signup(parsed.data);
-
-    const result = await signup({ name, email, password });
+    const result = await signup(parsed.data);
 
     if (result.success) {
-      console.log("Signup successful!");
-      router.push("/dashboard");
+      toastC({
+        type: "success",
+        data: TOAST_MESSAGES.SIGNUP_SUCCESS,
+      });
+
+      setName("");
+      setEmail("");
+      setPassword("");
     } else {
       console.error("Signup failed:", result.error);
-
+      toastC({
+        type: "error",
+        data: result.error || TOAST_MESSAGES.SIGNUP_FAILED,
+      });
     }
   }
 

@@ -16,7 +16,7 @@ import { CredentialResponse } from "@react-oauth/google";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
+  const { isAuthenticated, checkAuth, isLoading, user } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const continueTo = searchParams.get("continueTo");
@@ -25,20 +25,23 @@ const AuthPage = () => {
     setIsLogin(!isLogin);
   };
 
-  // useEffect(() => {
-  //   checkAuth();
-  // }, []);
-
   useEffect(() => {
     if (isLoading) return;
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !user) return;
 
+    // Redirect to verify email if not verified
+    if (!user.emailVerified) {
+      router.push("/verify-email");
+      return;
+    }
+
+    // Otherwise continue or go to dashboard
     const redirectPath = continueTo
       ? decodeURIComponent(continueTo)
       : "/dashboard";
 
     router.push(redirectPath);
-  }, [isLoading, isAuthenticated, continueTo, router]);
+  }, [isLoading, isAuthenticated, user, continueTo, router]);
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
@@ -115,17 +118,15 @@ const AuthPage = () => {
               />
             </div>
 
-            <div className="text-center text-sm mt-8 flex items-center justify-center">
-              <p className="font-light">
+              <p className="font-light text-sm my-4 whitespace-nowrap text-center">
                 {isLogin ? "Don't have an Account?" : "Already have an Account?"}
-              </p>
               <button
                 onClick={handleSwitch}
                 className="font-semibold hover:underline cursor-pointer mx-1 underline underline-offset-2 hover:text-brown"
-              >
+                >
                 {isLogin ? "Sign Up" : "Login"}
               </button>
-            </div>
+                </p>
           </div>
 
           {/* Right: Image Section */}

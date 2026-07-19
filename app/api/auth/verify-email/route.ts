@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { usersTable, verificationTokens } from "@/db/schema";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const token = req.nextUrl.searchParams.get("token");
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
           success: false,
           error: "Missing verification token.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -27,10 +27,7 @@ export async function GET(req: NextRequest) {
         emailVerified: usersTable.emailVerified,
       })
       .from(verificationTokens)
-      .innerJoin(
-        usersTable,
-        eq(verificationTokens.userId, usersTable.id)
-      )
+      .innerJoin(usersTable, eq(verificationTokens.userId, usersTable.id))
       .where(eq(verificationTokens.token, token));
 
     if (!verification) {
@@ -39,7 +36,7 @@ export async function GET(req: NextRequest) {
           success: false,
           error: "Invalid verification link.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +51,7 @@ export async function GET(req: NextRequest) {
           success: false,
           error: "Verification link has expired.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -70,18 +67,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    await db.transaction(async (tx) => {
-      await tx
-        .update(usersTable)
-        .set({
-          emailVerified: true,
-        })
-        .where(eq(usersTable.id, verification.userId));
+    await db
+      .update(usersTable)
+      .set({
+        emailVerified: true,
+      })
+      .where(eq(usersTable.id, verification.userId));
 
-      await tx
-        .delete(verificationTokens)
-        .where(eq(verificationTokens.id, verification.verificationId));
-    });
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.id, verification.verificationId));
 
     return NextResponse.json({
       success: true,
@@ -97,7 +92,7 @@ export async function GET(req: NextRequest) {
       },
       {
         status: 500,
-      }
+      },
     );
   }
 }

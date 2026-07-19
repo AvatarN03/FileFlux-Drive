@@ -7,6 +7,7 @@ export const publicUserSelect = {
   emailVerified: usersTable.emailVerified,
   storageUsed: usersTable.storageUsed,
   storageLimit: usersTable.storageLimit,
+  lastVerificationEmailSentAt: usersTable.lastVerificationEmailSentAt,
   lastLoginAt: usersTable.lastLoginAt,
   createdAt: usersTable.createdAt,
 };

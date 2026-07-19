@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
 
 import useAuthStore from "@/context/useAuthStore";
@@ -12,7 +11,6 @@ import { loginSchema } from "@/lib/validations/auth";
 const LoginForm = () => {
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const router = useRouter();
 
   const { login, isLoading } = useAuthStore();
 
@@ -39,12 +37,6 @@ const LoginForm = () => {
 
       setEmail("");
       setPassword("");
-
-      if (result.user && !result.user.emailVerified) {
-        router.push(`/verify-email`);
-      } else {
-        router.push("/dashboard");
-      }
     } else {
       console.error("Login failed:", result.error);
       toastC({

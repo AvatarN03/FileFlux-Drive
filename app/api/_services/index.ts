@@ -11,7 +11,6 @@ import cloudinary from "@/lib/cloudinary";
 
 export async function verifyAuth(): Promise<{ id: string }> {
   const cookieStore = await cookies();
-  console.log("touch-1")
 
   const token = cookieStore.get("FP-accessToken")?.value;
 
@@ -30,7 +29,6 @@ export async function verifyAuth(): Promise<{ id: string }> {
 
 export async function getAuthUser() {
   const { id } = await verifyAuth();
-    console.log("touch-2")
 
 
   const [user] = await db
@@ -67,33 +65,33 @@ export async function generateEmailVerification(userId: string) {
   return token;
 }
 
-// export async function buildFolderPath(
-//   folderId: number,
-//   userId: number
-// ): Promise<{ id: number; name: string }[]> {
-//   const path: { id: number; name: string }[] = [];
-//   let currentId: number | null = folderId;
+export async function buildFolderPath(
+  folderId: number,
+  userId: number
+): Promise<{ id: number; name: string }[]> {
+  const path: { id: number; name: string }[] = [];
+  let currentId: number | null = folderId;
 
-//   while (currentId !== null) {
-//     const folder: FolderPathNode | undefined = await db.query.folders.findFirst(
-//       {
-//         where: and(eq(folders.id, currentId), eq(folders.user_id, userId)),
-//         columns: {
-//           id: true,
-//           name: true,
-//           parentId: true,
-//         },
-//       }
-//     );
+  while (currentId !== null) {
+    const folder: FolderPathNode | undefined = await db.query.folders.findFirst(
+      {
+        where: and(eq(folders.id, currentId), eq(folders.user_id, userId)),
+        columns: {
+          id: true,
+          name: true,
+          parentId: true,
+        },
+      }
+    );
 
-//     if (!folder) break;
+    if (!folder) break;
 
-//     path.unshift({ id: folder.id, name: folder.name });
-//     currentId = folder.parentId;
-//   }
+    path.unshift({ id: folder.id, name: folder.name });
+    currentId = folder.parentId;
+  }
 
-//   return path;
-// }
+  return path;
+}
 
 export async function deleteFromCloudinary(publicId: string) {
   try {
