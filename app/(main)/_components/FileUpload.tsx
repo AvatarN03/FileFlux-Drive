@@ -1,30 +1,34 @@
-// components/FileUpload/FileUpload.tsx
+
 "use client";
 
-import React, { useRef, useState, ChangeEvent, useCallback } from "react";
+import React, { useRef, useState, ChangeEvent, useCallback, useEffect } from "react";
 import { useParams } from "next/navigation";
 
-import axios from "axios";
 
 import { toastError } from "@/lib/toast";
-import useFileStore from "@/context/useFileStore";
-import getFileNameWithoutExtension from "@/lib/file/getFileNameWithoutExtension";
-import createRenamedFile from "@/lib/file/createRenamedFile";
+
 import UploadArea from "./files/UploadArea";
 import FilePreview from "./files/FilePreview";
 import { UploadState } from "@/types/ui";
-import { API_ENDPOINTS, INITIAL_STATE } from "@/constant";
-import Link from "next/link";
+import { canUploadFile, createRenamedFile, getFileNameWithoutExtension } from "@/lib/file";
+import { INITIAL_STATE } from "@/constant";
+import { useAuth } from "@/hooks/useAuth";
+import { useFileMutations } from "@/hooks/useFileMutations";
+import axios from "axios";
 
 
 
 const FileUpload = () => {
   const fileRef = useRef<HTMLInputElement>(null);
+  const params = useParams();
+  const folderId = params.folderId as string | undefined ?? null;
+
   const [state, setState] = useState<UploadState>(INITIAL_STATE);
 
-  const { addFile, checkStorage } = useFileStore();
-  const params = useParams();
-  const folderId = params.folderId ? Number(params.folderId) : null;
+  const { user } = useAuth();
+  const { upload } = useFileMutations();
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const updateState = useCallback((updates: Partial<UploadState>) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -35,10 +39,12 @@ const FileUpload = () => {
     if (fileRef.current) {
       fileRef.current.value = "";
     }
+    abortControllerRef.current = null;
   }, []);
 
   const handleFileSelect = useCallback(
     (selectedFile: File) => {
+      if (state.isUploading) return;
       const fileName = getFileNameWithoutExtension(selectedFile);
       updateState({
         file: selectedFile,
@@ -48,17 +54,18 @@ const FileUpload = () => {
         isEditingFileName: false,
       });
     },
-    [updateState]
+    [updateState, state.isUploading]
   );
 
   const handleFileChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
+      if (state.isUploading) return;
       const selected = e.target.files?.[0];
       if (selected) {
         handleFileSelect(selected);
       }
     },
-    [handleFileSelect]
+    [handleFileSelect, state.isUploading]
   );
 
   const handleDragOver = useCallback(
@@ -76,6 +83,7 @@ const FileUpload = () => {
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
+      if (state.isUploading) return;
       const dropped = e.dataTransfer.files[0];
 
       if (dropped) {
@@ -84,108 +92,101 @@ const FileUpload = () => {
 
       updateState({ isDragging: false });
     },
-    [handleFileSelect, updateState]
+    [handleFileSelect, updateState, state.isUploading]
   );
 
-  const checkStorageAvailability = async (
-    fileSize: number
-  ): Promise<boolean> => {
-    try {
-      const { data } = await axios.get(API_ENDPOINTS.CHECK_STORAGE, {
-        params: { size: fileSize },
-      });
-
-      if (!data.canUpload) {
-        toastError("Storage limit exceeded");
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Storage check failed:", error);
-      toastError("Failed to check storage availability");
-      return false;
-    }
-  };
-
   const handleUpload = useCallback(async () => {
-    if (!state.file) return;
+    if (!state.file || !user) return;
 
-    // Check storage before uploading
-    const canUpload = await checkStorageAvailability(state.file.size);
-    if (!canUpload) {
-      resetState();
+    // Storage check
+    if (canUploadFile(state.file, user) === false) {
+      toastError("Storage limit exceeded.");
       return;
     }
 
-    // Prepare file and form data
-    const renamedFile = createRenamedFile(state.file, state.fileName);
-    const formData = new FormData();
-    formData.append("file", renamedFile);
-
-    if (folderId) {
-      formData.append("folderId", folderId.toString());
+    if (!state.fileName.trim()) {
+      toastError("Filename cannot be empty");
+      return;
     }
 
-    try {
-      updateState({ isUploading: true, uploadProgress: 0 });
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
-      const { data } = await axios.post(API_ENDPOINTS.UPLOAD, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const progress = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            updateState({ uploadProgress: progress });
-          }
+    try {
+      updateState({
+        isUploading: true,
+      });
+
+
+      const renamedFile = createRenamedFile(
+        state.file,
+        state.fileName.trim()
+      );
+
+      await upload.mutateAsync({
+        file: renamedFile,
+        folderId,
+        signal: controller.signal,
+        onProgress: (progress) => {
+          updateState({ uploadProgress: progress });
         },
       });
 
-      // Update store
-      addFile(data.file);
-      await checkStorage();
+      updateState({
+        uploadComplete: true,
+        uploadProgress: 0,
+      });
 
-      // Show completion briefly, then reset
-      updateState({ uploadComplete: true });
-
-      setTimeout(() => {
-        resetState();
-      }, 1000);
+      timeoutRef.current = setTimeout(resetState, 1000);
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error(error);
+      if (axios.isCancel(error) || (error as { code?: string })?.code === "ERR_CANCELED") {
+        resetState();
+        return;
+      }
+
       toastError("Failed to upload file");
+
       resetState();
+    } finally {
+      abortControllerRef.current = null;
     }
   }, [
     state.file,
     state.fileName,
+    user,
     folderId,
-    addFile,
-    checkStorage,
+    upload,
     updateState,
     resetState,
   ]);
 
+  const handleCancelUpload = useCallback(() => {
+    abortControllerRef.current?.abort();
+    // resetState() also runs in the catch block above once the
+    // aborted request rejects, but we flip isUploading immediately
+    // so the UI feels instant rather than waiting on the promise.
+    updateState({ isUploading: false, uploadProgress: 0 });
+  }, [updateState]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      abortControllerRef.current?.abort();
+    };
+  }, []);
+
   return (
-    <div className="max-w-92 w-full mx-auto h-auto rounded-xl p-2 md:p-3 bg-ember">
-      <div className="w-full rounded-xl p-3 bg-peach">
-      
-      <div className="bg-violet rounded-md w-full min-h-12 p-2 text-center text-peach">
-        <h4>The Upload Functionality is paused due to free tier limitations</h4>
-        <Link href="https://youtu.be/W5v5CXdyn74" target="_blank" className="underline font-semibold mt-1 block text-brown hover:text-ember">
-          Demo Video
-        </Link>
-      </div>
+    <div className="relative max-w-92 w-full mx-auto min-h-64  rounded-lg p-2 bg-ember">
+      <div className="w-full rounded-xl p-2 bg-peach h-full flex flex-col">
 
-
-        <h1 className="text-violet text-center text-xl md:text-2xl my-2 font-medium border-b-violet border-b-2 max-w-64 shadow-xl mx-auto">
+        <h1 className="text-violet text-center text-xl md:text-2xl font-medium border-b-violet border-b-2 max-w-64 shadow-xl mx-auto">
           Upload
         </h1>
 
         <div
-          className={`relative border-2 border-dashed rounded-xl p-1 md:p-2 w-full cursor-pointer transition-colors
-            ${state.isDragging ? "border-ember bg-ember/5" : "border-gray-300"}
+          className={`relative border-2 border-dashed rounded-xl p-1 w-full cursor-pointer transition-colors flex-1
+            ${state.isDragging ? "border-ember bg-ember/5" : "border-brown"}
           `}
           onClick={() => !state.file && fileRef.current?.click()}
           onDragOver={handleDragOver}
@@ -218,6 +219,7 @@ const FileUpload = () => {
               }
               onReset={resetState}
               onUpload={handleUpload}
+              onCancelUpload={handleCancelUpload}
             />
           )}
         </div>

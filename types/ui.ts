@@ -193,4 +193,14 @@ export interface FilePreviewProps {
   onToggleEdit: VoidFn;
   onReset: VoidFn;
   onUpload: VoidFn;
+  onCancelUpload: VoidFn;
 }
+
+// ----------------
+
+export type NavSection = {
+  key: string;
+  icon: LucideIcon;
+  label: string;
+  href: string;
+};

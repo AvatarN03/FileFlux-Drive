@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { API_ENDPOINTS, TOAST_MESSAGES } from "@/constant";
+import { AUTH_API_ENDPOINTS, TOAST_MESSAGES } from "@/constant";
 
 import toastC from "@/lib/toast";
 import getErrorMessage from "@/lib/file/getErrorMessage";
@@ -11,12 +11,14 @@ import type { ApiResponse, User, AuthCredentials } from "@/types/auth";
 
 const authApi = {
   async checkAuth(): Promise<User | null> {
-    const res = await fetch(API_ENDPOINTS.CHECK_AUTH, {
+    const res = await fetch(AUTH_API_ENDPOINTS.CHECK_AUTH, {
       credentials: "include",
       cache: "no-store",
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      return null;
+    }
 
     const data: ApiResponse<User> = await res.json();
 
@@ -24,7 +26,7 @@ const authApi = {
   },
 
   async login(credentials: AuthCredentials): Promise<User> {
-    const res = await fetch(API_ENDPOINTS.LOGIN, {
+    const res = await fetch(AUTH_API_ENDPOINTS.LOGIN, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -43,7 +45,7 @@ const authApi = {
   },
 
   async signup(credentials: AuthCredentials): Promise<User> {
-    const res = await fetch(API_ENDPOINTS.SIGNUP, {
+    const res = await fetch(AUTH_API_ENDPOINTS.SIGNUP, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -62,7 +64,7 @@ const authApi = {
   },
 
   async logout() {
-    const res = await fetch(API_ENDPOINTS.LOGOUT, {
+    const res = await fetch(AUTH_API_ENDPOINTS.LOGOUT, {
       method: "POST",
       credentials: "include",
     });
@@ -73,7 +75,7 @@ const authApi = {
   },
 
   async resendVerification() {
-    const res = await fetch(API_ENDPOINTS.VERIFICATION_MAIL, {
+    const res = await fetch(AUTH_API_ENDPOINTS.VERIFICATION_MAIL, {
       method: "POST",
       credentials: "include",
     });
@@ -89,7 +91,7 @@ const authApi = {
 
   async verifyEmail(token: string) {
     const res = await fetch(
-      `${API_ENDPOINTS.VERIFY_EMAIL}?token=${encodeURIComponent(token)}`,
+      `${AUTH_API_ENDPOINTS.VERIFY_EMAIL}?token=${encodeURIComponent(token)}`,
       {
         method: "POST",
         credentials: "include",
@@ -127,7 +129,7 @@ const authApi = {
   },
 
   async deleteAccount() {
-    const res = await fetch(API_ENDPOINTS.DELETE_ACCOUNT, {
+    const res = await fetch(AUTH_API_ENDPOINTS.DELETE_ACCOUNT, {
       method: "DELETE",
       credentials: "include",
     });

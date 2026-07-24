@@ -1,3 +1,6 @@
+import { usersTable } from "@/db/schema";
+import { InferSelectModel } from "drizzle-orm";
+
 // Generic API response
 export type ApiResponse<T = unknown> = {
   success: boolean;
@@ -11,18 +14,6 @@ export interface AuthCredentials {
   name?: string;
   email: string;
   password: string;
-}
-
-// User model
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  storageUsed: number;
-  storageLimit: number;
-  lastLoginAt: Date;
-  createdAt: Date;
 }
 
 // Auth store / hook interface
@@ -54,3 +45,18 @@ export interface ApiError {
 export type ResendState = "idle" | "sending" | "sent" | "error";
 
 export type Status = "verifying" | "success" | "error";
+
+export type User = InferSelectModel<typeof usersTable>;
+
+export type PublicUser = {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  emailVerified: boolean;
+  storageUsed: number;
+  storageLimit: number;
+  lastVerificationEmailSentAt: Date | null;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+};

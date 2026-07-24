@@ -89,14 +89,12 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 
-import { Files, Folders, LayoutDashboard, Menu } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 
 import Header from "./_components/Header";
-import FileUpload from "./_components/FileUpload";
-import Storage from "./_components/Storage";
+
 
 import Loading from "../_uiParts/Loading";
 
@@ -130,19 +128,18 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <div className="relative w-screen min-h-screen overflow-x-hidden bg-gradient-62 flex items-center">
+    <div className="relative w-screen min-h-screen overflow-x-hidden bg-gradient-62 flex max-w-500 mx-auto">
 
-       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col">
-        <header className="md:hidden flex items-center p-3 border-b border-neutral-800">
-          <button onClick={() => setSidebarOpen(true)} className="p-2">
-            <Menu className="w-6 h-6" />
-          </button>
-        </header>
 
-        <main className="flex-1 overflow-y-auto bg-neutral-950 p-6">{children}</main>
-      </div>
+      <main className="flex-1 flex flex-col min-w-0 space-y-4 bg-neutral-800">
+        <Header user={user!} onOpen={() => setSidebarOpen(true)} />
+        <div className="p-2 md:p-4 lg:p-6">
+          {children}
+        </div>
+      </main>
+
     </div>
   );
 };

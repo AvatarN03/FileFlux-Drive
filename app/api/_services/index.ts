@@ -67,6 +67,59 @@ export async function generateEmailVerification(userId: string) {
   return token;
 }
 
+export function getThumbnailUrl(
+  upload: UploadApiResponse
+): string | null {
+  // Images
+  if (upload.resource_type === "image") {
+    return cloudinary.url(upload.public_id, {
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ],
+    });
+  }
+
+  // Videos
+  if (upload.resource_type === "video") {
+    return cloudinary.url(upload.public_id, {
+      resource_type: "video",
+      format: "jpg",
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+        },
+      ],
+    });
+  }
+
+  // PDFs
+  if (upload.format?.toLowerCase() === "pdf") {
+    return cloudinary.url(upload.public_id, {
+      resource_type: "image",
+      format: "jpg",
+      page: 1,
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+        },
+      ],
+    });
+  }
+
+  return null;
+}
+
+
 export async function buildFolderPath(
   folderId: number,
   userId: number
@@ -121,6 +174,7 @@ export async function deleteFromCloudinary(publicId: string) {
 // utils/verifyEmail.ts
 import emailValidator from "node-email-verifier";
 import { publicUserSelect } from "@/db/selection";
+import { UploadApiResponse } from "cloudinary";
 
 export async function verifyEmailAddress(email: string) {
   try {
