@@ -1,27 +1,124 @@
 import { cookies } from "next/headers";
+import crypto from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { folders } from "@/db/schema";
-import { FolderPathNode } from "@/types/file";
+import { folders, usersTable, verificationTokens } from "@/db/schema";
+
 import { verifyToken } from "@/lib/validations/jwtServices";
 import cloudinary from "@/lib/cloudinary";
 
-export async function getAuthUser() {
+import { FolderPathNode } from "@/types/file";
+
+export async function verifyAuth(): Promise<{ id: string }> {
   const cookieStore = await cookies();
-  const tokenCookie = cookieStore.get("FP-accessToken");
 
-  if (!tokenCookie?.value) {
+  const token = cookieStore.get("FP-accessToken")?.value;
+
+  if (!token) {
     throw new Error("UNAUTHORIZED");
   }
 
-  try {
-    return verifyToken(tokenCookie.value).value as { id: number };
-  } catch {
+  const verified = verifyToken(token);
+
+  if (!verified.valid || !verified.value) {
     throw new Error("UNAUTHORIZED");
   }
+
+  return verified.value as { id: string };
 }
+
+export async function getAuthUser() {
+  const { id } = await verifyAuth();
+
+
+  const [user] = await db
+    .select(publicUserSelect)
+    .from(usersTable)
+    .where(eq(usersTable.id, id));
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  return user;
+}
+
+export async function generateEmailVerification(userId: string) {
+  // Random secure token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // Expires in 24 hours
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
+
+  // Remove any previous unexpired verification tokens
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.userId, userId));
+
+  // Save new token
+  await db.insert(verificationTokens).values({
+    userId,
+    token,
+    expiresAt,
+  });
+
+  return token;
+}
+
+export function getThumbnailUrl(
+  upload: UploadApiResponse
+): string | null {
+  // Images
+  if (upload.resource_type === "image") {
+    return cloudinary.url(upload.public_id, {
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+          quality: "auto",
+          fetch_format: "auto",
+        },
+      ],
+    });
+  }
+
+  // Videos
+  if (upload.resource_type === "video") {
+    return cloudinary.url(upload.public_id, {
+      resource_type: "video",
+      format: "jpg",
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+        },
+      ],
+    });
+  }
+
+  // PDFs
+  if (upload.format?.toLowerCase() === "pdf") {
+    return cloudinary.url(upload.public_id, {
+      resource_type: "image",
+      format: "jpg",
+      page: 1,
+      transformation: [
+        {
+          width: 300,
+          height: 300,
+          crop: "fill",
+        },
+      ],
+    });
+  }
+
+  return null;
+}
+
 
 export async function buildFolderPath(
   folderId: number,
@@ -76,6 +173,8 @@ export async function deleteFromCloudinary(publicId: string) {
 
 // utils/verifyEmail.ts
 import emailValidator from "node-email-verifier";
+import { publicUserSelect } from "@/db/selection";
+import { UploadApiResponse } from "cloudinary";
 
 export async function verifyEmailAddress(email: string) {
   try {

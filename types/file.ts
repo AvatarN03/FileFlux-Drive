@@ -113,3 +113,41 @@ export type UploadState = {
   uploadProgress: number;
   uploadComplete: boolean;
 };
+
+
+// ---- 
+export interface UploadFilePayload {
+  file: File;
+  folderId?: string | null;
+  onProgress?: (progress: number) => void;
+  signal?: AbortSignal;
+}
+
+export interface UpdateFilePayload {
+  fileId: string;
+  folderId?: string | null;
+
+  name: string;
+
+  isFavorite: boolean;
+}
+
+export interface MoveFilePayload {
+  fileId: string;
+  fromFolderId?: string | null;
+  toFolderId?: string | null;
+}
+
+export interface DeleteFilePayload {
+  fileId: string;
+  folderId?: string | null;
+}
+
+export interface RestoreFilePayload {
+  fileId: string;
+  folderId?: string | null;
+}
+
+export interface DownloadFilePayload {
+  fileId: string;
+}

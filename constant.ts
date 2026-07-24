@@ -10,10 +10,20 @@ import {
   ShieldCheck,
   Users,
   HardDrive,
+  Home,
+  FolderTree,
+  Star,
+  Clock,
+  Trash2,
+  Link2,
+  Settings,
+  User,
+  Activity,
 } from "lucide-react";
 
-import { FeatureType } from "./types/ui";
+import { FeatureType, NavSection } from "./types/ui";
 import { UploadState } from "./types/file";
+
 
 export const navLinks = [
   {
@@ -149,20 +159,33 @@ export const INITIAL_STATE: UploadState = {
 };
 
 
-export const API_ENDPOINTS = {
+export const AUTH_API_ENDPOINTS = {
   LOGIN: "/api/auth/login",
   SIGNUP: "/api/auth/signup",
   LOGOUT: "/api/auth/logout",
   CHECK_AUTH: "/api/auth/protected",
+  VERIFICATION_MAIL: "/api/auth/resend-verification",
+  VERIFY_EMAIL: "/api/auth/verify-email",
   DELETE_ACCOUNT: "/api/auth/delete",
   CHECK_STORAGE: "/api/files/checkStorage",
   UPLOAD: "/api/files/upload",
+} as const;
+
+export const FILE_API_ENDPOINTS = {
+  UPLOAD: "/api/files/upload",
+  GET: "/api/files",
+  DELETE: "/api/files/delete",
+  UPDATE: "/api/files/update",
+  MOVE: "/api/files/move",
+  RESTORE: "/api/files/restore",
+  DOWNLOAD: "/api/files/download",
 } as const;
 
 export const TOAST_MESSAGES = {
   LOGIN_SUCCESS: "Login successful 🎉",
   LOGIN_FAILED: "Login failed",
   SIGNUP_SUCCESS: "Account created successfully 🎉",
+  FIELDS_INVALID: "Field/s are invalid",
   SIGNUP_FAILED: "Signup failed",
   LOGOUT_SUCCESS: "Logged out successfully 👋",
   LOGOUT_FAILED: "Logout failed",
@@ -173,3 +196,63 @@ export const TOAST_MESSAGES = {
 } as const;
 
 export const STORAGE_KEY = "FP-storage";
+
+export const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+
+export const topSections: NavSection[] = [
+  { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
+  { key: "files", icon: Folder, label: "Files", href: "/files" },
+  { key: "folders", icon: FolderTree, label: "Folders", href: "/dashboard/folders" },
+  { key: "recent", icon: Clock, label: "Recent", href: "/dashboard/recent" },
+  { key: "favorites", icon: Star, label: "Favorites", href: "/dashboard/favorites" },
+  { key: "shared", icon: Link2, label: "Shared", href: "/dashboard/shared" },
+  { key: "trash", icon: Trash2, label: "Trash", href: "/dashboard/trash" },
+];
+
+export const bottomSections: NavSection[] = [
+  { key: "storage", icon: HardDrive, label: "Storage", href: "/dashboard/storage" },
+  { key: "activity", icon: Activity, label: "Activity", href: "/dashboard/activity" },
+  { key: "settings", icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  { key: "profile", icon: User, label: "Profile", href: "/dashboard/profile" },
+];
+
+const FILE_TYPES: Record<string, string> = {
+  pdf: "PDF",
+  doc: "Word Document",
+  docx: "Word Document",
+
+  xls: "Excel Spreadsheet",
+  xlsx: "Excel Spreadsheet",
+
+  ppt: "PowerPoint",
+  pptx: "PowerPoint",
+
+  jpg: "JPEG Image",
+  jpeg: "JPEG Image",
+  png: "PNG Image",
+  gif: "GIF Image",
+  webp: "WebP Image",
+  svg: "SVG Image",
+
+  mp4: "MP4 Video",
+  mov: "MOV Video",
+  mkv: "MKV Video",
+
+  mp3: "MP3 Audio",
+  wav: "WAV Audio",
+
+  zip: "ZIP Archive",
+  rar: "RAR Archive",
+  "7z": "7-Zip Archive",
+
+  txt: "Text File",
+  csv: "CSV File",
+  json: "JSON File",
+
+  default: "File",
+};
+
+export function getDisplayFileType(extension: string) {
+  return FILE_TYPES[extension.toLowerCase()] ?? "File";
+}

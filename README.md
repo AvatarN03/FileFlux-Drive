@@ -9,7 +9,7 @@
 
 **A modern, cloud-powered file management system built for the web**
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Contributing](#-contributing)
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Usage](#-usage) • [Architecture Guide](docs/project-architecture-and-schema-update-guide.md) • [Contributing](#-contributing)
 
 </div>
 
@@ -18,6 +18,8 @@
 ## 🌟 Overview
 
 FileFlux-Drive is a feature-rich file and folder management web application that brings desktop-like file organization to your browser. Built with cutting-edge web technologies, it provides seamless file uploads, intelligent organization, and real-time state management for an exceptional user experience.
+
+For a maintainer-focused explanation of how the app is wired and how to update it safely after schema changes, see [Project Architecture and Schema Update Guide](docs/project-architecture-and-schema-update-guide.md).
 
 ## ✨ Features
 

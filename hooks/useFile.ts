@@ -1,21 +1,34 @@
-import  useFileStore  from "@/context/useFileStore";
 
-const useFiles = () => {
-  const files = useFileStore((state) => state.files);
-  const loading = useFileStore((state) => state.loading);
-  const fetchFiles = useFileStore((state) => state.fetchFiles);
-  const deleteFile = useFileStore((state) => state.deleteFile);
-  const renameFile = useFileStore((state) => state.renameFile);
-  const moveFile = useFileStore((state) => state.moveFile);
 
-  return {
-    files,
-    loading,
-    fetchFiles,
-    deleteFile,
-    renameFile,
-    moveFile,
-  };
-};
+import { useQuery } from "@tanstack/react-query";
+import { fileApi } from "./useFileMutations";
 
-export default useFiles;
+
+
+
+export function useFiles(folderId?: string | null) {
+  return useQuery({
+    queryKey: folderId
+      ? ["folder-files", folderId]
+      : ["files"],
+
+    queryFn: () => fileApi.getFiles(folderId),
+  });
+}
+
+/*
+Future
+
+export function useRecentFiles() {}
+
+export function useTrashFiles() {}
+
+export function useFavorites() {}
+
+export function useStorage() {}
+
+export function useSharedFile(shareId: string) {}
+*/
+
+
+
