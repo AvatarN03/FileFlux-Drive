@@ -1,151 +1,13 @@
-"use client";
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AUTH_API_ENDPOINTS, TOAST_MESSAGES } from "@/constant";
+import authApi from "@/services/authApi";
 
-import toastC from "@/lib/toast";
-import getErrorMessage from "@/lib/file/getErrorMessage";
+import getErrorMessage from "@/lib";
 
-import type { ApiResponse, User, AuthCredentials } from "@/types/auth";
-
-const authApi = {
-  async checkAuth(): Promise<User | null> {
-    const res = await fetch(AUTH_API_ENDPOINTS.CHECK_AUTH, {
-      credentials: "include",
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    const data: ApiResponse<User> = await res.json();
-
-    return data.success ? data.user! : null;
-  },
-
-  async login(credentials: AuthCredentials): Promise<User> {
-    const res = await fetch(AUTH_API_ENDPOINTS.LOGIN, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    const data: ApiResponse<User> = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || TOAST_MESSAGES.LOGIN_FAILED);
-    }
-
-    return data.user!;
-  },
-
-  async signup(credentials: AuthCredentials): Promise<User> {
-    const res = await fetch(AUTH_API_ENDPOINTS.SIGNUP, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    const data: ApiResponse<User> = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || TOAST_MESSAGES.SIGNUP_FAILED);
-    }
-
-    return data.user!;
-  },
-
-  async logout() {
-    const res = await fetch(AUTH_API_ENDPOINTS.LOGOUT, {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      throw new Error("Logout failed");
-    }
-  },
-
-  async resendVerification() {
-    const res = await fetch(AUTH_API_ENDPOINTS.VERIFICATION_MAIL, {
-      method: "POST",
-      credentials: "include",
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw data;
-    }
-
-    return data;
-  },
-
-  async verifyEmail(token: string) {
-    const res = await fetch(
-      `${AUTH_API_ENDPOINTS.VERIFY_EMAIL}?token=${encodeURIComponent(token)}`,
-      {
-        method: "POST",
-        credentials: "include",
-      },
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw data;
-    }
-
-    return data;
-  },
-
-  async googleLogin(credential: string): Promise<User> {
-    const res = await fetch("/api/auth/google", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        credential,
-      }),
-    });
-
-    const data: ApiResponse<User> = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "Google Sign In failed");
-    }
-
-    return data.user!;
-  },
-
-  async deleteAccount() {
-    const res = await fetch(AUTH_API_ENDPOINTS.DELETE_ACCOUNT, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      throw new Error("Delete account failed");
-    }
-  },
-};
+import { AuthCredentials } from "@/types/auth";
 
 export function useAuth() {
   const queryClient = useQueryClient();
-
-  // =====================
-  // USER
-  // =====================
 
   const userQuery = useQuery({
     queryKey: ["auth", "user"],
@@ -161,10 +23,6 @@ export function useAuth() {
     refetchOnMount: true,
   });
 
-  // =====================
-  // LOGIN
-  // =====================
-
   const loginMutation = useMutation({
     mutationFn: authApi.login,
 
@@ -173,10 +31,6 @@ export function useAuth() {
     },
   });
 
-  // =====================
-  // SIGNUP
-  // =====================
-
   const signupMutation = useMutation({
     mutationFn: authApi.signup,
 
@@ -184,10 +38,6 @@ export function useAuth() {
       queryClient.setQueryData(["auth", "user"], user);
     },
   });
-
-  // =====================
-  // LOGOUT
-  // =====================
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
@@ -222,19 +72,15 @@ export function useAuth() {
     },
   });
 
-  // =====================
-  // DELETE ACCOUNT
-  // =====================
+  // const deleteMutation = useMutation({
+  //   mutationFn: authApi.deleteAccount,
 
-  const deleteMutation = useMutation({
-    mutationFn: authApi.deleteAccount,
+  //   onSuccess: () => {
+  //     queryClient.setQueryData(["auth", "user"], null);
 
-    onSuccess: () => {
-      queryClient.setQueryData(["auth", "user"], null);
-
-      queryClient.removeQueries();
-    },
-  });
+  //     queryClient.removeQueries();
+  //   },
+  // });
 
   return {
     user: userQuery.data ?? null,
@@ -246,8 +92,12 @@ export function useAuth() {
       loginMutation.isPending ||
       signupMutation.isPending ||
       logoutMutation.isPending ||
-      deleteMutation.isPending,
+      googleLoginMutation.isPending ||
+      verifyEmailMutation.isPending ||
+      resendVerificationMutation.isPending,
+    // deleteMutation.isPending,
 
+    
     checkAuth: userQuery.refetch,
 
     login: async (data: AuthCredentials) => {
@@ -286,11 +136,6 @@ export function useAuth() {
       try {
         await logoutMutation.mutateAsync();
 
-        toastC({
-          type: "success",
-          data: TOAST_MESSAGES.LOGOUT_SUCCESS,
-        });
-
         return {
           success: true,
         };
@@ -306,7 +151,10 @@ export function useAuth() {
       try {
         return await resendVerificationMutation.mutateAsync();
       } catch (error) {
-        throw error;
+        return {
+          success: false,
+          error: getErrorMessage(error),
+        };
       }
     },
 
@@ -321,7 +169,7 @@ export function useAuth() {
       } catch (error) {
         return {
           success: false,
-          error,
+          error: getErrorMessage(error),
         };
       }
     },
@@ -342,29 +190,29 @@ export function useAuth() {
       }
     },
 
-    deleteAccount: async () => {
-      try {
-        await deleteMutation.mutateAsync();
+    // deleteAccount: async () => {
+    //   try {
+    //     await deleteMutation.mutateAsync();
 
-        toastC({
-          type: "success",
-          data: TOAST_MESSAGES.DELETE_SUCCESS,
-        });
+    //     toastC({
+    //       type: "success",
+    //       data: AUTH_TOAST_MESSAGES.DELETE_SUCCESS,
+    //     });
 
-        return {
-          success: true,
-        };
-      } catch (error) {
-        toastC({
-          type: "error",
-          data: TOAST_MESSAGES.DELETE_FAILED,
-        });
+    //     return {
+    //       success: true,
+    //     };
+    //   } catch (error) {
+    //     toastC({
+    //       type: "error",
+    //       data: AUTH_TOAST_MESSAGES.DELETE_FAILED,
+    //     });
 
-        return {
-          success: false,
-          error: getErrorMessage(error),
-        };
-      }
-    },
+    //     return {
+    //       success: false,
+    //       error: getErrorMessage(error),
+    //     };
+    //   }
+    // },
   };
 }

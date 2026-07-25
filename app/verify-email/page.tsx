@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 
 import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
 
+import Logo from "@/app/_components/Logo";
+
 import { useAuth } from "@/hooks/useAuth";
 
-import Logo from "@/app/(main)/_components/Logo";
+import { formatTime } from "@/lib/email/formatTime";
 
-import { formatTime } from "@/lib/formatTime";
-
-import { ResendState } from "@/types/auth";
+import { ResendState, ResendVerificationResponse } from "@/types/auth";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
@@ -45,37 +45,47 @@ const VerifyEmailPage = () => {
 
     try {
       const data = await resendVerification();
+      if (data.success) {
+        setResendState("sent");
+        startCooldown(data.coolDownMs ?? 10000);
+        return;
+      }
 
-      setResendState("sent");
-      startCooldown(data.cooldownMs);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+      setResendState("error");
+      setResendMessage(data.error ?? "Couldn't resend email.");
+
+
+    } catch (error: unknown) {
       setResendState("error");
 
-      setResendMessage(
-        error.error ?? "Couldn't resend email."
-      );
+      const resendError = error as Partial<ResendVerificationResponse>;
 
-      if (error.retryAfterMs) {
-        startCooldown(error.retryAfterMs);
+      setResendMessage(resendError.error ?? "Couldn't resend email.");
+
+      if (resendError.coolDownMs) {
+        startCooldown(resendError.coolDownMs);
       }
     }
   };
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      router.replace("/auth");
+      return;
+    }
 
     if (user.emailVerified) {
       router.replace("/dashboard");
+      return;
     }
-  }, [user, router]);
+  }, [user,router]);
 
   return (
     <div className="min-h-screen w-full flex bg-neutral-900">
       {/* Left: image panel — hidden below lg */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1649019489428-70f505daacd6?auto=format&fit=crop&w=1400&q=80"
+          src="/verify_banner.avif"
           alt="verify email background"
           width={1400}
           height={1400}
@@ -173,9 +183,9 @@ const VerifyEmailPage = () => {
 
           <button
             onClick={() => router.push("/dashboard")}
-            className="mt-6 flex items-center justify-center gap-1.5 w-full text-sm text-gray-500 hover:text-gray-300 transition-colors"
+            className="mt-6 flex items-center justify-center gap-1.5 w-full text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer "
           >
-            Go to Dashboard
+            Skip, Go to Dashboard
             <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
           </button>
         </div>

@@ -7,23 +7,26 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
 import { CredentialResponse } from "@react-oauth/google";
 
+import Logo from "../_components/Logo";
+import LoginForm from "../_components/auth/LoginForm";
+import SignupForm from "../_components/auth/SignupForm";
+
 import { useAuth } from "@/hooks/useAuth";
 
-import Logo from "../(main)/_components/Logo";
-import LoginForm from "./_component/LoginForm";
-import SignupForm from "./_component/SignupForm";
-
 import toastC from "@/lib/toast";
+
+import { AUTH_TOAST_MESSAGES } from "@/constant";
 
 const AuthPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
   const continueTo = searchParams.get("continueTo");
+
   const { isAuthenticated, isLoading, user, googleLogin } = useAuth();
 
   const handleSwitch = () => {
-    setIsLogin(!isLogin);
+    setIsLogin(prev => !prev);
   };
 
   useEffect(() => {
@@ -49,7 +52,6 @@ const AuthPage = () => {
   ) => {
 
     try {
-
       if (!credentialResponse.credential) {
         toastC({
           data: "Unable to login.",
@@ -58,23 +60,24 @@ const AuthPage = () => {
         return;
       }
 
-
       const result = await googleLogin(
         credentialResponse.credential
       );
 
-
       if (!result.success) {
         toastC({
-          data: result.error,
+          data: result.error || AUTH_TOAST_MESSAGES.GOOGLE_LOGIN_FAILED,
           type: "error"
         });
         return;
       }
 
+      toastC({
+        type: "success",
+        data: AUTH_TOAST_MESSAGES.GOOGLE_LOGIN_SUCCESS,
+      });
 
       router.push("/dashboard");
-
 
     } catch {
 
@@ -143,7 +146,7 @@ const AuthPage = () => {
           {/* Right: Image Section */}
           <div className="hidden md:block md:col-span-1 lg:col-span-3 overflow-hidden relative h-full shadow-lg  rounded-r-md">
             <Image
-              src="/auth_img.png"
+              src="/auth_banner.png"
               alt="auth-img"
               fill
               className="object-cover"

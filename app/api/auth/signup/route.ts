@@ -4,15 +4,16 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { validate } from "deep-email-validator";
 
+import { verifyEmailAddress } from "../../_services/email";
+import { signingToken } from "../../_services/jwtServices";
+import { generateEmailVerification } from "../../_services";
+
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
 
 import { signupSchema } from "@/lib/validations/auth";
-import { signingToken } from "@/lib/validations/jwtServices";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
-
-import { generateEmailVerification, verifyEmailAddress } from "../../_services";
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +22,10 @@ export async function POST(req: Request) {
     const parsed = signupSchema.safeParse(body);
     if (!parsed.success) {
       const errors = parsed.error.issues.map((err) => err.message);
-      return NextResponse.json({ errors }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: errors.join(", ") },
+        { status: 400 },
+      );
     }
 
     const { name, email, password } = parsed.data;
@@ -36,7 +40,10 @@ export async function POST(req: Request) {
 
     if (!emailCheck.valid) {
       return NextResponse.json(
-        { error: "Invalid email address" },
+        {
+          success: false,
+          error: "Invalid email address",
+        },
         { status: 400 },
       );
     }
@@ -47,7 +54,7 @@ export async function POST(req: Request) {
 
     if (disifyData.disposable) {
       return NextResponse.json(
-        { error: "Temporary email addresses are not allowed" },
+        { success: false, error: "Temporary email addresses are not allowed" },
         { status: 400 },
       );
     }
@@ -58,21 +65,26 @@ export async function POST(req: Request) {
     // If completely invalid
     if (!validation || (typeof validation === "object" && !validation.valid)) {
       return NextResponse.json(
-        { error: "Invalid email address" },
+        { success: false, error: "Invalid email address" },
         { status: 400 },
       );
     }
 
     // ✅ STEP 3: Check existing user
-    const existingUser = await db
-      .select()
+    const [existingUser] = await db
+      .select({
+        id: usersTable.id,
+      })
       .from(usersTable)
       .where(eq(usersTable.email, email));
 
-    if (existingUser.length > 0) {
+    if (existingUser) {
       return NextResponse.json(
-        { error: "User already exists" },
-        { status: 400 },
+        {
+          success: false,
+          error: "User already exists",
+        },
+        { status: 409 },
       );
     }
 
@@ -103,7 +115,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json(
       {
         success: true,
-        user: newUser,
+        data: newUser,
       },
       { status: 201 },
     );

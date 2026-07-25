@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-import Footer from "./_uiParts/Footer";
-import Features from "./_uiParts/Features";
-import Pricing from "./_uiParts/Pricing";
-import Hero from "./_uiParts/Hero";
-import Navbar from "./_uiParts/Navbar";
+import Footer from "./_components/marketing/Footer";
+import Features from "./_components/marketing/Features";
+import Pricing from "./_components/marketing/Pricing";
+import Hero from "./_components/marketing/Hero";
+import Navbar from "./_components/marketing/Navbar";
 
 const LandingPage = () => {
   const [navColor, setNavColor] = useState(false);

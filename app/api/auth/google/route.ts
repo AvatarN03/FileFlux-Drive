@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { eq } from "drizzle-orm";
 
+import { signingToken } from "../../_services/jwtServices";
+
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
-
-import { signingToken } from "@/lib/validations/jwtServices";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -48,12 +48,15 @@ export async function POST(req: Request) {
     }
 
     const { email, name, picture, email_verified } = payload;
-    console.log("Google Auth Payload:", payload);
 
     let user;
 
     const [existingUser] = await db
-      .select()
+      .select({
+        id: usersTable.id,
+        avatarUrl: usersTable.avatarUrl,
+        emailVerified: usersTable.emailVerified,
+      })
       .from(usersTable)
       .where(eq(usersTable.email, email));
 
@@ -92,7 +95,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json(
       {
         success: true,
-        user,
+        data: user,
       },
       {
         status: 200,
@@ -108,9 +111,7 @@ export async function POST(req: Request) {
     });
 
     return response;
-  } catch (error) {
-    console.error("Google Auth Error:", error);
-
+  } catch {
     return NextResponse.json(
       {
         success: false,

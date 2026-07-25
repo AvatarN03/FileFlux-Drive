@@ -8,7 +8,7 @@ export async function GET() {
     
     return NextResponse.json({
       success: true,
-      user,
+      data: user,
     });
   } catch {
     return NextResponse.json(

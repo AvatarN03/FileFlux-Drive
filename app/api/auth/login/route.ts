@@ -3,19 +3,17 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 
+import { generateEmailVerification } from "../../_services";
+import { signingToken } from "../../_services/jwtServices";
+
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
 
 import { loginSchema } from "@/lib/validations/auth";
-import { signingToken } from "@/lib/validations/jwtServices";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
 
-import { generateEmailVerification } from "../../_services";
-
 import { COOLDOWN_MS } from "@/constant";
-
-
 
 export async function POST(req: Request) {
   // Changed from NextResponse to Request
@@ -27,18 +25,28 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       const errors = parsed.error.issues.map((issue) => issue.message);
 
-      return NextResponse.json({ errors }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: errors.join(", ") },
+        { status: 400 },
+      );
     }
 
     const { email, password } = parsed.data;
 
     const [existingUser] = await db
-      .select()
+      .select({
+        id: usersTable.id,
+        email: usersTable.email,
+        password: usersTable.password,
+        emailVerified: usersTable.emailVerified,
+        lastVerificationEmailSentAt: usersTable.lastVerificationEmailSentAt,
+      })
       .from(usersTable)
       .where(eq(usersTable.email, email));
+
     if (!existingUser) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { success: false, error: "Invalid email or password" },
         { status: 401 },
       );
     }
@@ -46,6 +54,7 @@ export async function POST(req: Request) {
     if (!existingUser.password) {
       return NextResponse.json(
         {
+          success: false,
           error:
             "This account uses Google Sign-In. Continue with Google, or set a password from your account settings first.",
         },
@@ -60,7 +69,7 @@ export async function POST(req: Request) {
     );
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { success: false, error: "Invalid email or password" },
         { status: 401 },
       );
     }
@@ -107,7 +116,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json(
       {
         success: true,
-        user: updatedUser,
+        data: updatedUser,
       },
       { status: 200 },
     );

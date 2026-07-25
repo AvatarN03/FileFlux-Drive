@@ -2,15 +2,14 @@ import { NextResponse } from "next/server";
 
 import { eq } from "drizzle-orm";
 
+import { generateEmailVerification, getAuthUser } from "../../_services";
+
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
 
-import { generateEmailVerification, getAuthUser } from "../../_services";
-
 import { COOLDOWN_MS } from "@/constant";
-
 
 export async function POST() {
   try {
@@ -52,7 +51,7 @@ export async function POST() {
         {
           success: false,
           error: "Please wait 15min before requesting another verification email.",
-          retryAfterMs,
+          coolDownMs: retryAfterMs,
         },
         { status: 429 }
       );
@@ -80,7 +79,7 @@ export async function POST() {
     return NextResponse.json(
       {
         success: false,
-        error: "Internal server error.",
+        error: error instanceof Error ? error.message : "Internal Server Error",
       },
       { status: 500 }
     );
