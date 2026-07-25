@@ -223,6 +223,13 @@ export const AUTH_TOAST_MESSAGES = {
   NETWORK_ERROR: "Network error",
   DELETE_SUCCESS: "Account deleted successfully",
   DELETE_FAILED: "Failed to delete account",
+  GOOGLE_LOGIN_FAILED: "Google login failed",
+  GOOGLE_LOGIN_SUCCESS: "Google login successful 🎉",
+  RESEND_VERIFICATION_SUCCESS: "Verification email sent successfully",
+  RESEND_VERIFICATION_FAILED: "Failed to send verification email",
+  EMAIL_VERIFICATION_SUCCESS: "Email verified successfully 🎉",
+  EMAIL_VERIFICATION_FAILED: "Email verification failed",
+
 } as const;
 
 
