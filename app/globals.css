@@ -1,5 +1,5 @@
-@import "tailwindcss";
 
+@import "tailwindcss";
 
 @theme {
   --color-peach: #fcde9c;
@@ -10,11 +10,14 @@
 }
 
 @layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-  *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
@@ -22,60 +25,77 @@
     overflow-x: hidden;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
+  /* Scrollbar Styling */
   ::-webkit-scrollbar {
     width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-brown);
   }
 
   ::-webkit-scrollbar-thumb {
     background: var(--color-violet);
     border-radius: 10px;
   }
-
-  ::-webkit-scrollbar-track {
-    background: var(--color-brown);
-  }
 }
 
 @layer utilities {
-  /* dot pattern combined with your existing gradient */
+  /* ---- Background Patterns ---- */
+
+  /* Dot pattern with gradient */
   .bg-gradient-62 {
     background-image:
       radial-gradient(circle, rgba(56, 29, 42, 0.25) 1.5px, transparent 1.5px),
       linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size: 18px 18px, 100% 100%;
-    background-position: 0 0, 0 0;
+    background-size:
+      18px 18px,
+      100% 100%;
+    background-position:
+      0 0,
+      0 0;
   }
 
-  /* alt: square grid pattern instead of dots */
+  /* Square grid pattern with gradient */
   .bg-gradient-62-grid {
     background-image:
       linear-gradient(rgba(56, 29, 42, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(56, 29, 42, 0.1) 1px, transparent 1px),
       linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size: 24px 24px, 24px 24px, 100% 100%;
+    background-size:
+      24px 24px,
+      24px 24px,
+      100% 100%;
   }
 
-  /* alt: diagonal / checkered squares (denser, more "pattern"-y) */
+  /* Checkered pattern with gradient */
   .bg-gradient-62-checker {
     background-image:
-      repeating-conic-gradient(rgba(56, 29, 42, 0.08) 0% 25%, transparent 0% 50%),
+      repeating-conic-gradient(
+        rgba(56, 29, 42, 0.08) 0% 25%,
+        transparent 0% 50%
+      ),
       linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size: 20px 20px, 100% 100%;
+    background-size:
+      20px 20px,
+      100% 100%;
   }
 
+  /* ---- Layout ---- */
 
+  /* Container max-width */
   .max-7 {
     max-width: var(--container-7xl);
     margin: 0 auto;
   }
 
+  /* Clip path */
   .custom-clip {
     clip-path: polygon(0 0, 0% 100%, 100% 100%, 27% 55%);
   }
+
+  /* ---- Animations ---- */
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -91,17 +111,33 @@
     animation: fadeIn 0.3s ease-out;
   }
 
-  .gradient-logo {
-  background: linear-gradient(
-    120deg,
-    #000,
-    var(--color-ember)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-}
+  /* ---- Typography ---- */
 
+  .gradient-logo {
+    background: linear-gradient(120deg, #000, var(--color-ember));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+  }
+
+  /* ---- Scrollbar for horizontal scrolling ---- */
+
+  .horizontal-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #8b5cf6;
+    border-radius: 9999px;
+  }
+
+  .horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
+  }
 }

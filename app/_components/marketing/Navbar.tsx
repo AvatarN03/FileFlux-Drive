@@ -1,5 +1,5 @@
 import { navLinks } from "@/constant";
-import Logo from "../(main)/_components/Logo";
+import Logo from "../Logo";
 import Link from "next/link";
 
 const Navbar = ({ navColor }: { navColor: boolean }) => {

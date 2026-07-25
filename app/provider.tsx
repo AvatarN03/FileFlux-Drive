@@ -11,7 +11,6 @@ export function Providers({
 
     const queryClient = new QueryClient();
 
-
     return (
         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
             <QueryClientProvider client={queryClient}>
