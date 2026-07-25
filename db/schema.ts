@@ -12,7 +12,7 @@ import {
   index,
   uuid,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 import { timestamps } from "./helper";
 
 /* USERS */
@@ -59,8 +59,6 @@ export const folders = pgTable(
       .references(() => usersTable.id, { onDelete: "cascade" }),
 
     color: text("color"),
-
-    icon: text("icon"),
 
     isFavorite: boolean("is_favorite").default(false).notNull(),
 
@@ -323,3 +321,5 @@ export const verificationTokensRelations = relations(
     }),
   })
 );
+
+export type User = InferSelectModel<typeof usersTable>;

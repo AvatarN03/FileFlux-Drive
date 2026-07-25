@@ -1,1 +1,0 @@
-ALTER TABLE "files" ADD COLUMN "public_id" text;
