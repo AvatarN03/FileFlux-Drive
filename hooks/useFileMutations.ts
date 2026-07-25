@@ -1,14 +1,20 @@
-import { FILE_API_ENDPOINTS } from "@/constant";
+import axios, { AxiosProgressEvent } from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { ApiResponse } from "@/types";
 import {
   DeleteFilePayload,
   DownloadFilePayload,
+  FileDetail,
+  FileQueryParams,
+  FilesResponse,
   MoveFilePayload,
   RestoreFilePayload,
   UpdateFilePayload,
   UploadFilePayload,
 } from "@/types/file";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosProgressEvent } from "axios";
+
+import { FILE_API_ENDPOINTS } from "@/constant";
 
 export const fileApi = {
   async upload({ file, folderId, onProgress, signal }: UploadFilePayload) {
@@ -20,38 +26,79 @@ export const fileApi = {
       formData.append("folderId", folderId);
     }
 
-    const { data } = await axios.post(FILE_API_ENDPOINTS.UPLOAD, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      signal,
-      onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-        if (!progressEvent.total) return;
+    const { data } = await axios.post<ApiResponse>(
+      FILE_API_ENDPOINTS.UPLOAD,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        signal,
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          if (!progressEvent.total) return;
 
-        const progress = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total,
-        );
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total,
+          );
 
-        onProgress?.(progress);
+          onProgress?.(progress);
+        },
       },
-    });
+    );
+
+    if (!data.success) {
+      throw new Error(data.error ?? "Upload failed");
+    }
 
     return data;
   },
 
-  async getFiles(folderId?: string | null) {
+  async getFiles({
+    folderId,
+    search,
+    category,
+  }: FileQueryParams): Promise<FilesResponse[]> {
     const params = new URLSearchParams();
 
     if (folderId) {
       params.set("folderId", folderId);
     }
 
+    if (search) {
+      params.set("search", search);
+    }
+
+    if (category && category !== "all") {
+      params.set("category", category);
+    }
+
     const res = await fetch(`${FILE_API_ENDPOINTS.GET}?${params.toString()}`);
 
-    return res.json();
+    const data: ApiResponse<FilesResponse[]> = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch files");
+    }
+
+    return data.data!;
   },
 
-  async update({ fileId, ...payload }: UpdateFilePayload) {
+  async getFile(fileId: string): Promise<FileDetail> {
+    const res = await fetch(`${FILE_API_ENDPOINTS.GET}/${fileId}`);
+
+    const data: ApiResponse<FileDetail> = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch file");
+    }
+
+    return data.data!;
+  },
+
+  async update({
+    fileId,
+    ...payload
+  }: UpdateFilePayload): Promise<ApiResponse> {
     const res = await fetch(`${FILE_API_ENDPOINTS.UPDATE}/${fileId}`, {
       method: "PATCH",
       headers: {
@@ -60,7 +107,11 @@ export const fileApi = {
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to update file");
+    }
 
     return data;
   },
@@ -76,7 +127,12 @@ export const fileApi = {
       }),
     });
 
-    const data = await res.json();
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to move file");
+    }
+
     return data;
   },
 
@@ -84,7 +140,11 @@ export const fileApi = {
     const res = await fetch(`${FILE_API_ENDPOINTS.DELETE}/${fileId}`, {
       method: "DELETE",
     });
-    const data = await res.json();
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to delete file");
+    }
 
     return data;
   },
@@ -94,7 +154,11 @@ export const fileApi = {
       method: "PATCH",
     });
 
-    const data = await res.json();
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to restore file");
+    }
 
     return data;
   },
@@ -104,7 +168,11 @@ export const fileApi = {
       method: "POST",
     });
 
-    const data = await res.json();
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to download file");
+    }
 
     return data;
   },
@@ -184,7 +252,7 @@ export function useFileMutations() {
   const remove = useMutation({
     mutationFn: (payload: DeleteFilePayload) => fileApi.delete(payload),
 
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       });
@@ -196,19 +264,13 @@ export function useFileMutations() {
       queryClient.invalidateQueries({
         queryKey: ["storage"],
       });
-
-      if (variables.folderId) {
-        queryClient.invalidateQueries({
-          queryKey: ["folder-files", variables.folderId],
-        });
-      }
     },
   });
 
   const restore = useMutation({
     mutationFn: (payload: RestoreFilePayload) => fileApi.restore(payload),
 
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       });
@@ -217,11 +279,9 @@ export function useFileMutations() {
         queryKey: ["trash-files"],
       });
 
-      if (variables.folderId) {
-        queryClient.invalidateQueries({
-          queryKey: ["folder-files", variables.folderId],
-        });
-      }
+      queryClient.invalidateQueries({
+        queryKey: ["recent-files"],
+      });
     },
   });
 
