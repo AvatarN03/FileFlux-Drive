@@ -4,7 +4,7 @@ import { User } from "@/db/schema";
 import { AUTH_API_ENDPOINTS, AUTH_TOAST_MESSAGES } from "@/constant";
 
 import { ApiResponse } from "@/types";
-import { AuthCredentials } from "@/types/auth";
+import { AuthCredentials, ResendVerificationResponse } from "@/types/auth";
 
 const authApi = {
   async checkAuth(): Promise<User | null> {
@@ -79,13 +79,13 @@ const authApi = {
     return true;
   },
 
-  async resendVerification(): Promise<ApiResponse> {
+  async resendVerification():  Promise<ResendVerificationResponse> {
     const res = await fetch(AUTH_API_ENDPOINTS.VERIFICATION_MAIL, {
       method: "POST",
       credentials: "include",
     });
 
-    const data: ApiResponse = await res.json();
+    const data: ResendVerificationResponse = await res.json();
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Error in resend email");

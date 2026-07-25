@@ -51,7 +51,7 @@ export async function POST() {
         {
           success: false,
           error: "Please wait 15min before requesting another verification email.",
-          retryAfterMs,
+          coolDownMs: retryAfterMs,
         },
         { status: 429 }
       );
@@ -79,7 +79,7 @@ export async function POST() {
     return NextResponse.json(
       {
         success: false,
-        error: "Internal server error.",
+        error: error instanceof Error ? error.message : "Internal Server Error",
       },
       { status: 500 }
     );
