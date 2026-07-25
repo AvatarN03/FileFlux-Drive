@@ -21,9 +21,8 @@ import {
   Activity,
 } from "lucide-react";
 
-import { FeatureType, NavSection } from "./types/ui";
-import { UploadState } from "./types/file";
 
+// ui
 
 export const navLinks = [
   {
@@ -40,7 +39,7 @@ export const navLinks = [
   },
 ]
 
-export const features: FeatureType[] = [
+export const features = [
   {
     title: "Secure Cloud Storage",
     description:
@@ -148,7 +147,27 @@ export const PRICING_PLANS = [
   },
 ];
 
-export const INITIAL_STATE: UploadState = {
+export const topSections = [
+  { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
+  { key: "files", icon: Folder, label: "Files", href: "/files" },
+  { key: "folders", icon: FolderTree, label: "Folders", href: "/dashboard/folders" },
+  { key: "recent", icon: Clock, label: "Recent", href: "/dashboard/recent" },
+  { key: "favorites", icon: Star, label: "Favorites", href: "/dashboard/favorites" },
+  { key: "shared", icon: Link2, label: "Shared", href: "/dashboard/shared" },
+  { key: "trash", icon: Trash2, label: "Trash", href: "/dashboard/trash" },
+];
+
+export const bottomSections = [
+  { key: "storage", icon: HardDrive, label: "Storage", href: "/dashboard/storage" },
+  { key: "activity", icon: Activity, label: "Activity", href: "/dashboard/activity" },
+  { key: "settings", icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  { key: "profile", icon: User, label: "Profile", href: "/dashboard/profile" },
+];
+
+// file 
+
+//upload file initial state
+export const INITIAL_STATE = {
   file: null,
   fileName: "",
   isEditingFileName: false,
@@ -158,7 +177,12 @@ export const INITIAL_STATE: UploadState = {
   uploadComplete: false,
 };
 
+// rate limiting constant
+export const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
 
+// api endpoints
+
+//user api endpoint
 export const AUTH_API_ENDPOINTS = {
   LOGIN: "/api/auth/login",
   SIGNUP: "/api/auth/signup",
@@ -171,6 +195,7 @@ export const AUTH_API_ENDPOINTS = {
   UPLOAD: "/api/files/upload",
 } as const;
 
+// file api endpoint
 export const FILE_API_ENDPOINTS = {
   UPLOAD: "/api/files/upload",
   GET: "/api/files",
@@ -181,7 +206,12 @@ export const FILE_API_ENDPOINTS = {
   DOWNLOAD: "/api/files/download",
 } as const;
 
-export const TOAST_MESSAGES = {
+// ---
+
+// toast messages 
+
+// auth toast 
+export const AUTH_TOAST_MESSAGES = {
   LOGIN_SUCCESS: "Login successful 🎉",
   LOGIN_FAILED: "Login failed",
   SIGNUP_SUCCESS: "Account created successfully 🎉",
@@ -195,29 +225,12 @@ export const TOAST_MESSAGES = {
   DELETE_FAILED: "Failed to delete account",
 } as const;
 
-export const STORAGE_KEY = "FP-storage";
-
-export const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
 
 
-export const topSections: NavSection[] = [
-  { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
-  { key: "files", icon: Folder, label: "Files", href: "/files" },
-  { key: "folders", icon: FolderTree, label: "Folders", href: "/dashboard/folders" },
-  { key: "recent", icon: Clock, label: "Recent", href: "/dashboard/recent" },
-  { key: "favorites", icon: Star, label: "Favorites", href: "/dashboard/favorites" },
-  { key: "shared", icon: Link2, label: "Shared", href: "/dashboard/shared" },
-  { key: "trash", icon: Trash2, label: "Trash", href: "/dashboard/trash" },
-];
 
-export const bottomSections: NavSection[] = [
-  { key: "storage", icon: HardDrive, label: "Storage", href: "/dashboard/storage" },
-  { key: "activity", icon: Activity, label: "Activity", href: "/dashboard/activity" },
-  { key: "settings", icon: Settings, label: "Settings", href: "/dashboard/settings" },
-  { key: "profile", icon: User, label: "Profile", href: "/dashboard/profile" },
-];
 
-const FILE_TYPES: Record<string, string> = {
+// file type constant
+export const FileType = {
   pdf: "PDF",
   doc: "Word Document",
   docx: "Word Document",
@@ -253,6 +266,3 @@ const FILE_TYPES: Record<string, string> = {
   default: "File",
 };
 
-export function getDisplayFileType(extension: string) {
-  return FILE_TYPES[extension.toLowerCase()] ?? "File";
-}
