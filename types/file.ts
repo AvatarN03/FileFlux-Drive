@@ -1,109 +1,5 @@
-import { files, folders } from "@/db/schema";
-import { AxiosError } from "axios";
-import { InferSelectModel } from "drizzle-orm";
 
-type ID = number;
-
-/* -------------------- */
-/* Folder Types         */
-/* -------------------- */
-
-export type Folder = {
-  id: ID;
-  name: string;
-  parentId: ID | null;
-  user_id: ID;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type FolderItem = InferSelectModel<typeof folders> & {
-  fileCount: number;
-  totalSize: number;
-};
-
-export type FolderPathNode = {
-  id: ID;
-  name: string;
-  parentId: ID | null;
-};
-
-/* -------------------- */
-/* File Types           */
-/* -------------------- */
-
-export type PathNode = {
-  id: ID;
-  name: string;
-};
-
-export type FileItem = InferSelectModel<typeof files> & {
-  public_id?: string;
-  path?: PathNode[];
-};
-
-export interface RenameArgs {
-  id: ID;
-  name: string;
-}
-
-/* -------------------- */
-/* Storage / State      */
-/* -------------------- */
-
-export type StorageInfo = {
-  used: number;
-  max: number;
-  remaining: number;
-  available: boolean;
-};
-
-export type FileState = {
-  files: FileItem[];
-  folders: FolderItem[];
-  loading: boolean;
-  error: AxiosError | null;
-  storage: StorageInfo | null;
-
-  /* Files */
-  setFiles: (files: FileItem[]) => void;
-  addFile: (file: FileItem) => void;
-  renameFile: (args: {
-    fileId: ID;
-    newName: string;
-    folderId?: ID;
-  }) => Promise<void>;
-  fetchFiles: (args?: { folderId?: ID; limit?: number }) => Promise<void>;
-  moveFile: (args: {
-    fileId: ID;
-    moveToFolderId: ID;
-    folderId?: ID;
-  }) => Promise<void>;
-  deleteFile: (args: { fileId: ID; folderId?: ID | null }) => Promise<void>;
-
-  /* Folders */
-  setFolders: (folders: FolderItem[]) => void;
-  addFolder: (args: { folderId?: ID; newFolder: string }) => Promise<void>;
-  moveFolder: (args: { folderId: ID; parentId?: ID }) => Promise<void>;
-  fetchFolders: (args?: { folderId?: ID; limit?: number }) => Promise<void>;
-  updateFolder: (args: {
-    folderId: ID;
-    editName: string;
-  }) => Promise<void>;
-  deleteFolder: (args: { folderId: ID }) => Promise<void>;
-
-  /* Storage */
-  checkStorage: () => Promise<void>;
-  getAllFolders: () => Promise<FolderItem[]>;
-};
-
-export type FolderResponse = {
-  id: ID;
-  name: string;
-  fileCount: number;
-  totalSize: number;
-};
-
+// FileUpload Component Type
 export type UploadState = {
   file: File | null;
   fileName: string;
@@ -114,8 +10,9 @@ export type UploadState = {
   uploadComplete: boolean;
 };
 
+// File Mutations hook types
 
-// ---- 
+//upload file api
 export interface UploadFilePayload {
   file: File;
   folderId?: string | null;
@@ -123,31 +20,145 @@ export interface UploadFilePayload {
   signal?: AbortSignal;
 }
 
+// update file api
 export interface UpdateFilePayload {
   fileId: string;
-  folderId?: string | null;
-
-  name: string;
-
-  isFavorite: boolean;
+  name?: string;
+  extension?: string;
+  isFavorite?: boolean;
 }
 
+// move file api
 export interface MoveFilePayload {
   fileId: string;
   fromFolderId?: string | null;
   toFolderId?: string | null;
 }
 
+// trash file api
 export interface DeleteFilePayload {
   fileId: string;
-  folderId?: string | null;
 }
 
+// restore file api
 export interface RestoreFilePayload {
   fileId: string;
-  folderId?: string | null;
 }
 
+// download file api
 export interface DownloadFilePayload {
   fileId: string;
 }
+
+// ---
+
+
+
+// export interface FileListItem {
+//   id: string;
+//   name: string;
+//   extension: string;
+//   mimeType: string;
+//   size: number;
+//   thumbnailUrl: string | null;
+//   folderId: string | null;
+//   isFavorite: boolean;
+//   createdAt: Date;
+
+//   folder: {
+//     id: string;
+//     name: string;
+//     color: string | null;
+//     icon: string | null;
+//   } | null;
+// }
+
+
+// File Type (General)
+//TODO: fix the fileItem type
+export interface FileFolder {
+  id: string;
+  name: string;
+  color:string;
+}
+export interface FileItem {
+  id: string;
+  name: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  thumbnailUrl: string | null;
+  folderId: string | null;
+  isFavorite: boolean;
+  createdAt: string;
+  updatedAt:string;
+  folder: FileFolder | null;
+}
+
+export interface FilesResponse {
+  id: string;
+  name: string;
+  size: number;
+  thumbnailUrl: string | null;
+  isFavorite: boolean;
+  createdAt: string;
+  updatedAt:string;
+  folder: FileFolder | null;
+}
+
+export interface FileDetail {
+  id: string;
+  name: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  thumbnailUrl: string | null;
+  isFavorite: boolean;
+  createdAt: string;
+  updatedAt:string;
+  folder: FileFolder | null;
+}
+
+// File Category Filter type
+export type FileCategoryFilter =
+  | "all"
+  | "image"
+  | "video"
+  | "document"
+  | "spreadsheet"
+  | "other";
+
+//TODO: fix this type
+// File Provider Context Actions type
+export type ModalMode = "preview" | "details" | "edit" | "move" | null;
+
+export interface FileModalState {
+  mode: ModalMode;
+  file: FileItem | null;
+}
+
+export interface FileModalContextValue extends FileModalState {
+  openModal: (mode: Exclude<ModalMode, null>, file: FileItem) => void;
+  closeModal: () => void;
+}
+
+export interface FileActionHandlers {
+  onEdit?: (file: FileItem) => void;
+  onToggleFavorite?: (file: FileItem) => void;
+  onMove?: (file: FileItem) => void;
+  onDetails?: (file: FileItem) => void;
+  onDownload?: (file: FileItem) => void;
+  onDelete?: (file: FileItem) => void;
+}
+
+// --- 
+
+
+// Individual File Query hook type
+export interface FileQueryParams {
+  folderId?: string | null;
+  search?: string;
+  category?: FileCategoryFilter;
+}
+
+
