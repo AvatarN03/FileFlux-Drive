@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { fileApi } from "./useFileMutations";
+import fileApi from "@/services/fileApi";
 
 import {  FileQueryParams } from "@/types/file";
 
