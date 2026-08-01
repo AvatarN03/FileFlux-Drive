@@ -60,7 +60,7 @@ const LoginForm = () => {
           id="email"
           type="email"
           placeholder="you@example.com"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -76,7 +76,7 @@ const LoginForm = () => {
           id="password"
           type="password"
           placeholder="••••••••"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}

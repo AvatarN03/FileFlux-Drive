@@ -66,7 +66,7 @@ const SignupForm = () => {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Ex. Ramu Naidu"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
@@ -82,7 +82,7 @@ const SignupForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
@@ -98,7 +98,7 @@ const SignupForm = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
           required
         />
       </div>
