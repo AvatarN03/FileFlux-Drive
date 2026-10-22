@@ -58,6 +58,8 @@ export const folders = pgTable(
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
 
+    color: text("color"),
+
     isFavorite: boolean("is_favorite").default(false).notNull(),
 
     deletedAt: timestamp("deleted_at"),
