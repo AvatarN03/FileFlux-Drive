@@ -93,13 +93,13 @@ import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 
-import Header from "./_components/Header";
+import Header from "../_components/Header";
 
 
-import Loading from "../_uiParts/Loading";
+import Loading from "../_components/marketing/Loading";
 
 import { useAuth } from "@/hooks/useAuth";
-import Sidebar from "./_components/Sidebar";
+import Sidebar from "../_components/Sidebar";
 
 
 const Layout = ({ children }: { children: ReactNode }) => {
@@ -128,14 +128,14 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <div className="relative w-screen min-h-screen overflow-x-hidden bg-gradient-62 flex max-w-500 mx-auto">
+    <div className=" relative w-screen h-screen overflow-hidden  flex max-w-500 mx-auto">
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
 
-      <main className="flex-1 flex flex-col min-w-0 space-y-4 bg-neutral-800">
+      <main className="flex-1 flex flex-col min-w-0">
         <Header user={user!} onOpen={() => setSidebarOpen(true)} />
-        <div className="p-2 md:p-4 lg:p-6">
+        <div className="overflow-y-scroll">
           {children}
         </div>
       </main>

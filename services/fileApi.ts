@@ -93,6 +93,18 @@ const fileApi = {
 
     return data.data!;
   },
+  
+  getFolderFiles: async (folderId: string) => {
+    const res = await fetch(`/api/files/${folderId}`);
+
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch files");
+    }
+
+    return data;
+  },
 
   async update({
     fileId,

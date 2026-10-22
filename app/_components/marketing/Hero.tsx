@@ -8,7 +8,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="bg-gradient-62 min-h-screen  w-screen p-4 relative isolate overflow-hidden"
+      className=" min-h-screen  w-screen p-4 relative isolate overflow-hidden"
     >
       {/* Blur layer - isolated at the back */}
       <div className="absolute inset-0 z-0 pointer-events-none">

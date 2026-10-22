@@ -34,7 +34,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <main className="relative bg-gradient-62">
+    <main className="relative">
       <Navbar navColor={navColor} />
 
       <Hero />

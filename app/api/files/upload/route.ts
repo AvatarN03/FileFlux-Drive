@@ -3,13 +3,28 @@ import { NextResponse } from "next/server";
 import { UploadApiResponse } from "cloudinary";
 
 import { db } from "@/db";
-import { files } from "@/db/schema";
+import { files, usersTable } from "@/db/schema";
 import cloudinary from "@/lib/cloudinary";
-import { canUploadFile, getFileExtension, getFileNameWithoutExtension } from "@/lib/file";
+import {
+  getFileExtension,
+  getFileNameWithoutExtension,
+} from "@/lib/file/operations";
 import { getAuthUser, getThumbnailUrl } from "../../_services";
+import { eq, sql } from "drizzle-orm";
+import { canUploadFile } from "@/lib/validations/file";
 
 export async function POST(req: Request) {
   const user = await getAuthUser();
+
+  if (!user.emailVerified) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Please verify your email before uploading files.",
+      },
+      { status: 403 },
+    );
+  }
 
   try {
     // 3️⃣ Read file
@@ -74,17 +89,26 @@ export async function POST(req: Request) {
 
     const thumbnailUrl = getThumbnailUrl(uploadResult);
 
-    await db.insert(files).values({
-      userId: user.id,
-      name: displayName,
-      originalName,
-      extension,
-      mimeType: file.type,
-      size: file.size,
-      url: uploadResult.secure_url,
-      thumbnailUrl,
-      publicId: uploadResult.public_id,
-      folderId: folderIdValue,
+    await db.transaction(async (tx) => {
+      await tx.insert(files).values({
+        userId: user.id,
+        name: displayName,
+        originalName,
+        extension,
+        mimeType: file.type,
+        size: file.size,
+        url: uploadResult.secure_url,
+        thumbnailUrl,
+        publicId: uploadResult.public_id,
+        folderId: folderIdValue,
+      });
+
+      await tx
+        .update(usersTable)
+        .set({
+          storageUsed: sql`${usersTable.storageUsed} + ${file.size}`,
+        })
+        .where(eq(usersTable.id, user.id));
     });
 
     return NextResponse.json({ success: true });

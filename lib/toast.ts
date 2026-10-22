@@ -10,7 +10,7 @@ interface ToastConfig {
 }
 
 const DEFAULT_TOAST_OPTIONS: ToastOptions = {
-  position: "top-right",
+  position: "bottom-right",
   autoClose: 2000,
   hideProgressBar: true,
   theme: "dark",

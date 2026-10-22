@@ -1,11 +1,10 @@
-
 @import "tailwindcss";
 
 @theme {
   --color-peach: #fcde9c;
   --color-brown: #ffa552;
-  --color-violet: #381d2a;
-  --color-green: #c4d6b0;
+--color-violet: #7F22FE; 
+  --color-green: #d8e4c4;
   --color-ember: #ba5624;
 }
 
@@ -20,10 +19,20 @@
     scroll-behavior: smooth;
   }
 
-  body {
-    width: 100%;
-    overflow-x: hidden;
-  }
+body {
+  margin: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+  color:#fff;
+
+  background-color: #000;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.2) 1px,
+    #00091d 1px
+  );
+  background-attachment: fixed;
+  background-size: 20px 20px;
+}
 
   /* Scrollbar Styling */
   ::-webkit-scrollbar {

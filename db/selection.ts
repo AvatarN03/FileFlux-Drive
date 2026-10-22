@@ -1,4 +1,4 @@
-import { usersTable } from "./schema";
+import { files, folders, usersTable } from "./schema";
 
 export const publicUserSelect = {
   id: usersTable.id,
@@ -11,4 +11,23 @@ export const publicUserSelect = {
   lastVerificationEmailSentAt: usersTable.lastVerificationEmailSentAt,
   lastLoginAt: usersTable.lastLoginAt,
   createdAt: usersTable.createdAt,
+};
+
+export const fileListSelect = {
+  id: files.id,
+  name: files.name,
+  extension: files.extension,
+  mimeType: files.mimeType,
+  size: files.size,
+  thumbnailUrl: files.thumbnailUrl,
+  folderId: files.folderId,
+  isFavorite: files.isFavorite,
+  createdAt: files.createdAt,
+  updatedAt: files.updatedAt
+};
+
+export const folderPreviewSelect = {
+  id: folders.id,
+  name: folders.name,
+  color: folders.color
 };

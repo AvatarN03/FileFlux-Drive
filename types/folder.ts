@@ -25,3 +25,25 @@ export type GetAllFolders = {
     name:string;
     isFavorite: boolean;
 }[]
+
+export type FolderItem = {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+}
+
+export type FolderModalMode = "details" | "edit" | "move" | "delete" | null;
+
+
+export interface FolderModalState {
+  mode: FolderModalMode;
+  folder: FolderItem | null;
+}
+
+export interface FolderModalContextValue extends FolderModalState {
+  openModal: (
+    mode: Exclude<FolderModalMode, null>,
+    folder: FolderItem
+  ) => void;
+  closeModal: () => void;
+}

@@ -90,11 +90,11 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gradient-62">
+    <div className="h-screen w-screen">
       <div className="flex items-center justify-center max-w-480 mx-auto h-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full h-full">
           {/* Left: Form Section */}
-          <div className="col-span-full md:col-span-1 lg:col-span-1 p-4 md:p-10 flex flex-col justify-center lg:justify-start text-green bg-neutral-900 max-w-lg m-auto md:m-0 rounded-2xl md:rounded-none shadow-lg h-fit w-full md:h-full">
+          <div className="col-span-full md:col-span-1 lg:col-span-1 p-4 md:p-10 flex flex-col justify-center lg:justify-start text-green  max-w-lg m-auto md:m-0 rounded-2xl md:rounded-none shadow-lg h-fit w-full md:h-full">
             <div className="my-8">
               <Logo />
             </div>

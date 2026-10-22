@@ -1,103 +1,75 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { and, desc, eq, ilike, isNull, not, or } from "drizzle-orm";
 
-import { and, eq } from "drizzle-orm";
-
-import { deleteFromCloudinary, getAuthUser } from "../_services";
-
+import { verifyAuth } from "../_services";
 import { db } from "@/db";
-import { files } from "@/db/schema";
+import { files, folders } from "@/db/schema";
+import { fileListSelect, folderPreviewSelect } from "@/db/selection";
 
-export async function PATCH(req: NextRequest) {
+const CATEGORY_EXTENSIONS = {
+  image: ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp", "heic"],
+  video: ["mp4", "mov", "avi", "mkv", "webm"],
+  spreadsheet: ["xls", "xlsx", "csv"],
+  document: ["doc", "docx", "pdf", "txt"],
+} as const;
+
+type Category = keyof typeof CATEGORY_EXTENSIONS;
+
+const isValidCategory = (value: string): value is Category =>
+  value in CATEGORY_EXTENSIONS;
+
+// Asserts non-null here, once, since every extensions[] we pass is
+// guaranteed non-empty (hardcoded above / derived via flat()).
+const extensionCondition = (extensions: readonly string[]) =>
+  or(...extensions.map((ext) => eq(files.extension, ext)))!;
+
+export async function GET(req: Request) {
   try {
-    const { id: userId } = await getAuthUser();
-    if (!userId)
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    const { fileId, file_name } = await req.json();
+    const { id } = await verifyAuth();
 
-    if (!fileId || !file_name?.trim()) {
-      return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    const { searchParams } = new URL(req.url);
+    const folderId = searchParams.get("folderId");
+    const search = searchParams.get("search");
+    const category = searchParams.get("category");
+
+    const conditions = [eq(files.userId, id), isNull(files.deletedAt)];
+
+    if (folderId) {
+      conditions.push(eq(files.folderId, folderId));
     }
-    const updated = await db
-      .update(files)
-      .set({
-        file_name,
+
+    if (search) {
+      conditions.push(ilike(files.name, `%${search}%`));
+    }
+
+    if (category === "other") {
+      const knownExtensions = Object.values(CATEGORY_EXTENSIONS).flat();
+      conditions.push(
+        not(or(...knownExtensions.map((ext) => eq(files.extension, ext)))!),
+      );
+    } else if (category && isValidCategory(category)) {
+      conditions.push(extensionCondition(CATEGORY_EXTENSIONS[category]));
+    }
+
+    const filesData = await db
+      .select({
+        ...fileListSelect,
+        folder: folderPreviewSelect,
       })
-      .where(and(eq(files.id, fileId), eq(files.user_id, userId)))
-      .returning();
-
-    if (!updated.length) {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
-    }
+      .from(files)
+      .leftJoin(folders, eq(files.folderId, folders.id))
+      .where(and(...conditions))
+      .orderBy(desc(files.createdAt));
 
     return NextResponse.json({
       success: true,
-      file: updated[0],
+      files: filesData,
     });
   } catch (error) {
-    console.error("Rename error:", error);
+    console.error("File fetch error:", error);
     return NextResponse.json(
-      { error: "Failed to rename file" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    const { fileId, folderId } = await req.json();
-
-    if (!fileId) {
-      return NextResponse.json(
-        { error: "File ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const { id: userId } = await getAuthUser();
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    // 1️⃣ Get file first (to access publicId)
-    const file = await db.query.files.findFirst({
-      where: and(
-        eq(files.id, fileId),
-        eq(files.user_id, userId),
-        folderId ? eq(files.folderId, folderId) : undefined
-      ),
-    });
-
-    if (!file) {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
-    }
-    if (!file.public_id) {
-      return NextResponse.json(
-        { error: "File has no public ID" },
-        { status: 400 }
-      );
-    }
-
-    // 2️⃣ Delete from Cloudinary
-    await deleteFromCloudinary(file.public_id);
-
-    // 3️⃣ Delete from DB
-    await db.delete(files).where(eq(files.id, fileId));
-
-    return NextResponse.json({
-      success: true,
-      message: "File deleted successfully",
-    });
-  } catch (error) {
-    console.error("Delete file error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete file" },
-      { status: 500 }
+      { success: false, error: "Failed to fetch files" },
+      { status: 500 },
     );
   }
 }

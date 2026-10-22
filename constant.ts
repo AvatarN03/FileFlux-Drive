@@ -150,11 +150,11 @@ export const PRICING_PLANS = [
 export const topSections = [
   { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
   { key: "files", icon: Folder, label: "Files", href: "/files" },
-  { key: "folders", icon: FolderTree, label: "Folders", href: "/dashboard/folders" },
-  { key: "recent", icon: Clock, label: "Recent", href: "/dashboard/recent" },
-  { key: "favorites", icon: Star, label: "Favorites", href: "/dashboard/favorites" },
-  { key: "shared", icon: Link2, label: "Shared", href: "/dashboard/shared" },
-  { key: "trash", icon: Trash2, label: "Trash", href: "/dashboard/trash" },
+  { key: "folders", icon: FolderTree, label: "Folders", href: "/folders" },
+  { key: "recent", icon: Clock, label: "Recent", href: "/recent" },
+  { key: "favorites", icon: Star, label: "Favorites", href: "/favorites" },
+  { key: "shared", icon: Link2, label: "Shared", href: "/shared" },
+  { key: "trash", icon: Trash2, label: "Trash", href: "/trash" },
 ];
 
 export const bottomSections = [
