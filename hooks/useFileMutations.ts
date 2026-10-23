@@ -48,7 +48,7 @@ export function useFileMutations() {
   const update = useMutation({
     mutationFn: (payload: UpdateFilePayload) => fileApi.update(payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       });
@@ -56,6 +56,12 @@ export function useFileMutations() {
       queryClient.invalidateQueries({
         queryKey: ["recent-files"],
       });
+
+      if (variables.fileId) {
+        queryClient.invalidateQueries({
+          queryKey: ["file", variables.fileId],
+        });
+      }
     },
   });
 
