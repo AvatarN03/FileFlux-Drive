@@ -5,9 +5,7 @@ import MobileFileMenu from "./MobileFileMenu";
 
 import  ItemNameDisplay  from "../shared/ItemNameDisplay";
 
-import { formatFileSize } from "@/lib/file";
-import { getReadableFileType } from "@/lib/file/fileType";
-import { getFileIcon } from "@/lib/file/getFileIcon";
+import { formatFileSize, getFileIcon, getReadableFileType } from "@/lib/file";
 import { FileItemRowProps } from "@/types/ui";
 
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { and, count, eq, isNull, sql } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 
 import { verifyAuth } from "../_services";
 

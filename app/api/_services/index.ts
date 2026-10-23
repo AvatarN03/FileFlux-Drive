@@ -2,13 +2,13 @@ import crypto from "node:crypto";
 
 import { cookies } from "next/headers";
 
-import {eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { UploadApiResponse } from "cloudinary";
 
 import { verifyToken } from "./jwtServices";
 
 import { db } from "@/db";
-import {  usersTable, verificationTokens } from "@/db/schema";
+import { folders, usersTable, verificationTokens } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
 
 import cloudinary from "@/lib/cloudinary";
@@ -146,4 +146,37 @@ export function getThumbnailUrl(
 //   }
 // }
 
+export async function buildFolderPath(
+  folderId: string,
+  userId: string
+): Promise<{ id: string; name: string }[]> {
+  const path: { id: string; name: string }[] = [];
+  const visited = new Set<string>();
+  let currentId: string | null = folderId;
 
+  while (currentId !== null && !visited.has(currentId) && visited.size < 50) {
+    visited.add(currentId);
+
+    const [folder] = await db
+      .select({
+        id: folders.id,
+        name: folders.name,
+        parentId: folders.parentId,
+      })
+      .from(folders)
+      .where(
+        and(
+          eq(folders.id, currentId),
+          eq(folders.userId, userId),
+          isNull(folders.deletedAt)
+        )
+      );
+
+    if (!folder) break;
+
+    path.unshift({ id: folder.id, name: folder.name });
+    currentId = folder.parentId;
+  }
+
+  return path;
+}

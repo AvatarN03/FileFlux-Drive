@@ -19,11 +19,12 @@ export const fileListSelect = {
   extension: files.extension,
   mimeType: files.mimeType,
   size: files.size,
+  url: files.url,
   thumbnailUrl: files.thumbnailUrl,
   folderId: files.folderId,
   isFavorite: files.isFavorite,
   createdAt: files.createdAt,
-  updatedAt: files.updatedAt
+  updatedAt: files.updatedAt,
 };
 
 export const folderPreviewSelect = {

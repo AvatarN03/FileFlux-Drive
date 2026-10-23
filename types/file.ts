@@ -1,4 +1,3 @@
-
 // FileUpload Component Type
 export type UploadState = {
   file: File | null;
@@ -12,7 +11,7 @@ export type UploadState = {
 
 // File Mutations hook types
 
-//upload file api
+// upload file api
 export interface UploadFilePayload {
   file: File;
   folderId?: string | null;
@@ -52,59 +51,32 @@ export interface DownloadFilePayload {
 
 // ---
 
-
-
-// export interface FileListItem {
-//   id: string;
-//   name: string;
-//   extension: string;
-//   mimeType: string;
-//   size: number;
-//   thumbnailUrl: string | null;
-//   folderId: string | null;
-//   isFavorite: boolean;
-//   createdAt: Date;
-
-//   folder: {
-//     id: string;
-//     name: string;
-//     color: string | null;
-//     icon: string | null;
-//   } | null;
-// }
-
-
 // File Type (General)
-//TODO: fix the fileItem type
 export interface FileFolder {
   id: string;
   name: string;
-  color:string;
+  color: string | null;
 }
+
 export interface FileItem {
   id: string;
   name: string;
   extension: string;
   mimeType: string;
   size: number;
+  url?: string;
   thumbnailUrl: string | null;
   folderId: string | null;
   isFavorite: boolean;
   createdAt: string;
-  updatedAt:string;
+  updatedAt: string;
   folder: FileFolder | null;
+  downloads?: number;
+  views?: number;
+  lastOpenedAt?: string | null;
 }
 
-export interface FilesResponse {
-  id: string;
-  name: string;
-  size: number;
-  thumbnailUrl: string | null;
-  isFavorite: boolean;
-  createdAt: string;
-  updatedAt:string;
-  folder: FileFolder | null;
-}
+export type FilesResponse = FileItem;
 
 export interface FileDetail {
   id: string;
@@ -115,8 +87,33 @@ export interface FileDetail {
   thumbnailUrl: string | null;
   isFavorite: boolean;
   createdAt: string;
-  updatedAt:string;
+  updatedAt: string;
   folder: FileFolder | null;
+  downloads?: number;
+  views?: number;
+  lastOpenedAt?: string | null;
+}
+
+export interface FolderFileItem {
+  id: string;
+  name: string;
+  originalName: string;
+  extension: string;
+  mimeType: string;
+  size: number;
+  url: string;
+  thumbnailUrl: string | null;
+  downloads: number;
+  views: number;
+  isFavorite: boolean;
+  createdAt: string | Date;
+  lastOpenedAt: string | Date | null;
+}
+
+export interface FolderFilesResponse {
+  success: boolean;
+  files: FolderFileItem[];
+  error?: string;
 }
 
 // File Category Filter type
@@ -128,7 +125,6 @@ export type FileCategoryFilter =
   | "spreadsheet"
   | "other";
 
-//TODO: fix this type
 // File Provider Context Actions type
 export type ModalMode = "preview" | "details" | "edit" | "move" | null;
 
@@ -151,8 +147,7 @@ export interface FileActionHandlers {
   onDelete?: (file: FileItem) => void;
 }
 
-// --- 
-
+// ---
 
 // Individual File Query hook type
 export interface FileQueryParams {
@@ -160,5 +155,3 @@ export interface FileQueryParams {
   search?: string;
   category?: FileCategoryFilter;
 }
-
-

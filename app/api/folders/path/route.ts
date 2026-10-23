@@ -8,11 +8,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const folderId = searchParams.get("folderId");
 
-    if (!folderId || isNaN(Number(folderId))) {
+    if (!folderId) {
       return NextResponse.json({ success: false, path: [] });
     }
 
-    const path = await buildFolderPath(Number(folderId), userId);
+    const path = await buildFolderPath(folderId, userId);
 
     return NextResponse.json({ success: true, path });
   } catch {

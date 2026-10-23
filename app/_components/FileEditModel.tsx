@@ -39,7 +39,6 @@ const FileEditModal = ({ file, onClose }: { file: FileItem; onClose: () => void 
     try {
       await update.mutateAsync({
         fileId: file.id,
-        folderId: file.folderId,
         name: trimmedName,
         extension: trimmedExtension,
         isFavorite,

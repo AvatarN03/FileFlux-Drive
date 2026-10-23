@@ -4,17 +4,19 @@ import Image from "next/image";
 import { getFileCategoryFilter } from "@/lib/file/operations";
 import FileModal from "./FileModal";
 import { File as FileIcon } from "lucide-react";
+import { FileItem } from "@/types/file";
 
-const FilePreviewModal = ({ file, onClose }: { file: any; onClose: () => void }) => {
+const FilePreviewModal = ({ file, onClose }: { file: FileItem; onClose: () => void }) => {
   const category = getFileCategoryFilter(file);
+  const imageSrc = file.thumbnailUrl || file.url;
 
   return (
     <FileModal title={`${file.name}.${file.extension}`} onClose={onClose} maxWidth="max-w-2xl">
       <div className="flex items-center justify-center bg-brown/5 rounded-lg min-h-64">
-        {category === "image" ? (
+        {category === "image" && imageSrc ? (
           <div className="relative w-full max-h-[70vh] aspect-video">
             <Image
-              src={file.thumbnailUrl ?? file.url}
+              src={imageSrc}
               alt={file.name}
               fill
               className="object-contain"

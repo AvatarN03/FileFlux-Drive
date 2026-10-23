@@ -7,6 +7,7 @@ import {
   FileDetail,
   FileQueryParams,
   FilesResponse,
+  FolderFilesResponse,
   MoveFilePayload,
   RestoreFilePayload,
   UpdateFilePayload,
@@ -73,13 +74,13 @@ const fileApi = {
 
     const res = await fetch(`${FILE_API_ENDPOINTS.GET}?${params.toString()}`);
 
-    const data: ApiResponse<FilesResponse[]> = await res.json();
+    const data = await res.json();
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to fetch files");
     }
 
-    return data.data!;
+    return (data.files ?? data.data ?? []) as FilesResponse[];
   },
 
   async getFile(fileId: string): Promise<FileDetail> {
@@ -93,11 +94,11 @@ const fileApi = {
 
     return data.data!;
   },
-  
-  getFolderFiles: async (folderId: string) => {
+
+  getFolderFiles: async (folderId: string): Promise<FolderFilesResponse> => {
     const res = await fetch(`/api/files/${folderId}`);
 
-    const data: ApiResponse = await res.json();
+    const data: FolderFilesResponse = await res.json();
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to fetch files");
@@ -128,13 +129,14 @@ const fileApi = {
   },
 
   async move({ fileId, toFolderId }: MoveFilePayload) {
-    const res = await fetch(`${FILE_API_ENDPOINTS.MOVE}/${fileId}`, {
+    const res = await fetch(FILE_API_ENDPOINTS.MOVE, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        folderId: toFolderId,
+        fileId,
+        folderId: toFolderId ?? null,
       }),
     });
 

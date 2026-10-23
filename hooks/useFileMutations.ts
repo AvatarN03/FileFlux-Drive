@@ -31,6 +31,9 @@ export function useFileMutations() {
       queryClient.invalidateQueries({
         queryKey: ["folder-files", folderId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["files", folderId],
+      });
     }
   };
 
@@ -68,11 +71,17 @@ export function useFileMutations() {
         queryClient.invalidateQueries({
           queryKey: ["folder-files", variables.fromFolderId],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["files", variables.fromFolderId],
+        });
       }
 
       if (variables.toFolderId) {
         queryClient.invalidateQueries({
           queryKey: ["folder-files", variables.toFolderId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["files", variables.toFolderId],
         });
       }
 

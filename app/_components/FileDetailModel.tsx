@@ -3,7 +3,7 @@
 import { FileItem } from "@/types/file";
 import { formatFileSize } from "@/lib/file";
 import FileModal from "./FileModal";
-import { useFile, useFiles } from "@/hooks/useFileQueries";
+import { useFile } from "@/hooks/useFileQueries";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -32,10 +32,14 @@ const FileDetailsModal = ({ file, onClose }: { file: FileItem; onClose: () => vo
         <Row label="Folder" value={record.folder ? record.folder.name : "No folder (root)"} />
         <Row label="Favorite" value={record.isFavorite ? "Yes" : "No"} />
         <Row label="Created" value={formatDate(record.createdAt)} />
-        {"downloads" in record && <Row label="Downloads" value={record.downloads} />}
-        {"views" in record && <Row label="Views" value={record.views} />}
-        {"lastOpenedAt" in record && record.lastOpenedAt && (
-          <Row label="Last opened" value={formatDate(record.lastOpenedAt as string)} />
+        {record.downloads !== undefined && (
+          <Row label="Downloads" value={record.downloads} />
+        )}
+        {record.views !== undefined && (
+          <Row label="Views" value={record.views} />
+        )}
+        {record.lastOpenedAt && (
+          <Row label="Last opened" value={formatDate(record.lastOpenedAt)} />
         )}
       </div>
       {isLoading && (

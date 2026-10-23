@@ -57,7 +57,7 @@ const FilesView = ({ folderId, title }: FilesViewProps) => {
             />
 
             <FileLists
-                data={files}
+                files={files}
                 isLoading={isLoading}
                 isFetching={isFetching}
             />
