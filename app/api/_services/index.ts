@@ -13,20 +13,38 @@ import { publicUserSelect } from "@/db/selection";
 
 import cloudinary from "@/lib/cloudinary";
 
-// auth 
+export class AuthError extends Error {
+  constructor(message = "Unauthorized") {
+    super(message);
+    this.name = "AuthError";
+  }
+}
+
+export function isAuthError(error: unknown): error is AuthError {
+  return (
+    error instanceof AuthError ||
+    (error instanceof Error &&
+      (error.name === "AuthError" ||
+        error.message === "UNAUTHORIZED" ||
+        error.message === "USER_NOT_FOUND" ||
+        error.message === "Unauthorized"))
+  );
+}
+
+// auth
 export async function verifyAuth(): Promise<{ id: string }> {
   const cookieStore = await cookies();
 
   const token = cookieStore.get("FP-accessToken")?.value;
 
   if (!token) {
-    throw new Error("UNAUTHORIZED");
+    throw new AuthError("Unauthorized");
   }
 
   const verified = verifyToken(token);
 
   if (!verified.valid || !verified.value) {
-    throw new Error("UNAUTHORIZED");
+    throw new AuthError("Unauthorized");
   }
 
   return verified.value as { id: string };
@@ -35,14 +53,13 @@ export async function verifyAuth(): Promise<{ id: string }> {
 export async function getAuthUser() {
   const { id } = await verifyAuth();
 
-
   const [user] = await db
     .select(publicUserSelect)
     .from(usersTable)
     .where(eq(usersTable.id, id));
 
   if (!user) {
-    throw new Error("USER_NOT_FOUND");
+    throw new AuthError("User not found");
   }
 
   return user;
@@ -70,9 +87,9 @@ export async function generateEmailVerification(userId: string) {
   return token;
 }
 
-// --- 
+// ---
 
-// file 
+// file
 
 export function getThumbnailUrl(
   upload: UploadApiResponse

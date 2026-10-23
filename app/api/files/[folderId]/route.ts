@@ -3,7 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
-import { verifyAuth } from "../../_services";
+import { isAuthError, verifyAuth } from "../../_services";
 
 interface RouteParams {
   params: Promise<{
@@ -86,6 +86,17 @@ export async function GET(
       files: folderFiles,
     });
   } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
     console.error(error);
 
     return NextResponse.json(

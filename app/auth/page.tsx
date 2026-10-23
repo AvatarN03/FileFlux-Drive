@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -17,7 +17,26 @@ import toastC from "@/lib/toast";
 
 import { AUTH_TOAST_MESSAGES } from "@/constant";
 
-const AuthPage = () => {
+function getSafeRedirectUrl(target: string | null | undefined): string {
+  if (!target) return "/dashboard";
+  try {
+    const decoded = decodeURIComponent(target);
+    if (
+      decoded.startsWith("/") &&
+      !decoded.startsWith("//") &&
+      !decoded.includes("\\") &&
+      decoded !== "/auth" &&
+      !decoded.startsWith("/auth?")
+    ) {
+      return decoded;
+    }
+  } catch {
+    // Malformed URI component fallback
+  }
+  return "/dashboard";
+}
+
+const AuthContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
@@ -39,10 +58,8 @@ const AuthPage = () => {
       return;
     }
 
-    // Otherwise continue or go to dashboard
-    const redirectPath = continueTo
-      ? decodeURIComponent(continueTo)
-      : "/dashboard";
+    // Otherwise continue to safe destination or dashboard
+    const redirectPath = getSafeRedirectUrl(continueTo);
 
     router.push(redirectPath);
   }, [isLoading, isAuthenticated, user, continueTo, router]);
@@ -77,7 +94,8 @@ const AuthPage = () => {
         data: AUTH_TOAST_MESSAGES.GOOGLE_LOGIN_SUCCESS,
       });
 
-      router.push("/dashboard");
+      const redirectPath = getSafeRedirectUrl(continueTo);
+      router.push(redirectPath);
 
     } catch {
 
@@ -156,6 +174,14 @@ const AuthPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const AuthPage = () => {
+  return (
+    <Suspense fallback={null}>
+      <AuthContent />
+    </Suspense>
   );
 };
 

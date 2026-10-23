@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { and, desc, eq, ilike, isNull, not, or } from "drizzle-orm";
 
-import { verifyAuth } from "../_services";
+import { isAuthError, verifyAuth } from "../_services";
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
 import { fileListSelect, folderPreviewSelect } from "@/db/selection";
@@ -66,6 +66,12 @@ export async function GET(req: Request) {
       files: filesData,
     });
   } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
     console.error("File fetch error:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch files" },

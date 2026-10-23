@@ -9,24 +9,24 @@ import {
   getFileExtension,
   getFileNameWithoutExtension,
 } from "@/lib/file/operations";
-import { getAuthUser, getThumbnailUrl } from "../../_services";
+import { getAuthUser, getThumbnailUrl, isAuthError } from "../../_services";
 import { eq, sql } from "drizzle-orm";
 import { canUploadFile } from "@/lib/validations/file";
 
 export async function POST(req: Request) {
-  const user = await getAuthUser();
-
-  if (!user.emailVerified) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Please verify your email before uploading files.",
-      },
-      { status: 403 },
-    );
-  }
-
   try {
+    const user = await getAuthUser();
+
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Please verify your email before uploading files.",
+        },
+        { status: 403 },
+      );
+    }
+
     // 3️⃣ Read file
     const formData = await req.formData();
 
@@ -113,12 +113,18 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
     console.error("Upload failed:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to upload file",
+        error: "Failed to upload file",
       },
       { status: 500 },
     );

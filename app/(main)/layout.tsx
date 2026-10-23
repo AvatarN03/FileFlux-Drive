@@ -90,7 +90,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 import Header from "../_components/Header";
@@ -108,6 +108,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
     isLoading,
   } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
 
@@ -116,9 +117,17 @@ const Layout = ({ children }: { children: ReactNode }) => {
     if (isLoading) return;
 
     if (!user) {
-      router.replace("/auth");
+      const search =
+        typeof window !== "undefined" ? window.location.search : "";
+      const currentUrl = `${pathname}${search}`;
+      const destination =
+        currentUrl && currentUrl !== "/auth" && currentUrl !== "/"
+          ? `/auth?continueTo=${encodeURIComponent(currentUrl)}`
+          : "/auth";
+
+      router.replace(destination);
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, user, pathname, router]);
 
   if (isLoading) {
     return (

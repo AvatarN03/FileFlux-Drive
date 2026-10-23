@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { and, count, eq, isNull } from "drizzle-orm";
 
-import { verifyAuth } from "../_services";
+import { isAuthError, verifyAuth } from "../_services";
 
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
@@ -31,10 +31,17 @@ export async function POST(req: Request) {
       .returning();
 
     return NextResponse.json({ success: true, folder });
-  } catch {
+  } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Create folder error:", error);
     return NextResponse.json(
-      { success: false, error: "Unauthorized" },
-      { status: 401 },
+      { success: false, error: "Internal Server Error" },
+      { status: 500 },
     );
   }
 }
@@ -77,7 +84,14 @@ export async function GET(req: Request) {
       success: true,
       data: result,
     });
-  } catch {
+  } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Fetch folders error:", error);
     return NextResponse.json(
       {
         success: false,
@@ -167,7 +181,13 @@ export async function DELETE(req: Request) {
       message: "Folder deleted successfully",
     });
   } catch (error) {
-    console.error(error);
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Delete folder error:", error);
 
     return NextResponse.json(
       {
@@ -244,7 +264,14 @@ export async function PATCH(req: Request) {
       success: true,
       folder: updatedFolder,
     });
-  } catch {
+  } catch (error) {
+    if (isAuthError(error)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+    console.error("Update folder error:", error);
     return NextResponse.json(
       {
         success: false,

@@ -4,7 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
-import { getAuthUser } from "../../_services";
+import { getAuthUser, isAuthError } from "../../_services";
 
 export async function PATCH(req: Request) {
   try {
@@ -76,6 +76,12 @@ export async function PATCH(req: Request) {
       message: "File moved successfully",
     });
   } catch (err) {
+    if (isAuthError(err)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
     console.error(err);
     return NextResponse.json(
       { success: false, error: "Failed to move file" },
