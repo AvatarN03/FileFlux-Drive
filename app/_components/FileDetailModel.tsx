@@ -20,7 +20,7 @@ const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
 
 const FileDetailsModal = ({ file, onClose }: { file: FileItem; onClose: () => void }) => {
   // Show list data immediately, replace with full record once it loads.
-  const { data: details, isLoading } = useFile(file.id);
+  const { data: details, isLoading, isError } = useFile(file.id);
   const record = details ?? file;
 
   return (
@@ -29,7 +29,7 @@ const FileDetailsModal = ({ file, onClose }: { file: FileItem; onClose: () => vo
         <Row label="Name" value={`${record.name}.${record.extension}`} />
         <Row label="Type" value={record.mimeType} />
         <Row label="Size" value={formatFileSize(record.size)} />
-        <Row label="Folder" value={record.folder ? record.folder.name : "No folder (root)"} />
+        <Row label="Folder" value={record.folder?.name || "No folder (root)"} />
         <Row label="Favorite" value={record.isFavorite ? "Yes" : "No"} />
         <Row label="Created" value={formatDate(record.createdAt)} />
         {record.downloads !== undefined && (
@@ -44,6 +44,9 @@ const FileDetailsModal = ({ file, onClose }: { file: FileItem; onClose: () => vo
       </div>
       {isLoading && (
         <p className="text-xs text-violet/40 mt-3">Loading full details…</p>
+      )}
+      {isError && (
+        <p className="text-xs text-rose-500/80 mt-3">Failed to load additional details.</p>
       )}
     </FileModal>
   );
