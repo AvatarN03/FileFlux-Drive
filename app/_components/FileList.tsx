@@ -21,6 +21,9 @@ import { FileItem } from "@/types/file";
 import { formatFileSize} from "@/lib/file";
 import { useFileModal } from "@/context/FileModalContext";
 import { getFileCategoryFilter } from "@/lib/file/operations";
+import { useFileMutations } from "@/hooks/useFileMutations";
+import { toastError, toastSuccess } from "@/lib/toast";
+import FileModal from "./FileModal";
 
 
 const CategoryIcon = ({ file }: { file: FileItem }) => {
@@ -41,9 +44,21 @@ const CategoryIcon = ({ file }: { file: FileItem }) => {
 
 const FileList = ({ file }: { file: FileItem }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { openModal } = useFileModal();
+  const { remove } = useFileMutations();
+
+  const handleDelete = async () => {
+    try {
+      await remove.mutateAsync({ fileId: file.id });
+      toastSuccess("File moved to trash");
+      setShowDeleteConfirm(false);
+    } catch {
+      toastError("Failed to delete file");
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -63,7 +78,7 @@ const FileList = ({ file }: { file: FileItem }) => {
     {
       label: "Delete",
       icon: Trash2,
-      handler: () => console.log("delete", file.id),
+      handler: () => setShowDeleteConfirm(true),
       danger: true,
     },
   ];
@@ -148,6 +163,42 @@ const FileList = ({ file }: { file: FileItem }) => {
       <p className="text-xs text-violet/60 mt-0.5">
         {file.extension.toUpperCase()} · {formatFileSize(file.size)}
       </p>
+
+      {showDeleteConfirm && (
+        <FileModal
+          title="Move to Trash"
+          onClose={() => !remove.isPending && setShowDeleteConfirm(false)}
+          maxWidth="max-w-sm"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-violet/80">
+              Are you sure you want to move{" "}
+              <span className="font-semibold text-violet">
+                {file.name}.{file.extension}
+              </span>{" "}
+              to Trash?
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={remove.isPending}
+                className="px-4 py-2 text-sm font-medium text-violet/70 hover:text-violet bg-brown/10 hover:bg-brown/20 rounded-md transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={remove.isPending}
+                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50"
+              >
+                {remove.isPending ? "Moving..." : "Move to Trash"}
+              </button>
+            </div>
+          </div>
+        </FileModal>
+      )}
     </div>
   );
 };

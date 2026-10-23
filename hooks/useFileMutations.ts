@@ -100,18 +100,24 @@ export function useFileMutations() {
   const remove = useMutation({
     mutationFn: (payload: DeleteFilePayload) => fileApi.delete(payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recent-files"],
       });
 
       queryClient.invalidateQueries({
         queryKey: ["trash-files"],
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["storage"],
-      });
+      if (variables.fileId) {
+        queryClient.invalidateQueries({
+          queryKey: ["file", variables.fileId],
+        });
+      }
     },
   });
 
