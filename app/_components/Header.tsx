@@ -2,6 +2,7 @@ import {  Menu } from "lucide-react";
 import Image from "next/image";
 import { PublicUser } from "@/types/auth";
 import Link from "next/link";
+import VaultStatusBadge from "./vault/VaultStatusBadge";
 
 const Header = ({ user, onOpen }: { user: PublicUser, onOpen: () => void }) => {
   console.log(user)
@@ -16,16 +17,19 @@ const Header = ({ user, onOpen }: { user: PublicUser, onOpen: () => void }) => {
         <h1 className="text-base md:text-2xl font-medium">Welcome back, <br className="md:hidden" />{user.name}!</h1>
       </div>
 
-      <Link href="/settings" className="flex gap-2 items-center md:px-3 md:py-2 rounded-md bg-neutral-800">
-        <h4 className="hidden lg:block">{user.name}</h4>
-        <Image
-          src={user.avatarUrl || "/default-avatar.webp"}
-          alt="User Avatar"
-          width={40}
-          height={40}
-          className="rounded-full cursor-pointer"
-        />
-      </Link>
+      <div className="flex items-center gap-3">
+        <VaultStatusBadge />
+        <Link href="/settings" className="flex gap-2 items-center md:px-3 md:py-2 rounded-md bg-neutral-800">
+          <h4 className="hidden lg:block">{user.name}</h4>
+          <Image
+            src={user.avatarUrl || "/default-avatar.webp"}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="rounded-full cursor-pointer"
+          />
+        </Link>
+      </div>
     </header>
   );
 };
