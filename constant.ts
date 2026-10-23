@@ -199,6 +199,7 @@ export const AUTH_API_ENDPOINTS = {
 export const FILE_API_ENDPOINTS = {
   UPLOAD: "/api/files/upload",
   GET: "/api/files",
+  ITEM: "/api/files/item",
   DELETE: "/api/files/delete",
   UPDATE: "/api/files/update",
   MOVE: "/api/files/move",

@@ -84,7 +84,7 @@ const fileApi = {
   },
 
   async getFile(fileId: string): Promise<FileDetail> {
-    const res = await fetch(`${FILE_API_ENDPOINTS.GET}/${fileId}`);
+    const res = await fetch(`${FILE_API_ENDPOINTS.ITEM}/${fileId}`);
 
     const data: ApiResponse<FileDetail> = await res.json();
 
