@@ -1,4 +1,4 @@
-import { files, folders, usersTable } from "./schema";
+import { files, folders, usersTable, vaults } from "./schema";
 
 export const publicUserSelect = {
   id: usersTable.id,
@@ -23,6 +23,13 @@ export const fileListSelect = {
   thumbnailUrl: files.thumbnailUrl,
   folderId: files.folderId,
   isFavorite: files.isFavorite,
+  objectKey: files.objectKey,
+  streamHeader: files.streamHeader,
+  encryptedKeyNonce: files.encryptedKeyNonce,
+  encryptedKeyCiphertext: files.encryptedKeyCiphertext,
+  encryptedMetadataNonce: files.encryptedMetadataNonce,
+  encryptedMetadataCiphertext: files.encryptedMetadataCiphertext,
+  isEncrypted: files.isEncrypted,
   createdAt: files.createdAt,
   updatedAt: files.updatedAt,
 };
@@ -31,4 +38,17 @@ export const folderPreviewSelect = {
   id: folders.id,
   name: folders.name,
   color: folders.color
+};
+
+export const vaultEnvelopesSelect = {
+  id: vaults.id,
+  kdfSalt: vaults.kdfSalt,
+  kdfOpsLimit: vaults.kdfOpsLimit,
+  kdfMemLimit: vaults.kdfMemLimit,
+  kdfAlgorithm: vaults.kdfAlgorithm,
+  passphraseNonce: vaults.passphraseNonce,
+  passphraseCiphertext: vaults.passphraseCiphertext,
+  recoveryNonce: vaults.recoveryNonce,
+  recoveryCiphertext: vaults.recoveryCiphertext,
+  updatedAt: vaults.updatedAt,
 };

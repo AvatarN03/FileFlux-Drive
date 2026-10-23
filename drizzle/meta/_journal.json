@@ -29,6 +29,20 @@
       "when": 1784972251581,
       "tag": "0003_giant_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792776460499,
+      "tag": "0004_smiling_swarm",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792778934621,
+      "tag": "0005_famous_wild_pack",
+      "breakpoints": true
     }
   ]
 }

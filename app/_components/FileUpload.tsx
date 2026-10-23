@@ -10,8 +10,11 @@ import FilePreview from "./files/FilePreview";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useFileMutations } from "@/hooks/useFileMutations";
+import { useVault } from "@/context/VaultContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { uploadEncryptedFile } from "@/lib/storage/encryptedFileTransfer";
 
-import { toastError } from "@/lib/toast";
+import { toastError, toastSuccess } from "@/lib/toast";
 import { createRenamedFile, getFileNameWithoutExtension } from "@/lib/file/operations";
 
 import { INITIAL_STATE } from "@/constant";
@@ -31,6 +34,8 @@ const FileUpload = () => {
   }>();
 
   const { user } = useAuth();
+  const { vaultKey } = useVault();
+  const queryClient = useQueryClient();
   const { upload } = useFileMutations();
 
   const updateState = useCallback((updates: Partial<UploadState>) => {
@@ -112,6 +117,11 @@ const FileUpload = () => {
       return;
     }
 
+    if (!vaultKey) {
+      toastError("Please unlock your secure vault before uploading files.");
+      return;
+    }
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
@@ -120,15 +130,17 @@ const FileUpload = () => {
         isUploading: true,
       });
 
-
       const renamedFile = createRenamedFile(
         state.file,
         state.fileName.trim()
       );
 
-      await upload.mutateAsync({
+      // Perform client-side authenticated encryption and direct Neon S3 upload
+      await uploadEncryptedFile({
         file: renamedFile,
+        displayName: state.fileName.trim(),
         folderId,
+        vaultKey,
         signal: controller.signal,
         onProgress: (progress) => {
           updateState({ uploadProgress: progress });
@@ -137,8 +149,12 @@ const FileUpload = () => {
 
       updateState({
         uploadComplete: true,
-        uploadProgress: 0,
+        uploadProgress: 100,
       });
+
+      queryClient.invalidateQueries({ queryKey: ["files"] });
+      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      toastSuccess("File encrypted and stored securely!");
 
       timeoutRef.current = setTimeout(resetState, 1000);
     } catch (error) {
@@ -148,7 +164,7 @@ const FileUpload = () => {
         return;
       }
 
-      toastError("Failed to upload file");
+      toastError((error as Error)?.message || "Failed to upload file");
 
       resetState();
     } finally {
@@ -159,7 +175,8 @@ const FileUpload = () => {
     state.fileName,
     user,
     folderId,
-    upload,
+    vaultKey,
+    queryClient,
     updateState,
     resetState,
   ]);

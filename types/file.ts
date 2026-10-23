@@ -74,6 +74,13 @@ export interface FileItem {
   downloads?: number;
   views?: number;
   lastOpenedAt?: string | null;
+  isEncrypted?: boolean;
+  objectKey?: string | null;
+  streamHeader?: string | null;
+  encryptedKeyNonce?: string | null;
+  encryptedKeyCiphertext?: string | null;
+  encryptedMetadataNonce?: string | null;
+  encryptedMetadataCiphertext?: string | null;
 }
 
 export type FilesResponse = FileItem;

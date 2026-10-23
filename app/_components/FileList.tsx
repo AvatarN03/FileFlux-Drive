@@ -22,6 +22,9 @@ import { formatFileSize} from "@/lib/file";
 import { useFileModal } from "@/context/FileModalContext";
 import { getFileCategoryFilter } from "@/lib/file/operations";
 import { useFileMutations } from "@/hooks/useFileMutations";
+import { useVault } from "@/context/VaultContext";
+import { downloadAndDecryptFile } from "@/lib/storage/encryptedFileTransfer";
+import { decryptMetadata } from "@/lib/crypto";
 import { toastError, toastSuccess } from "@/lib/toast";
 import FileModal from "./FileModal";
 
@@ -45,10 +48,45 @@ const CategoryIcon = ({ file }: { file: FileItem }) => {
 const FileList = ({ file }: { file: FileItem }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [displayName, setDisplayName] = useState(file.name);
+  const [displayExt, setDisplayExt] = useState(file.extension);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { openModal } = useFileModal();
   const { remove } = useFileMutations();
+  const { vaultKey } = useVault();
+
+  useEffect(() => {
+    if (file.isEncrypted && file.encryptedMetadataCiphertext && file.encryptedMetadataNonce && vaultKey) {
+      decryptMetadata(
+        {
+          nonce: file.encryptedMetadataNonce,
+          ciphertext: file.encryptedMetadataCiphertext,
+        },
+        vaultKey
+      )
+        .then((meta) => {
+          setDisplayName(meta.name);
+          setDisplayExt(meta.extension);
+        })
+        .catch((err) => {
+          console.error("Failed to decrypt file metadata:", err);
+        });
+    } else if (file.isEncrypted && !vaultKey) {
+      setDisplayName("[Encrypted File]");
+      setDisplayExt("");
+    } else {
+      setDisplayName(file.name);
+      setDisplayExt(file.extension);
+    }
+  }, [
+    file.isEncrypted,
+    file.encryptedMetadataCiphertext,
+    file.encryptedMetadataNonce,
+    file.name,
+    file.extension,
+    vaultKey,
+  ]);
 
   const handleDelete = async () => {
     try {
@@ -57,6 +95,26 @@ const FileList = ({ file }: { file: FileItem }) => {
       setShowDeleteConfirm(false);
     } catch {
       toastError("Failed to delete file");
+    }
+  };
+
+  const handleDownload = async () => {
+    if (file.isEncrypted) {
+      if (!vaultKey) {
+        toastError("Please unlock your secure vault to decrypt and download this file.");
+        return;
+      }
+      try {
+        await downloadAndDecryptFile({ fileId: file.id, vaultKey });
+        toastSuccess("File decrypted and downloaded successfully!");
+      } catch (err: unknown) {
+        console.error(err);
+        toastError((err as Error)?.message || "Failed to decrypt and download file");
+      }
+    } else if (file.url) {
+      window.open(file.url, "_blank");
+    } else {
+      toastError("No download URL available for this file");
     }
   };
 
@@ -74,7 +132,7 @@ const FileList = ({ file }: { file: FileItem }) => {
     { label: "Edit", icon: Pencil, handler: () => openModal("edit", file) },
     { label: "Details", icon: Info, handler: () => openModal("details", file) },
     { label: "Move", icon: FolderInput, handler: () => openModal("move", file) },
-    { label: "Download", icon: Download, handler: () => console.log("download", file.id) },
+    { label: "Download", icon: Download, handler: handleDownload },
     {
       label: "Delete",
       icon: Trash2,
@@ -157,11 +215,11 @@ const FileList = ({ file }: { file: FileItem }) => {
       </div>
 
       {/* Meta */}
-      <p className="font-medium text-sm truncate text-violet" title={file.name}>
-        {file.name}.{file.extension}
+      <p className="font-medium text-sm truncate text-violet" title={displayName}>
+        {displayName}{displayExt ? `.${displayExt}` : ""}
       </p>
       <p className="text-xs text-violet/60 mt-0.5">
-        {file.extension.toUpperCase()} · {formatFileSize(file.size)}
+        {displayExt ? `${displayExt.toUpperCase()} · ` : ""}{formatFileSize(file.size)}
       </p>
 
       {showDeleteConfirm && (
@@ -174,7 +232,7 @@ const FileList = ({ file }: { file: FileItem }) => {
             <p className="text-sm text-violet/80">
               Are you sure you want to move{" "}
               <span className="font-semibold text-violet">
-                {file.name}.{file.extension}
+                {displayName}{displayExt ? `.${displayExt}` : ""}
               </span>{" "}
               to Trash?
             </p>
