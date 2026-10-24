@@ -1,50 +1,24 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
-import Footer from "./_components/marketing/Footer";
-import Features from "./_components/marketing/Features";
-import Pricing from "./_components/marketing/Pricing";
-import Hero from "./_components/marketing/Hero";
 import Navbar from "./_components/marketing/Navbar";
+import Hero from "./_components/marketing/Hero";
+import Features from "./_components/marketing/Features";
+import Footer from "./_components/marketing/Footer";
+
+export const metadata = {
+  title: "FileFlux | Intelligent File & Folder Management Platform",
+  description:
+    "A fast, secure, and modern file management platform featuring encrypted personal vaults, granular file sharing, and real-time usage metrics.",
+};
 
 const LandingPage = () => {
-  const [navColor, setNavColor] = useState(false);
-
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const vh = window.innerHeight;
-
-      if (scrollY >= vh && scrollY < vh * 2) {
-        setNavColor(true);
-      } else {
-        setNavColor(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    handleScroll();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <main className="relative bg-gradient-62">
-      <Navbar navColor={navColor} />
-
-      <Hero />
-
-      <Features />
-
-      <Pricing />
-
+    <div className="min-h-screen bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet flex flex-col w-full overflow-x-hidden">
+      <Navbar />
+      <main className="flex-1 w-full">
+        <Hero />
+        <Features />
+      </main>
       <Footer />
-    </main>
+    </div>
   );
 };
 

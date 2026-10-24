@@ -31,6 +31,9 @@ export function useFileMutations() {
       queryClient.invalidateQueries({
         queryKey: ["folder-files", folderId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["files", folderId],
+      });
     }
   };
 
@@ -45,7 +48,7 @@ export function useFileMutations() {
   const update = useMutation({
     mutationFn: (payload: UpdateFilePayload) => fileApi.update(payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       });
@@ -53,6 +56,12 @@ export function useFileMutations() {
       queryClient.invalidateQueries({
         queryKey: ["recent-files"],
       });
+
+      if (variables.fileId) {
+        queryClient.invalidateQueries({
+          queryKey: ["file", variables.fileId],
+        });
+      }
     },
   });
 
@@ -68,11 +77,17 @@ export function useFileMutations() {
         queryClient.invalidateQueries({
           queryKey: ["folder-files", variables.fromFolderId],
         });
+        queryClient.invalidateQueries({
+          queryKey: ["files", variables.fromFolderId],
+        });
       }
 
       if (variables.toFolderId) {
         queryClient.invalidateQueries({
           queryKey: ["folder-files", variables.toFolderId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["files", variables.toFolderId],
         });
       }
 
@@ -85,18 +100,24 @@ export function useFileMutations() {
   const remove = useMutation({
     mutationFn: (payload: DeleteFilePayload) => fileApi.delete(payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["recent-files"],
       });
 
       queryClient.invalidateQueries({
         queryKey: ["trash-files"],
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["storage"],
-      });
+      if (variables.fileId) {
+        queryClient.invalidateQueries({
+          queryKey: ["file", variables.fileId],
+        });
+      }
     },
   });
 

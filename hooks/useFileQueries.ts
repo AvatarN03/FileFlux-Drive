@@ -33,6 +33,16 @@ export function useFile(fileId?: string) {
   });
 }
 
+export const useFolderFiles = (folderId: string | null) => {
+  return useQuery({
+    queryKey: ["files", folderId],
+
+    queryFn: () => fileApi.getFolderFiles(folderId!),
+
+    enabled: !!folderId,
+  });
+};
+
 // export function useRecentFiles() {
 //   return useQuery({
 //     queryKey: ["files", "recent"],

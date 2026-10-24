@@ -43,48 +43,44 @@ export const features = [
   {
     title: "Secure Cloud Storage",
     description:
-      "Store your files safely in the cloud with up to 250 MB of personal storage and full control.",
+      "Store your files safely with quota enforcement, high availability, and resilient infrastructure.",
     icon: Cloud,
-    class:
-      "flex-col-reverse col-span-1 md:col-span-6  bg-peach relative after:content-[''] after:absolute after:right-25   after:top-0    after:w-3  after:h-3   after:rounded-sm  after:bg-peach after:z-20 before:content-[''] before:absolute before:right-0   before:top-13    before:w-4  before:h-4  before:rounded-sm  before:bg-peach before:z-20",
-    pos: "bottom-0 right-2",
-    cut: "top-0 -right-2 -translate-y-2",
+    tag: "Security",
   },
   {
     title: "Organize Files & Folders",
     description:
-      "Create folders, upload files, edit details, and delete anything with ease.",
+      "Create hierarchical folders, upload files, manage details, and organize your digital assets cleanly.",
     icon: Folder,
-    class: "flex-col col-span-1 md:col-span-5 bg-brown",
-    pos: "top-0 right-2",
-    cut: "bottom-0 -right-2 translate-y-2",
+    tag: "Organization",
   },
   {
-    title: "View & Download Files",
+    title: "Instant Preview & Download",
     description:
-      "Instantly preview and download your files anytime without losing quality.",
+      "Preview images, documents, spreadsheets, and media directly in the browser with lossless download speeds.",
     icon: Download,
-    class: "flex-col col-span-1 md:col-span-5 bg-peach",
-    pos: "right-2 top-2",
-    cut: "bottom-0 -right-2 translate-y-2",
+    tag: "Performance",
   },
   {
-    title: "Controlled Public Access",
+    title: "Granular Access Sharing",
     description:
-      "Share files publicly with a toggle—only when you choose to make them accessible.",
+      "Share files with customizable public visibility toggles—keep personal assets strictly confidential.",
     icon: Eye,
-    class: "flex-col-reverse col-span-1 md:col-span-6 bg-brown",
-    pos: "bottom-2 right-2",
-    cut: "top-0 -right-2 -translate-y-2",
+    tag: "Privacy",
   },
   {
     title: "Activity & Storage Analytics",
     description:
-      "Track uploads, downloads, edits, and storage usage from a single analysis board.",
+      "Track your upload metrics, capacity utilization, file distribution, and recent activity from a central console.",
     icon: BarChart3,
-    class: "flex-col col-span-1 md:col-span-full bg-peach",
-    pos: "right-4 bottom-3",
-    cut: "top-0 -right-2 -translate-y-2 !w-32 md:!w-64",
+    tag: "Analytics",
+  },
+  {
+    title: "Client-Side Encrypted Vault",
+    description:
+      "Protect your most confidential documents with master passphrases, libsodium crypto, and recovery keys.",
+    icon: ShieldCheck,
+    tag: "Vault",
   },
 ];
 
@@ -150,11 +146,11 @@ export const PRICING_PLANS = [
 export const topSections = [
   { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
   { key: "files", icon: Folder, label: "Files", href: "/files" },
-  { key: "folders", icon: FolderTree, label: "Folders", href: "/dashboard/folders" },
-  { key: "recent", icon: Clock, label: "Recent", href: "/dashboard/recent" },
-  { key: "favorites", icon: Star, label: "Favorites", href: "/dashboard/favorites" },
-  { key: "shared", icon: Link2, label: "Shared", href: "/dashboard/shared" },
-  { key: "trash", icon: Trash2, label: "Trash", href: "/dashboard/trash" },
+  { key: "folders", icon: FolderTree, label: "Folders", href: "/folders" },
+  { key: "recent", icon: Clock, label: "Recent", href: "/recent" },
+  { key: "favorites", icon: Star, label: "Favorites", href: "/favorites" },
+  { key: "shared", icon: Link2, label: "Shared", href: "/shared" },
+  { key: "trash", icon: Trash2, label: "Trash", href: "/trash" },
 ];
 
 export const bottomSections = [
@@ -199,6 +195,7 @@ export const AUTH_API_ENDPOINTS = {
 export const FILE_API_ENDPOINTS = {
   UPLOAD: "/api/files/upload",
   GET: "/api/files",
+  ITEM: "/api/files/item",
   DELETE: "/api/files/delete",
   UPDATE: "/api/files/update",
   MOVE: "/api/files/move",

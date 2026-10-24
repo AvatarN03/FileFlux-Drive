@@ -113,6 +113,15 @@ export const files = pgTable(
 
     lastOpenedAt: timestamp("last_opened_at"),
 
+    // Zero-Knowledge Encrypted Storage (Neon S3)
+    objectKey: text("object_key"),
+    streamHeader: text("stream_header"),
+    encryptedKeyNonce: text("encrypted_key_nonce"),
+    encryptedKeyCiphertext: text("encrypted_key_ciphertext"),
+    encryptedMetadataNonce: text("encrypted_metadata_nonce"),
+    encryptedMetadataCiphertext: text("encrypted_metadata_ciphertext"),
+    isEncrypted: boolean("is_encrypted").default(false).notNull(),
+
     ...timestamps,
   },
   (table) => [
@@ -227,9 +236,40 @@ export const verificationTokens = pgTable(
   ]
 );
 
+// VAULTS (Zero-Knowledge Key Envelopes)
+export const vaults = pgTable(
+  "vaults",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .unique()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+
+    // Argon2id KDF parameters
+    kdfSalt: text("kdf_salt").notNull(),
+    kdfOpsLimit: integer("kdf_ops_limit").notNull(),
+    kdfMemLimit: integer("kdf_mem_limit").notNull(),
+    kdfAlgorithm: text("kdf_algorithm").default("argon2id").notNull(),
+
+    // Passphrase-wrapped vault key envelope
+    passphraseNonce: text("passphrase_nonce").notNull(),
+    passphraseCiphertext: text("passphrase_ciphertext").notNull(),
+
+    // Recovery-wrapped vault key envelope
+    recoveryNonce: text("recovery_nonce").notNull(),
+    recoveryCiphertext: text("recovery_ciphertext").notNull(),
+
+    ...timestamps,
+  },
+  (table) => [index("vaults_user_idx").on(table.userId)]
+);
+
 // RELATIONS
 
-export const usersRelations = relations(usersTable, ({ many }) => ({
+export const usersRelations = relations(usersTable, ({ one, many }) => ({
+  vault: one(vaults),
+
   files: many(files),
 
   folders: many(folders),
@@ -322,4 +362,12 @@ export const verificationTokensRelations = relations(
   })
 );
 
+export const vaultsRelations = relations(vaults, ({ one }) => ({
+  user: one(usersTable, {
+    fields: [vaults.userId],
+    references: [usersTable.id],
+  }),
+}));
+
 export type User = InferSelectModel<typeof usersTable>;
+export type Vault = InferSelectModel<typeof vaults>;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 import { getAuthUser } from "../../_services";
 
@@ -14,7 +14,7 @@ export async function GET() {
     const allFolders = await db
       .select()
       .from(folders)
-      .where(eq(folders.user_id, userId));
+      .where(and(eq(folders.userId, userId), isNull(folders.deletedAt)));
 
     return NextResponse.json({ success: true, allFolders });
   } catch  {

@@ -50,17 +50,20 @@ const LoginForm = () => {
   }
 
   return (
-    <form className="space-y-8 w-full h-full">
+    <form onSubmit={handleLogin} className="space-y-5 w-full">
       {/* Email */}
-      <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="email" className="text-xl">
-          Email
+      <div className="flex flex-col gap-1.5 justify-start">
+        <label
+          htmlFor="email"
+          className="text-xs font-bold uppercase tracking-wider text-brand-peach"
+        >
+          Email Address
         </label>
         <input
           id="email"
           type="email"
           placeholder="you@example.com"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -68,34 +71,39 @@ const LoginForm = () => {
       </div>
 
       {/* Password */}
-      <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="password" className="text-xl">
-          Password
-        </label>
+      <div className="flex flex-col gap-1.5 justify-start">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="password"
+            className="text-xs font-bold uppercase tracking-wider text-brand-peach"
+          >
+            Password
+          </label>
+        </div>
         <input
           id="password"
           type="password"
           placeholder="••••••••"
-          className="px-3 py-2 bg-slate-400 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
 
-      {/* Sign In */}
+      {/* Sign In Button */}
       <button
-        onClick={handleLogin}
-        className="w-full  text-base rounded-md cursor-pointer px-3 py-2 font-semibold bg-ember text-peach hover:text-green hover:bg-ember/80 transition-colors duration-300 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-violet disabled:text-peach/80"
+        type="submit"
+        className="w-full px-5 py-3 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-sm font-bold border-2 border-brand-brown shadow-[3px_3px_0px_0px_#FFA552] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#FFA552] transition-all rounded-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
         disabled={isLoading}
       >
         {isLoading ? (
           <div className="flex items-center justify-center gap-2">
-            <LoaderCircle className="animate-spin" />
-            Loging In...
+            <LoaderCircle className="w-4 h-4 animate-spin text-brand-peach" />
+            <span>Logging In...</span>
           </div>
         ) : (
-          "Log In"
+          "Log In to FileFlux"
         )}
       </button>
     </form>

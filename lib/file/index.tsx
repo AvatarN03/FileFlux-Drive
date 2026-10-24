@@ -1,7 +1,16 @@
-import { JSX } from "react";
+import { ReactNode } from "react";
+import {
+  Image as ImageIcon,
+  FileText,
+  File,
+  FileVideo,
+  FileAudio,
+  FileArchive,
+  FileSpreadsheet,
+  FileCode,
+} from "lucide-react";
 
-
-// file size 
+// file size
 export const formatFileSize = (bytes: number): string => {
   if (!bytes || bytes === 0) return "0 Bytes";
   const k = 1024;
@@ -10,15 +19,25 @@ export const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
+export const getReadableFileType = (type: string | null | undefined): string => {
+  if (!type) return "Unknown";
 
-export function getDisplayFileType(extension: string) {
-  return FileType[extension.toLowerCase()] ?? "File";
-}
+  const lower = type.toLowerCase();
+  if (lower.includes("wordprocessingml") || lower.includes("doc")) return "Word Document";
+  if (lower.includes("spreadsheetml") || lower.includes("xls") || lower.includes("sheet")) return "Excel Sheet";
+  if (lower.includes("presentationml") || lower.includes("ppt")) return "PowerPoint";
+  if (lower.includes("pdf")) return "PDF Document";
+  if (lower.includes("image")) return "Image";
+  if (lower.includes("video")) return "Video";
+  if (lower.includes("audio")) return "Audio";
+  if (lower.includes("zip") || lower.includes("archive") || lower.includes("tar") || lower.includes("rar")) return "ZIP Archive";
 
+  return "File";
+};
 
-export const getFileIcon = (type: string | null): JSX.Element => {
+export const getFileIcon = (type: string | null | undefined): ReactNode => {
   if (!type) {
-    return <File size={32} />; // fallback if null
+    return <File size={32} />;
   }
 
   const lowerType = type.toLowerCase();

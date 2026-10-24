@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -17,7 +17,26 @@ import toastC from "@/lib/toast";
 
 import { AUTH_TOAST_MESSAGES } from "@/constant";
 
-const AuthPage = () => {
+function getSafeRedirectUrl(target: string | null | undefined): string {
+  if (!target) return "/dashboard";
+  try {
+    const decoded = decodeURIComponent(target);
+    if (
+      decoded.startsWith("/") &&
+      !decoded.startsWith("//") &&
+      !decoded.includes("\\") &&
+      decoded !== "/auth" &&
+      !decoded.startsWith("/auth?")
+    ) {
+      return decoded;
+    }
+  } catch {
+    // Malformed URI component fallback
+  }
+  return "/dashboard";
+}
+
+const AuthContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(true);
@@ -39,10 +58,8 @@ const AuthPage = () => {
       return;
     }
 
-    // Otherwise continue or go to dashboard
-    const redirectPath = continueTo
-      ? decodeURIComponent(continueTo)
-      : "/dashboard";
+    // Otherwise continue to safe destination or dashboard
+    const redirectPath = getSafeRedirectUrl(continueTo);
 
     router.push(redirectPath);
   }, [isLoading, isAuthenticated, user, continueTo, router]);
@@ -77,7 +94,8 @@ const AuthPage = () => {
         data: AUTH_TOAST_MESSAGES.GOOGLE_LOGIN_SUCCESS,
       });
 
-      router.push("/dashboard");
+      const redirectPath = getSafeRedirectUrl(continueTo);
+      router.push(redirectPath);
 
     } catch {
 
@@ -90,72 +108,95 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gradient-62">
-      <div className="flex items-center justify-center max-w-480 mx-auto h-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-full h-full">
-          {/* Left: Form Section */}
-          <div className="col-span-full md:col-span-1 lg:col-span-1 p-4 md:p-10 flex flex-col justify-center lg:justify-start text-green bg-neutral-900 max-w-lg m-auto md:m-0 rounded-2xl md:rounded-none shadow-lg h-fit w-full md:h-full">
-            <div className="my-8">
-              <Logo />
+    <div className="min-h-screen w-full bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet flex items-center justify-center overflow-x-hidden">
+      <div className="w-full h-screen grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+        {/* Left: Form Section (Dark Theme matching Brand Palette) */}
+        <div className="col-span-12 md:col-span-5 lg:col-span-4 xl:col-span-4 bg-brand-violet-dark text-brand-cream flex flex-col justify-between p-6 sm:p-8 md:p-10 lg:p-12 overflow-y-auto border-r-2 border-brand-violet relative z-10 shadow-2xl">
+          <div>
+            {/* Top Brand Logo with cabinet icon & glowing text contrast */}
+            <div className="mb-8">
+              <Logo classes="text-brand-cream" />
             </div>
 
-            <div className="flex flex-col gap-2 text-center mb-8">
-              <h1 className="text-2xl font-medium ">
+            {/* Heading & Subtext */}
+            <div className="mb-6">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-cream tracking-tight">
                 {isLogin ? "Welcome Back" : "Create an Account"}
               </h1>
-              <p className="mb-6 font-light tracking-wider text-sm text-peach">
-                Login to continue managing your files.
+              <p className="mt-2 text-sm text-brand-peach/85 font-medium leading-relaxed">
+                {isLogin
+                  ? "Enter your credentials to access and command your encrypted vaults."
+                  : "Sign up to start organizing files with zero-knowledge security."}
               </p>
             </div>
 
+            {/* Interactive Auth Form */}
             <div>{isLogin ? <LoginForm /> : <SignupForm />}</div>
-            <div className="mt-6">
-              <div className="relative my-5">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-700" />
-                </div>
 
-                <div className="relative flex justify-center">
-                  <span className="bg-neutral-900 px-4 text-xs text-neutral-400">
-                    OR
-                  </span>
-                </div>
+            {/* Divider in Dark Theme */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t-2 border-brand-violet-light/60" />
               </div>
+              <div className="relative flex justify-center">
+                <span className="bg-brand-violet px-3 py-0.5 text-xs font-bold text-brand-peach uppercase tracking-wider border border-brand-violet-light">
+                  Or Continue With
+                </span>
+              </div>
+            </div>
 
+            {/* Google Authentication */}
+            <div className="flex justify-center w-full">
               <GoogleLogin
-                theme="filled_blue"
-                shape="pill"
+                theme="filled_black"
+                shape="rectangular"
                 size="large"
                 width="100%"
                 onSuccess={handleGoogleSuccess}
-                onError={() => toastC({ data: "Google Sign In failed", type: "error" })}
+                onError={() =>
+                  toastC({ data: "Google Sign In failed", type: "error" })
+                }
               />
             </div>
+          </div>
 
-            <p className="font-light text-sm my-4 whitespace-nowrap text-center">
+          {/* Switch Login / Signup Footer */}
+          <div className="pt-6 mt-6 border-t border-brand-violet-light/60 text-center text-sm font-medium text-brand-cream/70">
+            <span>
               {isLogin ? "Don't have an Account?" : "Already have an Account?"}
-              <button
-                onClick={handleSwitch}
-                className="font-semibold hover:underline cursor-pointer mx-1 underline underline-offset-2 hover:text-brown"
-              >
-                {isLogin ? "Sign Up" : "Login"}
-              </button>
-            </p>
+            </span>{" "}
+            <button
+              type="button"
+              onClick={handleSwitch}
+              className="font-bold text-brand-peach-vibrant hover:text-brand-peach underline underline-offset-4 cursor-pointer transition-colors"
+            >
+              {isLogin ? "Sign Up" : "Log In"}
+            </button>
           </div>
+        </div>
 
-          {/* Right: Image Section */}
-          <div className="hidden md:block md:col-span-1 lg:col-span-3 overflow-hidden relative h-full shadow-lg  rounded-r-md">
-            <Image
-              src="/auth_banner.png"
-              alt="auth-img"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+        {/* Right: Large Banner Image Section */}
+        <div className="hidden md:block md:col-span-7 lg:col-span-8 relative h-full w-full bg-brand-violet-dark">
+          <Image
+            src="/auth_banner.png"
+            alt="FileFlux Authentication Banner"
+            fill
+            className="object-cover"
+            priority
+          />
+          {/* Brand Accent Stripe on Divider */}
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-brand-brown via-brand-peach-vibrant to-brand-peach" />
         </div>
       </div>
     </div>
+  );
+};
+
+const AuthPage = () => {
+  return (
+    <Suspense fallback={null}>
+      <AuthContent />
+    </Suspense>
   );
 };
 
