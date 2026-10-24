@@ -1,53 +1,141 @@
 import Link from "next/link";
-import { GithubIcon, LinkedinIcon } from "lucide-react";
-
+import { GithubIcon, LinkedinIcon, ArrowUpRight } from "lucide-react";
+import Logo from "../Logo";
 
 const Footer = () => {
   return (
-    <footer className="md:h-96 w-screen bg-violet  p-8 pt-16">
-      <div className="h-full w-full text-center flex justify-center items-center flex-col">
-        <h1
-          className="text-3xl font-bold mb-4 
-  bg-linear-to-r from-ember to-peach 
-  bg-clip-text text-transparent tracking-wider"
-        >
-          FileFlux
-        </h1>
+    <footer className="w-full bg-brand-violet text-brand-cream border-t-2 border-brand-violet-dark pt-16 pb-12">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-brand-violet-light/40">
+          {/* Brand Info with Current Logo */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="inline-block text-brand-cream">
+              <Logo classes="text-brand-cream" />
+            </div>
+            <p className="text-sm text-brand-cream-muted/80 max-w-sm leading-relaxed">
+              FileFlux is a next-generation file management platform engineered
+              for developers and teams who demand speed, security, and
+              zero-knowledge personal privacy.
+            </p>
+            <div className="flex items-center gap-3 pt-2">
+              <Link
+                href="https://github.com/AvatarN03"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#FFA552] rounded-none"
+                title="GitHub"
+              >
+                <GithubIcon className="w-5 h-5" />
+              </Link>
+              <Link
+                href="https://linkedin.com/in/prashanth-naidu03"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#FFA552] rounded-none"
+                title="LinkedIn"
+              >
+                <LinkedinIcon className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
 
-        <p className="text-brown/80 md:w-[700px] ">
-          FileFlux provides a simple and efficient way to manage your files in one place.
-Upload, organize, and access your data securely with ease and speed.
-        </p>
+          {/* Platform Links */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-brand-peach mb-4">
+              Platform
+            </h4>
+            <ul className="space-y-2.5 text-sm text-brand-cream-muted/80">
+              <li>
+                <Link href="#home" className="hover:text-brand-peach transition-colors">
+                  Overview
+                </Link>
+              </li>
+              <li>
+                <Link href="#features" className="hover:text-brand-peach transition-colors">
+                  Features
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/auth?continueTo=dashboard"
+                  className="hover:text-brand-peach transition-colors inline-flex items-center gap-1 group"
+                >
+                  Dashboard{" "}
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-        <div className="flex justify-center items-center gap-12 md:gap-16 my-8">
-          {/* GitHub */}
-          <Link
-            href="https://github.com/AvatarN03"
-            target="_blank"
-            className="p-4 rounded-full bg-ember hover:bg-brown hover:text-violet w-32 h-32 flex justify-center items-center hover:scale-105 transition"
-            title="github"
-          >
-            <GithubIcon size={64} />
-          </Link>
+          {/* Security & Vault */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-brand-peach mb-4">
+              Security
+            </h4>
+            <ul className="space-y-2.5 text-sm text-brand-cream-muted/80">
+              <li>
+                <span className="text-brand-cream-muted/65 hover:text-brand-cream transition-colors cursor-default">
+                  Client-Side Vault
+                </span>
+              </li>
+              <li>
+                <span className="text-brand-cream-muted/65 hover:text-brand-cream transition-colors cursor-default">
+                  Libsodium Crypto
+                </span>
+              </li>
+              <li>
+                <span className="text-brand-cream-muted/65 hover:text-brand-cream transition-colors cursor-default">
+                  Quota Enforcement
+                </span>
+              </li>
+              <li>
+                <span className="text-brand-cream-muted/65 hover:text-brand-cream transition-colors cursor-default">
+                  Token Authentication
+                </span>
+              </li>
+            </ul>
+          </div>
 
-          {/* LinkedIn */}
-          <Link
-            href="https://linkedin.com/in/prashanth-naidu03"
-            target="_blank"
-            className="p-4 rounded-full bg-ember  hover:bg-brown hover:text-violet w-32 h-32 flex justify-center items-center hover:scale-105 transition"
-            title="linkedin"
-          >
-            <LinkedinIcon size={64} />
-          </Link>
+          {/* Legal */}
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-brand-peach mb-4">
+              Legal
+            </h4>
+            <ul className="space-y-2.5 text-sm text-brand-cream-muted/80">
+              <li>
+                <span className="hover:text-brand-peach transition-colors cursor-pointer">
+                  Privacy Policy
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-brand-peach transition-colors cursor-pointer">
+                  Terms of Service
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-brand-peach transition-colors cursor-pointer">
+                  Acceptable Use
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div className="flex justify-between items-center max-w-7xl mx-auto px-4 text-ember">
-        <div className="flex-1 text-md">
-          &copy; CopyRights by Prashanth Naidu |{" "}
-          <span className="text-green">{new Date().getFullYear()}</span>
-        </div>
-        <div className="hidden md:flex justify-end items-center gap-4">
-          <p>Privacy Policy</p> |<p>Terms and Conditions*</p>
+
+        {/* Bottom Sub-bar */}
+        <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-brand-cream-muted/70">
+          <div>
+            &copy; {new Date().getFullYear()} FileFlux. Built by{" "}
+            <span className="text-brand-peach font-semibold">Prashanth Naidu</span>.
+            All rights reserved.
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span className="text-brand-cream-muted">Core Services Operational</span>
+          </div>
         </div>
       </div>
     </footer>

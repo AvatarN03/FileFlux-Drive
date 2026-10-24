@@ -1,125 +1,131 @@
 "use client";
-import { useState } from "react";
 
+import Link from "next/link";
 import { motion } from "motion/react";
-
 import { PRICING_PLANS } from "@/constant";
+import { Check, ArrowRight } from "lucide-react";
 
 const Pricing = () => {
-  const [hoverIdx, setHoverIdx] = useState<number>(0);
-
-  const handleHover = (idx: number) => {
-    setHoverIdx(idx);
-  };
-
   return (
     <section
       id="pricing"
-      className="p-4 min-h-screen w-screen bg-gradient-62 relative z-10"
+      className="w-full py-20 lg:py-28 bg-brand-cream-muted border-b border-brand-border"
     >
-      <div className="absolute inset-0 w-full h-full custom-clip bg-ember z-0" />
-      <div className="relative z-10">
-        <div className="flex flex-col gap-8 justify-center items-center my-10">
-          <h2 className="text-3xl md:text-5xl">Pricing</h2>
-          <p className="text-ember max-w-3xl text-center text-base md:text-xl mb-4">
-            Secure file uploads with folder organization, storage-limit
-            enforcement, and fast preview/download access, backed by
-            authenticated APIs and real-time updates.
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
+          <span className="inline-block px-3 py-1 border border-brand-border bg-brand-cream text-brand-brown text-xs font-semibold uppercase tracking-wider mb-4 rounded-none">
+            Transparent Pricing
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-violet tracking-tight mb-4">
+            Simple, Predictable Plans for Everyone
+          </h2>
+          <p className="text-base sm:text-lg text-brand-violet/75 leading-relaxed">
+            Start completely free or upgrade to expanded quotas and dedicated
+            support as your digital storage requirements grow.
           </p>
         </div>
 
-        <motion.div
-          initial={{
-            y: 100,
-            opacity: 0,
-          }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-          // viewport={{ once: true, amount: 0.5 }}
-          className="flex flex-col md:flex-row justify-center gap-6 md:gap-16 xl:gap-24 max-w-7xl mx-auto"
-        >
+        {/* Normal Side-by-Side Pricing Cards (Strictly No Rounded Corners) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {PRICING_PLANS.map((plan, idx) => {
-            const isActive = hoverIdx === idx;
+            const isHighlighted = !!plan.highlight;
+            const Icon = plan.icon;
 
             return (
-              <div
-                key={idx}
-                onMouseEnter={() => handleHover(idx)}
-                className={`
-              transition-all duration-700 ease-in-out cursor-pointer relative overflow-hidden
-              rounded-xl text-peach p-5 w-full md:max-w-sm
-              md:max-h-[500px]
-              ${
-                isActive
-                  ? "md:flex-1 bg-violet"
-                  : "md:flex-[0.1] bg-violet md:bg-green md:text-violet"
-              }
-            `}
+              <motion.div
+                key={plan.id || idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className={`relative flex flex-col justify-between p-8 bg-brand-cream transition-all duration-200 rounded-none ${
+                  isHighlighted
+                    ? "border-2 border-brand-brown shadow-md bg-brand-cream"
+                    : "border border-brand-border hover:border-brand-brown/60"
+                }`}
               >
-                {/* Collapsed State - Rotated Title (Desktop Only) */}
-                <div
-                  className={`
-                hidden md:flex items-center gap-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                transition-all duration-500 ease-in-out
-                ${
-                  isActive
-                    ? "rotate-0 opacity-0 -translate-x-full"
-                    : "rotate-90 opacity-100 -translate-x-1/2"
-                }
-              `}
-                >
-                  <plan.icon className="w-8 h-8" />
-                  <h3 className="text-2xl font-semibold whitespace-nowrap">
-                    {plan.name}
-                  </h3>
-                </div>
-
-                {/* Expanded State - Content */}
-                <div
-                  className={`
-                md:transition-all md:duration-700 md:ease-in-out md:delay-200
-                ${
-                  isActive
-                    ? "opacity-100 translate-y-0"
-                    : "md:opacity-0 md:translate-y-16 md:pointer-events-none"
-                }
-              `}
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <plan.icon className="w-8 h-8" />
-                    <h3 className="text-2xl font-semibold">{plan.name}</h3>
+                {/* Popular Ribbon / Badge for Highlighted Plan */}
+                {isHighlighted && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-brown text-brand-cream px-3 py-0.5 text-[11px] font-bold uppercase tracking-widest border border-brand-brown-dark rounded-none">
+                    Most Popular
                   </div>
+                )}
 
-                  <p className="text-sm opacity-80 mb-4">{plan.description}</p>
-
-                  <div className="flex flex-col gap-4">
-                    <h1>{plan.duration}</h1>
-                    <h2 className="text-3xl font-bold">{plan.price}</h2>
-
-                    <div className="flex flex-col text-sm">
-                      <p>Storage: {plan.limits.storageMB} MB</p>
-                      <p>Max file size: {plan.limits.maxFileSizeMB} MB</p>
+                <div>
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 border border-brand-border bg-brand-cream-muted flex items-center justify-center text-brand-brown rounded-none">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-2xl font-bold text-brand-violet">
+                        {plan.name}
+                      </h3>
                     </div>
                   </div>
 
-                  {/* Features */}
-                  <ul className="flex flex-col gap-3 my-6">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm">
-                        <feature.icon className="w-4 h-4" />
-                        {feature.label}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-xs text-brand-violet/75 mb-6 min-h-8">
+                    {plan.description}
+                  </p>
 
-                  <button className="w-full py-2 rounded-lg font-medium bg-peach text-violet hover:opacity-90 transition-opacity">
-                    Get Started
-                  </button>
+                  {/* Pricing Display */}
+                  <div className="pb-6 mb-6 border-b border-brand-border/80">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl sm:text-5xl font-extrabold text-brand-violet tracking-tight">
+                        {plan.price}
+                      </span>
+                      <span className="text-xs text-brand-violet/60 font-medium">
+                        / {plan.duration}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex items-center gap-3 text-xs font-semibold text-brand-brown">
+                      <span>Storage: {plan.limits.storageMB} MB</span>
+                      <span>•</span>
+                      <span>Max File: {plan.limits.maxFileSizeMB} MB</span>
+                    </div>
+                  </div>
+
+                  {/* Feature Checklist */}
+                  <div className="space-y-3 mb-8">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-brand-violet/60">
+                      What&apos;s Included:
+                    </p>
+                    <ul className="space-y-2.5">
+                      {plan.features.map((feature, fIdx) => (
+                        <li
+                          key={fIdx}
+                          className="flex items-center gap-2.5 text-xs text-brand-violet font-medium"
+                        >
+                          <span className="w-4 h-4 bg-brand-peach/50 border border-brand-border flex items-center justify-center text-brand-brown shrink-0 rounded-none">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </span>
+                          <span>{feature.label}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
+
+                {/* Plan CTA (No rounded corners) */}
+                <div className="pt-4 border-t border-brand-border/60">
+                  <Link
+                    href="/auth?continueTo=dashboard"
+                    className={`w-full py-3 px-4 font-semibold text-sm flex items-center justify-center gap-2 transition-colors rounded-none ${
+                      isHighlighted
+                        ? "bg-brand-brown hover:bg-brand-brown-dark text-brand-cream border border-brand-brown"
+                        : "bg-brand-cream-muted hover:bg-brand-violet hover:text-brand-cream text-brand-violet border border-brand-border hover:border-brand-violet"
+                    }`}
+                  >
+                    <span>Get Started</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
