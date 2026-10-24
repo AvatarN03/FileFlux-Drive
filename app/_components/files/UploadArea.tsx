@@ -1,11 +1,16 @@
-import { Upload } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 
 const UploadArea = () => {
   return (
-    <div className="flex flex-row md:flex-col gap-2 items-center justify-center text-center space-y-4 border-dashed border-2 p-4 rounded-md h-full">
-      <Upload className="w-8 md:w-12 h-8 md:h-12 text-ember" />
-      <p className="font-semibold">
-        Drag & drop or <span className="text-ember">browse</span>
+    <div className="flex flex-col items-center justify-center text-center p-4 py-6 w-full">
+      <div className="w-12 h-12 bg-brand-cream-muted border-2 border-brand-brown text-brand-brown flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#BA5624]">
+        <UploadCloud className="w-6 h-6" />
+      </div>
+      <p className="text-xs font-bold text-brand-violet">
+        Drag & drop or <span className="text-brand-brown underline underline-offset-2">browse file</span>
+      </p>
+      <p className="text-[10px] text-brand-violet/70 mt-1 font-mono">
+        Automatic client-side authenticated encryption
       </p>
     </div>
   );

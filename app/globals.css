@@ -1,11 +1,46 @@
 @import "tailwindcss";
 
+:root {
+  --brand-violet: #381D2A;
+  --brand-violet-dark: #26131D;
+  --brand-violet-light: #4D2B3C;
+  --brand-brown: #BA5624;
+  --brand-brown-dark: #964219;
+  --brand-peach: #FCDE9C;
+  --brand-peach-vibrant: #FFA552;
+  --brand-cream: #FAF6F0;
+  --brand-cream-muted: #F2EBE0;
+  --brand-border: #E8DEC8;
+}
+
 @theme {
-  --color-peach: #fcde9c;
-  --color-brown: #ffa552;
---color-violet: #7F22FE; 
-  --color-green: #d8e4c4;
-  --color-ember: #ba5624;
+  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Brand color tokens requested */
+  --color-brand-violet: #381D2A;
+  --color-brand-violet-dark: #26131D;
+  --color-brand-violet-light: #4D2B3C;
+  --color-brand-brown: #BA5624;
+  --color-brand-brown-dark: #964219;
+  --color-brand-peach: #FCDE9C;
+  --color-brand-peach-vibrant: #FFA552;
+  --color-brand-cream: #FAF6F0;
+  --color-brand-cream-muted: #F2EBE0;
+  --color-brand-border: #E8DEC8;
+
+  /* Aliased tokens replacing obsolete palette across the codebase */
+  --color-violet: #381D2A;
+  --color-violet-dark: #26131D;
+  --color-violet-light: #4D2B3C;
+  --color-brown: #BA5624;
+  --color-brown-dark: #964219;
+  --color-peach: #FCDE9C;
+  --color-peach-vibrant: #FFA552;
+  --color-cream: #FAF6F0;
+  --color-cream-muted: #F2EBE0;
+  --color-border: #E8DEC8;
+  --color-ember: #BA5624;
 }
 
 @layer base {
@@ -19,88 +54,65 @@
     scroll-behavior: smooth;
   }
 
-body {
-  margin: 0;
-  overflow-x: hidden;
-  min-height: 100vh;
-  color:#fff;
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+    color: var(--brand-violet);
+    background-color: var(--brand-cream);
+  }
 
-  background-color: #000;
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.2) 1px,
-    #00091d 1px
-  );
-  background-attachment: fixed;
-  background-size: 20px 20px;
-}
-
-  /* Scrollbar Styling */
+  /* Scrollbar Styling - Sharp Corners */
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--color-brown);
+    background: var(--brand-cream-muted);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--color-violet);
-    border-radius: 10px;
+    background: var(--brand-brown);
+    border-radius: 0px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-brown-dark);
   }
 }
 
 @layer utilities {
   /* ---- Background Patterns ---- */
 
+  /* Network Nodes & Circuit Topology pattern */
+  .bg-pattern-network {
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23381D2A' stroke-width='1' stroke-opacity='0.08'%3E%3Cpath d='M0 32h64M32 0v64M0 0l64 64M64 0L0 64'/%3E%3Ccircle cx='32' cy='32' r='3' fill='%23BA5624' fill-opacity='0.22' stroke='%23381D2A' stroke-opacity='0.15' stroke-width='1'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='64' cy='0' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='0' cy='64' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='64' cy='64' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(180deg, var(--brand-cream), var(--brand-cream-muted));
+    background-size: 64px 64px, 100% 100%;
+  }
+
   /* Dot pattern with gradient */
   .bg-gradient-62 {
     background-image:
-      radial-gradient(circle, rgba(56, 29, 42, 0.25) 1.5px, transparent 1.5px),
-      linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size:
-      18px 18px,
-      100% 100%;
-    background-position:
-      0 0,
-      0 0;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23381D2A' stroke-width='1' stroke-opacity='0.08'%3E%3Cpath d='M0 32h64M32 0v64M0 0l64 64M64 0L0 64'/%3E%3Ccircle cx='32' cy='32' r='3' fill='%23BA5624' fill-opacity='0.22' stroke='%23381D2A' stroke-opacity='0.15' stroke-width='1'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='64' cy='0' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='0' cy='64' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3Ccircle cx='64' cy='64' r='2' fill='%23FFA552' fill-opacity='0.28' stroke='none'/%3E%3C/g%3E%3C/svg%3E"),
+      linear-gradient(60deg, var(--brand-cream-muted), var(--brand-cream));
+    background-size: 64px 64px, 100% 100%;
   }
 
   /* Square grid pattern with gradient */
   .bg-gradient-62-grid {
     background-image:
-      linear-gradient(rgba(56, 29, 42, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(56, 29, 42, 0.1) 1px, transparent 1px),
-      linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size:
-      24px 24px,
-      24px 24px,
-      100% 100%;
+      linear-gradient(rgba(56, 29, 42, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56, 29, 42, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
-
-  /* Checkered pattern with gradient */
-  .bg-gradient-62-checker {
-    background-image:
-      repeating-conic-gradient(
-        rgba(56, 29, 42, 0.08) 0% 25%,
-        transparent 0% 50%
-      ),
-      linear-gradient(60deg, var(--color-brown), var(--color-peach));
-    background-size:
-      20px 20px,
-      100% 100%;
-  }
-
-  /* ---- Layout ---- */
 
   /* Container max-width */
   .max-7 {
     max-width: var(--container-7xl);
     margin: 0 auto;
-  }
-
-  /* Clip path */
-  .custom-clip {
-    clip-path: polygon(0 0, 0% 100%, 100% 100%, 27% 55%);
   }
 
   /* ---- Animations ---- */
@@ -110,6 +122,7 @@ body {
       opacity: 0;
       transform: translateY(6px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -123,7 +136,7 @@ body {
   /* ---- Typography ---- */
 
   .gradient-logo {
-    background: linear-gradient(120deg, #000, var(--color-ember));
+    background: linear-gradient(120deg, var(--brand-violet), var(--brand-brown));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -131,22 +144,22 @@ body {
     font-weight: 700;
   }
 
-  /* ---- Scrollbar for horizontal scrolling ---- */
+  /* ---- Scrollbar for horizontal scrolling (No rounded corners) ---- */
 
   .horizontal-scroll::-webkit-scrollbar {
     height: 4px;
   }
 
   .horizontal-scroll::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--brand-cream-muted);
   }
 
   .horizontal-scroll::-webkit-scrollbar-thumb {
-    background: #8b5cf6;
-    border-radius: 9999px;
+    background: var(--brand-brown);
+    border-radius: 0px;
   }
 
   .horizontal-scroll::-webkit-scrollbar-thumb:hover {
-    background: #7c3aed;
+    background: var(--brand-brown-dark);
   }
 }

@@ -54,27 +54,33 @@ const SignupForm = () => {
   }
 
   return (
-    <form className="space-y-6 w-full h-full">
+    <form onSubmit={handleSignup} className="space-y-4 w-full">
       {/* Name */}
-      <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="name" className="text-xl">
-          Name
+      <div className="flex flex-col gap-1.5 justify-start">
+        <label
+          htmlFor="name"
+          className="text-xs font-bold uppercase tracking-wider text-brand-peach"
+        >
+          Full Name
         </label>
         <input
           id="name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Ex. Ramu Naidu"
-          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          placeholder="e.g. John Doe"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
           required
         />
       </div>
 
       {/* Email */}
-      <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="email" className="text-xl">
-          Email
+      <div className="flex flex-col gap-1.5 justify-start">
+        <label
+          htmlFor="email"
+          className="text-xs font-bold uppercase tracking-wider text-brand-peach"
+        >
+          Email Address
         </label>
         <input
           id="email"
@@ -82,15 +88,18 @@ const SignupForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
           required
         />
       </div>
 
       {/* Password */}
-      <div className="flex flex-col gap-2 justify-start">
-        <label htmlFor="password" className="text-xl">
-          Password
+      <div className="flex flex-col gap-1.5 justify-start">
+        <label
+          htmlFor="password"
+          className="text-xs font-bold uppercase tracking-wider text-brand-peach"
+        >
+          Create Password
         </label>
         <input
           id="password"
@@ -98,24 +107,24 @@ const SignupForm = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
-          className="px-3 py-2 bg-slate-700/60 rounded-md text-violet outline-0 border-0 focus:border-2 focus:border-ember"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
           required
         />
       </div>
 
       {/* Sign Up Button */}
       <button
-        className="w-full  text-base rounded-md cursor-pointer px-3 py-2 font-semibold bg-ember text-peach hover:text-green hover:bg-ember/80 transition-colors duration-300 flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:bg-violet disabled:text-peach/80"
-        onClick={handleSignup}
+        type="submit"
+        className="w-full px-5 py-3 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-sm font-bold border-2 border-brand-brown shadow-[3px_3px_0px_0px_#FFA552] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#FFA552] transition-all rounded-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
         disabled={isLoading}
       >
         {isLoading ? (
           <div className="flex items-center justify-center gap-2">
-            <LoaderCircle className="animate-spin" />
-            Creating your account...
+            <LoaderCircle className="w-4 h-4 animate-spin text-brand-peach" />
+            <span>Creating account...</span>
           </div>
         ) : (
-          "Create Account"
+          "Create FileFlux Account"
         )}
       </button>
     </form>

@@ -54,7 +54,6 @@ const FilePreview = ({
   useEffect(() => {
     if (category !== "image" && category !== "video") return;
     const url = URL.createObjectURL(file);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPreviewUrl(url);
     return () => {
       URL.revokeObjectURL(url);
@@ -62,9 +61,9 @@ const FilePreview = ({
   }, [file, category]);
 
   return (
-    <div className="space-y-4 w-full">
-      <div className="p-2 rounded-lg bg-brown">
-        <div className="flex items-center gap-2 flex-col bg-peach p-2 rounded-md">
+    <div className="space-y-3 w-full text-brand-violet">
+      <div className="p-3 bg-brand-cream-muted border-2 border-brand-border">
+        <div className="flex items-center gap-2 flex-col">
           {isEditingFileName ? (
             <input
               autoFocus
@@ -75,32 +74,44 @@ const FilePreview = ({
                   e.currentTarget.blur();
                 }
               }}
-              className="flex-1 border border-b-2 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-ember"
+              className="w-full px-2.5 py-1.5 bg-brand-cream border-2 border-brand-brown text-brand-violet text-xs font-bold focus:outline-none"
               onBlur={onToggleEdit}
               disabled={isUploading}
             />
           ) : (
-            <div className="w-full">
-              <p className="truncate font-medium" title={displayFileName}>
+            <div className="w-full flex items-center justify-between gap-2">
+              <p className="truncate font-bold text-xs text-brand-violet" title={displayFileName}>
                 {displayFileName}
               </p>
+              {!isUploading && !uploadComplete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleEdit();
+                  }}
+                  className="p-1 hover:bg-brand-cream text-brand-brown transition-colors cursor-pointer"
+                  title="Rename"
+                >
+                  <Edit size={14} />
+                </button>
+              )}
             </div>
           )}
 
-          <div className="relative w-full h-fit max-h-45 overflow-hidden flex justify-center items-center bg-brown rounded-md p-1">
-            {/* Preview area, branched by category */}
+          <div className="relative w-full min-h-24 max-h-36 overflow-hidden flex justify-center items-center bg-brand-cream border border-brand-border p-2 mt-1">
             {category === "image" && previewUrl && (
               <img
                 src={previewUrl}
                 alt={file.name}
-                className="object-cover rounded-md"
+                className="max-h-32 object-contain"
               />
             )}
 
             {category === "video" && previewUrl && (
               <video
                 src={previewUrl}
-                className=" object-cover rounded-md"
+                className="max-h-32 object-contain"
                 muted
                 playsInline
                 preload="metadata"
@@ -108,69 +119,54 @@ const FilePreview = ({
             )}
 
             {category === "pdf" && (
-              <FileText size={40} className="text-violet" />
+              <FileText size={36} className="text-brand-brown" />
             )}
 
             {category === "doc" && (
-              <FileText size={40} className="text-violet" />
+              <FileText size={36} className="text-brand-brown" />
             )}
 
             {category === "sheet" && (
-              <FileSpreadsheet size={40} className="text-violet" />
+              <FileSpreadsheet size={36} className="text-brand-brown" />
             )}
 
             {category === "other" && (
-              <FileIcon size={40} className="text-violet" />
+              <FileIcon size={36} className="text-brand-brown" />
             )}
           </div>
 
-          {!isUploading && !uploadComplete && (
-            <div className="flex justify-around gap-2 items-center w-full">
-              <button
-                type="button"
-                className="hover:bg-ember group rounded-sm cursor-pointer p-2 transition bg-amber-500 flex items-center gap-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleEdit();
-                }}
-                aria-label="Edit filename"
-              >
-                <Edit size={20} className="group-hover:text-peach" />
-                Edit
-              </button>
+          <div className="w-full flex items-center justify-between text-[11px] font-mono text-brand-violet/70 mt-1">
+            <span>{getDisplayFileType(extension)}</span>
+            <span>{formatFileSize(file.size)}</span>
+          </div>
 
+          {!isUploading && !uploadComplete && (
+            <div className="flex justify-end gap-2 w-full mt-2">
               <button
                 type="button"
-                className="hover:bg-ember group rounded-sm p-2 transition cursor-pointer bg-ember/30 flex items-center gap-1"
+                className="px-3 py-1 bg-brand-cream text-brand-violet hover:bg-brand-peach border border-brand-border text-xs font-bold transition cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   onReset();
                 }}
-                aria-label="Remove file"
               >
-                <X size={20} className="text-red-500 group-hover:text-peach" />
-                Cancel
+                Clear
               </button>
             </div>
           )}
         </div>
-
-        <p
-          className="text-xs mt-2 text-violet text-ellipsis w-full line-clamp-2"
-          title={file.type}
-        >
-          {getDisplayFileType(extension)} · {formatFileSize(file.size)}
-        </p>
       </div>
 
       {!uploadComplete && (
         <>
-          <div className="h-2 bg-brown rounded overflow-hidden">
-            <div
-              style={{ width: `${uploadProgress}%` }}
-              className="h-full bg-ember transition-all duration-300"
-            />
-          </div>
+          {isUploading && (
+            <div className="h-2 bg-brand-cream-muted border border-brand-border overflow-hidden">
+              <div
+                style={{ width: `${uploadProgress}%` }}
+                className="h-full bg-brand-peach-vibrant transition-all duration-200"
+              />
+            </div>
+          )}
 
           {isUploading ? (
             <button
@@ -179,9 +175,9 @@ const FilePreview = ({
                 e.stopPropagation();
                 onCancelUpload();
               }}
-              className="w-full bg-red-500 hover:bg-red-600 font-semibold text-peach cursor-pointer rounded-md py-3 shadow-md transition"
+              className="w-full bg-red-600 hover:bg-red-700 font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-red-800 shadow-[2px_2px_0px_0px_#381D2A] transition-all"
             >
-              Cancel Upload ({uploadProgress}%)
+              Cancel Encryption ({uploadProgress}%)
             </button>
           ) : (
             <button
@@ -190,17 +186,17 @@ const FilePreview = ({
                 e.stopPropagation();
                 onUpload();
               }}
-              className="w-full bg-ember hover:text-peach font-semibold text-brown cursor-pointer rounded-md py-3 shadow-md transition"
+              className="w-full bg-brand-brown hover:bg-brand-brown-dark font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-brand-brown shadow-[3px_3px_0px_0px_#381D2A] hover:shadow-[1px_1px_0px_0px_#381D2A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
             >
-              Upload
+              Encrypt & Store File
             </button>
           )}
         </>
       )}
 
       {uploadComplete && (
-        <div className="text-center text-green-600 font-semibold py-3">
-          Upload Complete! ✓
+        <div className="text-center bg-emerald-600/15 border-2 border-emerald-700 text-emerald-900 font-bold text-xs py-2">
+          File Encrypted & Stored Successfully ✓
         </div>
       )}
     </div>

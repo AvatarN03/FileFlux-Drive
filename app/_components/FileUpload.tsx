@@ -183,9 +183,6 @@ const FileUpload = () => {
 
   const handleCancelUpload = useCallback(() => {
     abortControllerRef.current?.abort();
-    // resetState() also runs in the catch block above once the
-    // aborted request rejects, but we flip isUploading immediately
-    // so the UI feels instant rather than waiting on the promise.
     updateState({ isUploading: false, uploadProgress: 0 });
   }, [updateState]);
 
@@ -198,26 +195,43 @@ const FileUpload = () => {
 
   if (!user || !user.emailVerified) {
     return (
-      <div className="">
-        <h1>Please verify your email address to upload files.</h1>
-        <button onClick={() => router.push("/verify-email")} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">Resend Verification Email
-
+      <div className="p-4 bg-brand-cream-muted border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] text-center">
+        <h2 className="text-sm font-bold text-brand-violet mb-3">
+          Please verify your email address to upload files.
+        </h2>
+        <button
+          type="button"
+          onClick={() => router.push("/verify-email")}
+          className="bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold px-4 py-2 border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+        >
+          Resend Verification Email
         </button>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="relative max-w-92 w-full mx-auto min-h-64  rounded-md p-2 ">
-      <div className="w-full rounded-xl p-2 bg-brown h-full flex flex-col">
-
-        <h1 className="text-violet text-center text-xl md:text-2xl font-medium border-b-violet border-b-2 max-w-64 shadow-xl mx-auto">
-          Upload
-        </h1>
+    <div className="relative w-full mx-auto">
+      <div className="w-full bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col">
+        <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-brand-border">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-brand-brown inline-block" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
+              Encrypted File Ingestion
+            </h2>
+          </div>
+          <span className="text-[10px] font-mono font-bold bg-brand-peach text-brand-violet px-2 py-0.5 border border-brand-border">
+            Libsodium
+          </span>
+        </div>
 
         <div
-          className={`relative border-2 border-dashed rounded-xl p-1 w-full cursor-pointer transition-colors flex-1
-            ${state.isDragging ? "border-ember bg-ember/5" : "border-brown"}
+          className={`relative border-2 border-dashed p-4 w-full cursor-pointer transition-all flex-1 min-h-[150px] flex items-center justify-center
+            ${
+              state.isDragging
+                ? "border-brand-peach-vibrant bg-brand-peach/15"
+                : "border-brand-brown/60 bg-brand-cream-muted/50 hover:bg-brand-cream-muted hover:border-brand-brown"
+            }
           `}
           onClick={() => !state.file && fileRef.current?.click()}
           onDragOver={handleDragOver}

@@ -2,17 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
 
 import Logo from "@/app/_components/Logo";
-
 import { useAuth } from "@/hooks/useAuth";
-
 import toastC from "@/lib/toast";
-
 import { Status } from "@/types/auth";
-
 import { AUTH_TOAST_MESSAGES } from "@/constant";
 
 const VerifyEmailTokenPage = () => {
@@ -25,7 +20,6 @@ const VerifyEmailTokenPage = () => {
   const { verifyEmail } = useAuth();
 
   useEffect(() => {
-
     if (hasRun.current) return;
     hasRun.current = true;
 
@@ -34,19 +28,16 @@ const VerifyEmailTokenPage = () => {
     const verify = async () => {
       if (!token) {
         setStatus("error");
-        setMessage("This verification link is missing its token.");
+        setMessage("This verification link is missing its cryptographic token.");
         return;
       }
 
       try {
-
         const result = await verifyEmail(token);
 
         if (!result.success) {
           setStatus("error");
-          setMessage(
-            "This link is invalid or has expired."
-          );
+          setMessage("This verification link is invalid or has expired.");
           toastC({
             type: "error",
             data: AUTH_TOAST_MESSAGES.EMAIL_VERIFICATION_FAILED,
@@ -60,25 +51,19 @@ const VerifyEmailTokenPage = () => {
           data: AUTH_TOAST_MESSAGES.EMAIL_VERIFICATION_SUCCESS,
         });
 
-
         setTimeout(() => {
           router.push("/dashboard");
         }, 1800);
-
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-
+      } catch (error: unknown) {
         setStatus("error");
         setMessage(
-          error?.message ||
-          "Something went wrong. Check your connection and try again."
+          (error as Error)?.message ||
+            "Something went wrong while verifying. Check your connection and try again."
         );
         toastC({
           type: "error",
           data: AUTH_TOAST_MESSAGES.EMAIL_VERIFICATION_FAILED,
         });
-
       }
     };
 
@@ -86,59 +71,60 @@ const VerifyEmailTokenPage = () => {
   }, [params?.token, verifyEmail, router]);
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-neutral-950 px-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-brand-cream text-brand-violet px-4 selection:bg-brand-peach selection:text-brand-violet">
       <div className="w-full max-w-md text-center">
-        <div className="flex justify-center mb-8 text-peach">
+        <div className="flex justify-center mb-6">
           <Logo />
         </div>
 
-        <div className="border border-gray-800 rounded-2xl p-8 bg-gray-900/60 shadow-ember/40 shadow-md animate-fadeIn">
+        <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-[8px_8px_0px_0px_#BA5624] p-8 animate-fadeIn">
           {status === "verifying" && (
-            <>
-              <div className="relative w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-slate-500/20">
-                <Loader2 className="w-7 h-7 text-slate-300 animate-spin" strokeWidth={1.75} />
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-brand-violet border-2 border-brand-brown mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#BA5624]">
+                <Loader2 className="w-8 h-8 text-brand-peach-vibrant animate-spin" strokeWidth={2.5} />
               </div>
-              <h1 className="text-xl font-semibold text-gray-100 mb-2">
-                Verifying your email
+              <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
+                Verifying Token
               </h1>
-              <p className="text-sm text-gray-400">
-                Give us a moment while we confirm your link.
+              <p className="text-xs text-brand-peach/80">
+                Validating cryptographic verification challenge with server...
               </p>
-            </>
+            </div>
           )}
 
           {status === "success" && (
-            <>
-              <div className="relative w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-emerald-500/15">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400" strokeWidth={1.75} />
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-emerald-600/20 border-2 border-emerald-500 mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#064e3b]">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400" strokeWidth={2.5} />
               </div>
-              <h1 className="text-xl font-semibold text-gray-100 mb-2">
-                Email verified
+              <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
+                Email Verified Successfully
               </h1>
-              <p className="text-sm text-gray-400">
-                Your account is active. Taking you to your dashboard...
+              <p className="text-xs text-brand-peach/85">
+                Your zero-knowledge workspace is ready. Redirecting you to your dashboard...
               </p>
-            </>
+            </div>
           )}
 
           {status === "error" && (
-            <>
-              <div className="relative w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-red-500/15">
-                <XCircle className="w-8 h-8 text-red-400" strokeWidth={1.75} />
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-red-600/20 border-2 border-red-500 mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#381D2A]">
+                <XCircle className="w-8 h-8 text-red-400" strokeWidth={2.5} />
               </div>
-              <h1 className="text-xl font-semibold text-gray-100 mb-2">
-                Verification failed
+              <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
+                Verification Failed
               </h1>
-              <p className="text-sm text-gray-400 mb-6">
+              <p className="text-xs text-brand-cream/70 leading-relaxed">
                 {message}
               </p>
               <button
-                onClick={() => router.push("/dashboard")}
-                className="text-sm font-medium text-peach hover:text-brown transition-colors cursor-pointer px-3 py-2 rounded-md bg-neutral-800"
+                type="button"
+                onClick={() => router.push("/auth")}
+                className="w-full mt-2 inline-flex items-center justify-center gap-2 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border border-brand-peach shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
               >
-                Back to Dashboard
+                Return to Login <ArrowRight className="w-3.5 h-3.5 text-brand-peach" />
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
