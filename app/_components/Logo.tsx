@@ -37,10 +37,11 @@ const Logo = ({
         />
       </div>
       <span
-        className={`font-display tracking-tight select-none ${textClass || "text-lg sm:text-xl md:text-2xl"
-          }`}
+        className={`tracking-tight select-none ${
+          textClass || "text-lg sm:text-xl md:text-2xl"
+        }`}
       >
-        <span className="font-semibold text-brand-cream">File</span>
+        <span className="font-medium text-brand-cream">File</span>
         <span className="font-extrabold text-brand-peach-vibrant ml-0.5">Flux</span>
       </span>
     </Link>

@@ -15,8 +15,6 @@ import {
   Zap,
   FileCode,
   LockKeyhole,
-  CheckCircle2,
-  UploadCloud,
 } from "lucide-react";
 
 const Hero = () => {
@@ -31,7 +29,7 @@ const Hero = () => {
       <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Hero Split Grid: 7 Cols (Story & Action) + 5 Cols (Live Vault Workspace) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-14 items-center">
-
+          
           {/* Left Column: Command & Narrative Hub */}
           <div className="lg:col-span-7 flex flex-col items-start text-left">
             {/* Live Security Status Badge */}
@@ -51,7 +49,7 @@ const Hero = () => {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="font-display text-3xl sm:text-5xl xl:text-6xl font-extrabold text-brand-violet tracking-tight leading-[1.08] mb-6"
+              className="text-3xl sm:text-5xl xl:text-6xl font-extrabold text-brand-violet tracking-tight leading-[1.08] mb-6"
             >
               Upload, Encrypt & Command Your Files{" "}
               <span className="text-brand-brown block mt-1">
@@ -128,7 +126,7 @@ const Hero = () => {
             className="lg:col-span-5 w-full"
           >
             <div className="border-2 border-brand-violet bg-brand-cream shadow-[8px_8px_0px_0px_#BA5624] sm:shadow-[12px_12px_0px_0px_#BA5624] rounded-none overflow-hidden">
-
+              
               {/* Window Header Bar */}
               <div className="flex items-center justify-between bg-brand-violet px-4 py-3 border-b-2 border-brand-brown text-xs text-brand-cream">
                 <div className="flex items-center gap-2">
