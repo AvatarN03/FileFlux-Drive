@@ -20,10 +20,11 @@ export default function VaultStatusBadge() {
     return (
       <>
         <button
+          type="button"
           onClick={() => setShowSetupModal(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-medium transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-peach text-brand-violet border-2 border-brand-violet text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#BA5624] hover:bg-brand-peach-vibrant hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
         >
-          <ShieldAlert size={15} />
+          <ShieldAlert size={14} className="text-brand-brown" />
           <span>Setup Vault</span>
         </button>
         <VaultSetupModal
@@ -37,14 +38,15 @@ export default function VaultStatusBadge() {
   if (isUnlocked) {
     return (
       <button
+        type="button"
         onClick={lockVault}
         title="Vault is unlocked. Click to lock immediately."
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-medium transition-colors cursor-pointer group"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-cream-muted text-emerald-800 border-2 border-emerald-700 text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#064e3b] hover:bg-emerald-100 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer group"
       >
-        <Unlock size={14} className="group-hover:hidden" />
-        <Lock size={14} className="hidden group-hover:inline" />
+        <Unlock size={14} className="group-hover:hidden text-emerald-700" />
+        <Lock size={14} className="hidden group-hover:inline text-brand-brown" />
         <span className="group-hover:hidden">Vault Unlocked</span>
-        <span className="hidden group-hover:inline">Lock Vault</span>
+        <span className="hidden group-hover:inline text-brand-brown">Lock Vault</span>
       </button>
     );
   }
@@ -52,11 +54,12 @@ export default function VaultStatusBadge() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setShowUnlockModal(true)}
         title="Vault is locked. Click to enter your passphrase."
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-medium transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-brown text-brand-cream border-2 border-brand-violet text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#381D2A] hover:bg-brand-brown-dark hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
       >
-        <Lock size={14} />
+        <Lock size={14} className="text-brand-peach" />
         <span>Vault Locked</span>
       </button>
       <VaultUnlockModal

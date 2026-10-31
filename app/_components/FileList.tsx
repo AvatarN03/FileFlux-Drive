@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -15,10 +14,11 @@ import {
   FileSpreadsheet,
   File as FileIcon,
   Video as VideoIcon,
+  Lock,
 } from "lucide-react";
 
 import { FileItem } from "@/types/file";
-import { formatFileSize} from "@/lib/file";
+import { formatFileSize } from "@/lib/file";
 import { useFileModal } from "@/context/FileModalContext";
 import { getFileCategoryFilter } from "@/lib/file/operations";
 import { useFileMutations } from "@/hooks/useFileMutations";
@@ -28,10 +28,9 @@ import { decryptMetadata } from "@/lib/crypto";
 import { toastError, toastSuccess } from "@/lib/toast";
 import FileModal from "./FileModal";
 
-
 const CategoryIcon = ({ file }: { file: FileItem }) => {
   const category = getFileCategoryFilter(file);
-  const iconProps = { size: 36, className: "text-violet" };
+  const iconProps = { size: 32, className: "text-brand-brown" };
 
   switch (category) {
     case "video":
@@ -57,7 +56,12 @@ const FileList = ({ file }: { file: FileItem }) => {
   const { vaultKey } = useVault();
 
   useEffect(() => {
-    if (file.isEncrypted && file.encryptedMetadataCiphertext && file.encryptedMetadataNonce && vaultKey) {
+    if (
+      file.isEncrypted &&
+      file.encryptedMetadataCiphertext &&
+      file.encryptedMetadataNonce &&
+      vaultKey
+    ) {
       decryptMetadata(
         {
           nonce: file.encryptedMetadataNonce,
@@ -101,7 +105,9 @@ const FileList = ({ file }: { file: FileItem }) => {
   const handleDownload = async () => {
     if (file.isEncrypted) {
       if (!vaultKey) {
-        toastError("Please unlock your secure vault to decrypt and download this file.");
+        toastError(
+          "Please unlock your secure vault to decrypt and download this file."
+        );
         return;
       }
       try {
@@ -109,7 +115,9 @@ const FileList = ({ file }: { file: FileItem }) => {
         toastSuccess("File decrypted and downloaded successfully!");
       } catch (err: unknown) {
         console.error(err);
-        toastError((err as Error)?.message || "Failed to decrypt and download file");
+        toastError(
+          (err as Error)?.message || "Failed to decrypt and download file"
+        );
       }
     } else if (file.url) {
       window.open(file.url, "_blank");
@@ -129,8 +137,9 @@ const FileList = ({ file }: { file: FileItem }) => {
   }, []);
 
   const menuActions = [
-    { label: "Edit", icon: Pencil, handler: () => openModal("edit", file) },
+    { label: "Preview", icon: Info, handler: () => openModal("preview", file) },
     { label: "Details", icon: Info, handler: () => openModal("details", file) },
+    { label: "Edit", icon: Pencil, handler: () => openModal("edit", file) },
     { label: "Move", icon: FolderInput, handler: () => openModal("move", file) },
     { label: "Download", icon: Download, handler: handleDownload },
     {
@@ -142,10 +151,11 @@ const FileList = ({ file }: { file: FileItem }) => {
   ];
 
   return (
-    <div className="group relative bg-brown rounded-lg p-2 border border-brown/30 hover:border-ember hover:shadow-md transition-all">
-      {/* Thumbnail */}
-      <div className="relative w-full aspect-square rounded-md overflow-hidden bg-brown/10 mb-3"
-      onDoubleClick={() => openModal("preview", file)}
+    <div className="group relative bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-[2px_2px_0px_0px_#BA5624] p-2.5 transition-all flex flex-col justify-between">
+      {/* Thumbnail area */}
+      <div
+        className="relative w-full aspect-square bg-brand-cream-muted border border-brand-border overflow-hidden mb-2.5 flex items-center justify-center cursor-pointer"
+        onDoubleClick={() => openModal("preview", file)}
       >
         {file.thumbnailUrl ? (
           <Image
@@ -155,30 +165,40 @@ const FileList = ({ file }: { file: FileItem }) => {
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center gap-1">
             <CategoryIcon file={file} />
+            {file.isEncrypted && (
+              <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-brand-brown">
+                <Lock className="w-2.5 h-2.5" />
+                Zero-Knowledge
+              </span>
+            )}
           </div>
         )}
 
-        {/* Favorite toggle - top left, always visible if favorited */}
+        {/* Favorite toggle badge */}
         <button
           type="button"
-           onClick={(e) => {
+          onClick={(e) => {
             e.stopPropagation();
-            console.log("toggle favorite", file.id);
           }}
           aria-label={file.isFavorite ? "Unfavorite" : "Favorite"}
-          className={`absolute top-2 left-2 p-1.5 rounded-full bg-brown/60 backdrop-blur-sm transition-opacity
-            ${file.isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+          className={`absolute top-1.5 left-1.5 p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] transition-opacity cursor-pointer ${
+            file.isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
         >
           <Star
-            size={16}
-            className={file.isFavorite ? "fill-ember text-ember" : "text-peach"}
+            size={13}
+            className={
+              file.isFavorite
+                ? "fill-brand-peach-vibrant text-brand-peach-vibrant"
+                : "text-brand-violet"
+            }
           />
         </button>
 
-        {/* Options menu - top right */}
-        <div className="absolute top-2 right-2" ref={menuRef}>
+        {/* Options menu button */}
+        <div className="absolute top-1.5 right-1.5" ref={menuRef}>
           <button
             type="button"
             onClick={(e) => {
@@ -186,13 +206,13 @@ const FileList = ({ file }: { file: FileItem }) => {
               setMenuOpen((prev) => !prev);
             }}
             aria-label="File options"
-            className="p-1.5 rounded-full bg-brown/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+            className="p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] text-brand-violet opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-pointer"
           >
-            <MoreVertical size={16} className="text-peach" />
+            <MoreVertical size={13} />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-40 bg-peach rounded-md shadow-lg border border-brown/20 py-1 z-30">
+            <div className="absolute right-0 mt-1 w-36 bg-brand-cream border-2 border-brand-violet shadow-[3px_3px_0px_0px_#BA5624] py-1 z-30">
               {menuActions.map(({ label, icon: Icon, handler, danger }) => (
                 <button
                   key={label}
@@ -202,10 +222,13 @@ const FileList = ({ file }: { file: FileItem }) => {
                     setMenuOpen(false);
                     handler();
                   }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-brown transition-colors
-                    ${danger ? "text-red-500" : "text-violet"}`}
+                  className={`w-full flex items-center gap-2 px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+                    danger
+                      ? "text-red-600 hover:bg-red-50"
+                      : "text-brand-violet hover:bg-brand-peach"
+                  }`}
                 >
-                  <Icon size={15} />
+                  <Icon size={13} />
                   {label}
                 </button>
               ))}
@@ -214,13 +237,20 @@ const FileList = ({ file }: { file: FileItem }) => {
         </div>
       </div>
 
-      {/* Meta */}
-      <p className="font-medium text-sm truncate text-violet" title={displayName}>
-        {displayName}{displayExt ? `.${displayExt}` : ""}
-      </p>
-      <p className="text-xs text-violet/60 mt-0.5">
-        {displayExt ? `${displayExt.toUpperCase()} · ` : ""}{formatFileSize(file.size)}
-      </p>
+      {/* Metadata */}
+      <div>
+        <p
+          className="font-bold text-xs truncate text-brand-violet"
+          title={displayName}
+        >
+          {displayName}
+          {displayExt ? `.${displayExt}` : ""}
+        </p>
+        <div className="flex items-center justify-between text-[10px] font-mono text-brand-violet/70 mt-1">
+          <span>{displayExt ? displayExt.toUpperCase() : "FILE"}</span>
+          <span>{formatFileSize(file.size)}</span>
+        </div>
+      </div>
 
       {showDeleteConfirm && (
         <FileModal
@@ -229,19 +259,20 @@ const FileList = ({ file }: { file: FileItem }) => {
           maxWidth="max-w-sm"
         >
           <div className="space-y-4">
-            <p className="text-sm text-violet/80">
+            <p className="text-xs text-brand-violet font-medium leading-relaxed">
               Are you sure you want to move{" "}
-              <span className="font-semibold text-violet">
-                {displayName}{displayExt ? `.${displayExt}` : ""}
+              <span className="font-bold text-brand-brown">
+                {displayName}
+                {displayExt ? `.${displayExt}` : ""}
               </span>{" "}
               to Trash?
             </p>
-            <div className="flex justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={remove.isPending}
-                className="px-4 py-2 text-sm font-medium text-violet/70 hover:text-violet bg-brown/10 hover:bg-brown/20 rounded-md transition-colors disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-brand-violet bg-brand-cream-muted border-2 border-brand-border hover:bg-brand-cream cursor-pointer transition-colors"
               >
                 Cancel
               </button>
@@ -249,7 +280,7 @@ const FileList = ({ file }: { file: FileItem }) => {
                 type="button"
                 onClick={handleDelete}
                 disabled={remove.isPending}
-                className="px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50"
+                className="px-3 py-1.5 text-xs font-bold text-brand-cream bg-red-600 hover:bg-red-700 border-2 border-red-800 shadow-[2px_2px_0px_0px_#381D2A] cursor-pointer transition-colors"
               >
                 {remove.isPending ? "Moving..." : "Move to Trash"}
               </button>

@@ -3,15 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
 
 import Logo from "@/app/_components/Logo";
-
 import { useAuth } from "@/hooks/useAuth";
-
 import { formatTime } from "@/lib/email/formatTime";
-
 import { ResendState, ResendVerificationResponse } from "@/types/auth";
 
 const VerifyEmailPage = () => {
@@ -53,13 +49,9 @@ const VerifyEmailPage = () => {
 
       setResendState("error");
       setResendMessage(data.error ?? "Couldn't resend email.");
-
-
     } catch (error: unknown) {
       setResendState("error");
-
       const resendError = error as Partial<ResendVerificationResponse>;
-
       setResendMessage(resendError.error ?? "Couldn't resend email.");
 
       if (resendError.coolDownMs) {
@@ -78,116 +70,101 @@ const VerifyEmailPage = () => {
       router.replace("/dashboard");
       return;
     }
-  }, [user,router]);
+  }, [user, router]);
 
   return (
-    <div className="min-h-screen w-full flex bg-neutral-900">
-      {/* Left: image panel — hidden below lg */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
-        <Image
-          src="/verify_banner.avif"
-          alt="verify email background"
-          width={1400}
-          height={1400}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-neutral-950 via-neutral-950/60 to-neutral-950/20" />
-        <div className="absolute inset-0 bg-neutral-950/30" />
+    <div className="min-h-screen w-full bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet flex items-center justify-center overflow-x-hidden">
+      <div className="w-full h-screen grid grid-cols-1 md:grid-cols-12 overflow-hidden">
+        {/* Left: Content Panel */}
+        <div className="col-span-12 md:col-span-5 lg:col-span-4 xl:col-span-4 bg-brand-violet-dark text-brand-cream flex flex-col justify-between p-6 sm:p-8 md:p-10 lg:p-12 overflow-y-auto border-r-2 border-brand-violet relative z-10 shadow-2xl">
+          <div>
+            <div className="mb-8">
+              <Logo classes="text-brand-cream" />
+            </div>
 
-        <div className="relative z-10 flex justify-center items-center p-12 w-full">
-          <div className="max-w-sm text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3">
-              Almost there
-            </p>
-            <h2 className="text-2xl font-semibold text-gray-100 leading-snug mb-3">
-              One click and you&apos;re in.
-            </h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              We take account security seriously — confirming your email keeps
-              your data safe and makes sure it&apos;s really you.
-            </p>
-          </div>
-        </div>
-      </div>
+            {/* Step indicator */}
+            <div className="flex items-center gap-2 mb-6 text-xs text-brand-cream/80 max-w-xs whitespace-nowrap">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2.5} />
+                Account Created
+              </span>
+              <span className="w-full h-0.5 bg-brand-violet-light" />
+              <span className="flex items-center gap-1.5 text-brand-peach font-bold">
+                <MailCheck className="w-3.5 h-3.5" strokeWidth={2.5} />
+                Verify Email
+              </span>
+            </div>
 
-      {/* Right: content panel */}
-      <div className="flex-1 flex items-center justify-center px-4 py-12 sm:px-8">
-        <div className="w-full max-w-md">
-          <div className="flex justify-center mb-8 text-peach">
-            <Logo />
-          </div>
+            <div className="border-2 border-brand-violet bg-brand-violet p-6 shadow-[4px_4px_0px_0px_#BA5624] text-center mb-6">
+              <div className="w-14 h-14 bg-brand-peach border-2 border-brand-brown mx-auto flex items-center justify-center mb-4 shadow-[2px_2px_0px_0px_#BA5624]">
+                <Mail className="w-7 h-7 text-brand-brown" strokeWidth={2} />
+              </div>
 
-          {/* Step indicator */}
-          <div className="flex items-center justify-center gap-2 mb-8 text-xs text-gray-300 max-w-xs mx-auto whitespace-nowrap">
-            <span className="flex items-center gap-1.5 text-emerald-400 ">
-              <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2} />
-              Account created
-            </span>
-            <span className="w-full h-px bg-gray-700" />
-            <span className="flex items-center gap-1.5 text-peach font-medium">
-              <MailCheck className="w-3.5 h-3.5" strokeWidth={2} />
-              Verify email
-            </span>
-          </div>
+              <h1 className="text-xl font-extrabold text-brand-cream mb-2 tracking-tight">
+                Check Your Inbox
+              </h1>
+              <p className="text-xs text-brand-peach/85 mb-2">
+                We sent a cryptographic verification token to:
+              </p>
+              <p className="text-xs font-mono font-bold text-brand-peach bg-brand-violet-dark border border-brand-violet-light p-2 mb-4 truncate">
+                {user?.email}
+              </p>
+              <p className="text-[11px] text-brand-cream/70 leading-relaxed mb-4">
+                Click the confirmation link inside that message to activate zero-knowledge vaults for your account.
+              </p>
 
-          <div className="border border-gray-800 rounded-2xl p-8 bg-gray-900/60 backdrop-blur shadow-xl animate-fadeIn text-center">
-            <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full bg-slate-500/20 animate-ping" />
-              <div className="relative w-16 h-16 rounded-full bg-slate-500/70 flex items-center justify-center">
-                <Mail className="w-7 h-7 text-brown" strokeWidth={1.75} />
+              <div className="border-t border-brand-violet-light pt-4">
+                {resendState === "sent" && cooldown > 0 ? (
+                  <p className="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Verification link resent!
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={cooldown > 0 || resendState === "sending"}
+                    className="w-full text-xs font-bold uppercase tracking-wider text-brand-cream bg-brand-brown hover:bg-brand-brown-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all py-2.5 border border-brand-peach-vibrant shadow-[2px_2px_0px_0px_#26131D] cursor-pointer"
+                  >
+                    {resendState === "sending"
+                      ? "Sending..."
+                      : cooldown > 0
+                        ? `Resend in ${formatTime(cooldown)}`
+                        : "Resend Verification Email"}
+                  </button>
+                )}
+
+                {resendState === "error" && resendMessage && (
+                  <p className="text-xs text-red-400 mt-2 font-bold">{resendMessage}</p>
+                )}
               </div>
             </div>
 
-            <h1 className="text-xl font-semibold text-gray-100 mb-2">
-              Check your inbox
-            </h1>
-            <p className="text-sm text-gray-400 mb-1">
-              We sent a verification link to
-            </p>
-            <p className="text-sm text-gray-200 font-medium mb-6">
-              {/* {email} */}
-              {user?.email}
-            </p>
-            <p className="text-sm text-gray-400 mb-6">
-              Click the link in that email to activate your account. It expires
-              in 24 hours.
-            </p>
-
-            <div className="border-t border-gray-800 pt-6">
-              <p className="text-xs text-gray-500 mb-3">Didn&apos;t receive the email?</p>
-
-              {resendState === "sent" && cooldown > 0 ? (
-                <p className="text-sm text-emerald-400 flex items-center justify-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" strokeWidth={2} />
-                  Verification email sent!
-                </p>
-              ) : (
-                <button
-                  onClick={handleResend}
-                  disabled={cooldown > 0 || resendState === "sending"}
-                  className="text-sm font-medium cursor-pointer text-peach hover:text-brown disabled:text-gray-500 disabled:cursor-not-allowed transition-colors px-4 py-2 rounded-md bg-neutral-800 border border-violet hover:border-green"
-                >
-                  {resendState === "sending"
-                    ? "Sending..."
-                    : cooldown > 0
-                      ? `Resend in ${formatTime(cooldown)}`
-                      : "Resend email"}
-                </button>
-              )}
-
-              {resendState === "error" && resendMessage && (
-                <p className="text-xs text-red-400 mt-2">{resendMessage}</p>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
+              className="flex items-center justify-center gap-1.5 w-full text-xs font-bold text-brand-peach/80 hover:text-brand-peach transition-colors cursor-pointer"
+            >
+              Skip, proceed to Dashboard
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="mt-6 flex items-center justify-center gap-1.5 w-full text-sm text-gray-500 hover:text-gray-300 transition-colors cursor-pointer "
-          >
-            Skip, Go to Dashboard
-            <ArrowRight className="w-3.5 h-3.5" strokeWidth={2} />
-          </button>
+          <div className="pt-6 mt-6 border-t border-brand-violet-light text-center text-xs text-brand-cream/60 font-mono">
+            fileflux://auth/verify · End-to-End Encrypted
+          </div>
+        </div>
+
+        {/* Right: Banner Image */}
+        <div className="hidden md:block md:col-span-7 lg:col-span-8 relative h-full w-full bg-brand-violet-dark">
+          <Image
+            src="/auth_banner.png"
+            alt="FileFlux Verify Email Banner"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-brand-brown via-brand-peach-vibrant to-brand-peach" />
         </div>
       </div>
     </div>

@@ -1,15 +1,11 @@
 "use client";
 
-import {
-  X,
-
-} from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import { NavSection } from "@/types/ui";
 import { bottomSections, topSections } from "@/constant";
-
 
 type SidebarProps = {
   isOpen: boolean;
@@ -30,47 +26,75 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         href={section.href}
         title={section.label}
         onClick={onClose}
-        className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-colors last:last-of-type:mb-4 justify-start text-brown/70 hover:text-ember ${active ? "bg-brown" : "hover:bg-peach  "}`}
+        className={`flex items-center gap-3 px-3 py-2.5 transition-all text-sm font-bold border-2 cursor-pointer ${
+          active
+            ? "bg-brand-brown text-brand-cream border-brand-brown-dark shadow-[3px_3px_0px_0px_#26131D]"
+            : "border-transparent text-brand-cream/80 hover:text-brand-peach hover:bg-brand-violet"
+        }`}
       >
-        <Icon className={`w-5 h-5 shrink-0 ${active && "text-ember"}`} />
-        
-          <span className={`text-sm font-semibold ${active && "text-ember"}`}>
-            {section.label}
-          </span>
-    
+        <Icon
+          className={`w-4 h-4 shrink-0 ${
+            active ? "text-brand-peach" : "text-brand-peach-vibrant"
+          }`}
+        />
+        <span className="truncate">{section.label}</span>
       </Link>
     );
   };
 
   return (
     <>
-      {/* Desktop rail — logo pinned at top, icons below, centered */}
-      <div className="hidden md:flex flex-col w-64 h-dvh bg-neutral-950 p-2 gap-2  text-brown border-r border-peach/30">
-        <div className="flex items-center justify-center py-4 ">
-          <Logo />
+      {/* Desktop rail — logo pinned at top, icons below */}
+      <aside className="hidden md:flex flex-col w-64 h-screen bg-brand-violet-dark text-brand-cream p-4 border-r-2 border-brand-violet shrink-0 select-none z-30">
+        <div className="flex items-center justify-start pb-4 pt-2">
+          <Logo classes="text-brand-cream" />
         </div>
-        <hr className="my-3"/>
-        {topSections.map((s) => renderItem(s))}
-        <div className="flex-1" />
-        {bottomSections.map((s) => renderItem(s))}
-      </div>
+        <div className="w-full border-t-2 border-brand-violet-light my-2" />
 
-      {/* Mobile drawer — logo at top, icon + label below */}
+        <div className="flex flex-col gap-1.5 mt-2">
+          {topSections.map((s) => renderItem(s))}
+        </div>
+
+        <div className="flex-1" />
+
+        <div className="w-full border-t-2 border-brand-violet-light my-3" />
+        <div className="flex flex-col gap-1.5">
+          {bottomSections.map((s) => renderItem(s))}
+        </div>
+      </aside>
+
+      {/* Mobile drawer */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="w-64 h-dvh bg-neutral-900 p-4 flex flex-col gap-2  text-peach">
-            <div className="flex items-center justify-between mb-4 ">
-              <Logo />
-              <button onClick={onClose} className="p-2 rounded-md bg-neutral-800 hover:bg-brown">
-                <X className="w-5 h-5 text-ember" />
+          <div className="w-72 h-screen bg-brand-violet-dark text-brand-cream p-5 flex flex-col border-r-2 border-brand-violet shadow-2xl animate-fadeIn">
+            <div className="flex items-center justify-between pb-3">
+              <Logo classes="text-brand-cream" />
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close sidebar"
+                className="p-1.5 bg-brand-violet border-2 border-brand-peach text-brand-peach hover:bg-brand-brown hover:text-brand-cream transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <hr className="my-2" />
-            {topSections.map((s) => renderItem(s))}
+            <div className="w-full border-t-2 border-brand-violet-light my-2" />
+
+            <div className="flex flex-col gap-1.5 mt-2 overflow-y-auto">
+              {topSections.map((s) => renderItem(s))}
+            </div>
+
             <div className="flex-1" />
-            {bottomSections.map((s) => renderItem(s))}
+
+            <div className="w-full border-t-2 border-brand-violet-light my-3" />
+            <div className="flex flex-col gap-1.5">
+              {bottomSections.map((s) => renderItem(s))}
+            </div>
           </div>
-          <div className="flex-1 bg-black/40 backdrop-blur-xs" onClick={onClose} />
+          <div
+            className="flex-1 bg-brand-violet-dark/60 backdrop-blur-xs"
+            onClick={onClose}
+          />
         </div>
       )}
     </>

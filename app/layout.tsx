@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 
 import { Providers } from "./provider";
@@ -7,9 +7,14 @@ import { Providers } from "./provider";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
-const sora = Sora({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["200", "400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta-sans",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +34,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={`${sora.className} antialiased`}>
+      <body
+        className={`${plusJakartaSans.className} ${spaceGrotesk.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <Providers>{children}
 
           <ToastContainer />
