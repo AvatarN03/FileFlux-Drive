@@ -15,6 +15,8 @@ import {
   Zap,
   FileCode,
   LockKeyhole,
+  CheckCircle2,
+  UploadCloud,
 } from "lucide-react";
 
 const Hero = () => {
