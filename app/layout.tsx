@@ -23,7 +23,9 @@ export const metadata: Metadata = {
   keywords: ["cloud storage", "file management", "folders", "files", "drive"],
   authors: [{ name: "AvatarN03" }],
   icons: {
-    icon: "logo.png"
+    icon: "/logo-cabinet.svg",
+    shortcut: "/logo-cabinet.svg",
+    apple: "/logo-cabinet.svg",
   }
 };
 

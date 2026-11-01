@@ -37,7 +37,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <div className="relative w-full h-screen overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
+    <div className="relative w-full h-screen h-dvh overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-brand-cream">
@@ -51,4 +51,3 @@ const Layout = ({ children }: { children: ReactNode }) => {
 };
 
 export default Layout;
-
