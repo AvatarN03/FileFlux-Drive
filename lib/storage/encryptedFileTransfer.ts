@@ -249,7 +249,7 @@ export interface DownloadEncryptedFileOptions {
 
 /**
  * Retrieve encrypted ciphertext from Neon Object Storage, authenticate, decrypt, and trigger download.
- * Memory-optimized: Reconstructs the downloaded file directly as a Blob from decrypted chunks without monolithic duplicate buffers.
+ * Memory & streaming optimized: Reads ciphertext packets directly via ReadableStream and decrypts chunk-by-chunk.
  */
 export async function downloadAndDecryptFile({
   fileId,
@@ -287,46 +287,104 @@ export async function downloadAndDecryptFile({
 
   if (onProgress) onProgress(20);
 
-  // 3. Fetch ciphertext from Neon Object Storage
+  // 3. Fetch ciphertext from Neon Object Storage using streaming ReadableStream
   const storageRes = await fetch(presignedUrl, { signal });
   if (!storageRes.ok) {
     throw new Error("Failed to fetch encrypted file from storage");
   }
 
-  const ciphertextBuffer = await storageRes.arrayBuffer();
-  const ciphertextBytes = new Uint8Array(ciphertextBuffer);
-
-  if (onProgress) onProgress(60);
-
-  // 4. Decrypt secretstream chunk by chunk
   const streamHeaderBytes = sodium.from_hex(file.streamHeader);
   const decryptState = await initStreamDecryption(streamHeaderBytes, fileKey);
 
   const CIPHER_CHUNK_SIZE =
     STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
   const decryptedChunks: Uint8Array[] = [];
-  let readOffset = 0;
   let isFinalSeen = false;
 
-  while (readOffset < ciphertextBytes.length) {
-    if (signal?.aborted) {
-      throw new Error("Download aborted");
+  if (storageRes.body && typeof storageRes.body.getReader === "function") {
+    // Streaming network read: decrypts chunks incrementally as packets arrive
+    const contentLengthHeader = storageRes.headers.get("content-length");
+    const totalContentLength = contentLengthHeader
+      ? parseInt(contentLengthHeader, 10)
+      : 0;
+
+    const reader = storageRes.body.getReader();
+    let buffer = new Uint8Array(0);
+    let bytesReceived = 0;
+
+    while (true) {
+      if (signal?.aborted) {
+        reader.cancel();
+        throw new Error("Download aborted");
+      }
+
+      const { done, value } = await reader.read();
+
+      if (value) {
+        bytesReceived += value.length;
+        const newBuffer = new Uint8Array(buffer.length + value.length);
+        newBuffer.set(buffer, 0);
+        newBuffer.set(value, buffer.length);
+        buffer = newBuffer;
+
+        if (onProgress && totalContentLength > 0) {
+          const pct = 20 + Math.round((bytesReceived / totalContentLength) * 70);
+          onProgress(Math.min(pct, 90));
+        }
+      }
+
+      // Process all full CIPHER_CHUNK_SIZE chunks currently in buffer
+      while (buffer.length >= CIPHER_CHUNK_SIZE && !isFinalSeen) {
+        const chunkToDecrypt = buffer.subarray(0, CIPHER_CHUNK_SIZE);
+        buffer = buffer.subarray(CIPHER_CHUNK_SIZE);
+
+        const res = await decryptStreamChunk(decryptState, chunkToDecrypt);
+        decryptedChunks.push(res.plaintext);
+        if (res.isFinal) {
+          isFinalSeen = true;
+          break;
+        }
+      }
+
+      if (done) {
+        // Process trailing final chunk
+        if (buffer.length > 0 && !isFinalSeen) {
+          const res = await decryptStreamChunk(decryptState, buffer);
+          decryptedChunks.push(res.plaintext);
+          if (res.isFinal) {
+            isFinalSeen = true;
+          }
+          buffer = new Uint8Array(0);
+        }
+        break;
+      }
     }
+  } else {
+    // ArrayBuffer fallback for environments where ReadableStream is unavailable
+    const ciphertextBuffer = await storageRes.arrayBuffer();
+    const ciphertextBytes = new Uint8Array(ciphertextBuffer);
 
-    const end = Math.min(readOffset + CIPHER_CHUNK_SIZE, ciphertextBytes.length);
-    const cipherChunk = ciphertextBytes.subarray(readOffset, end);
-    readOffset = end;
+    let readOffset = 0;
+    while (readOffset < ciphertextBytes.length) {
+      if (signal?.aborted) {
+        throw new Error("Download aborted");
+      }
 
-    const res = await decryptStreamChunk(decryptState, cipherChunk);
-    decryptedChunks.push(res.plaintext);
+      const end = Math.min(readOffset + CIPHER_CHUNK_SIZE, ciphertextBytes.length);
+      const cipherChunk = ciphertextBytes.subarray(readOffset, end);
+      readOffset = end;
 
-    if (onProgress) {
-      onProgress(60 + Math.round((readOffset / ciphertextBytes.length) * 30));
-    }
+      const res = await decryptStreamChunk(decryptState, cipherChunk);
+      decryptedChunks.push(res.plaintext);
 
-    if (res.isFinal) {
-      isFinalSeen = true;
-      break;
+      if (onProgress) {
+        onProgress(20 + Math.round((readOffset / ciphertextBytes.length) * 70));
+      }
+
+      if (res.isFinal) {
+        isFinalSeen = true;
+        break;
+      }
     }
   }
 
