@@ -13,6 +13,8 @@ import {
   EncryptedEnvelope,
 } from "@/lib/crypto";
 
+export const STREAM_CHUNK_SIZE = 1024 * 1024; // 1 MB chunks
+
 export interface UploadEncryptedFileOptions {
   file: File;
   displayName: string;
@@ -23,7 +25,93 @@ export interface UploadEncryptedFileOptions {
 }
 
 /**
+ * Notify the server to delete an unfinalized S3 object if an upload is aborted or fails.
+ */
+async function cleanupAbortedUpload(objectKey: string): Promise<void> {
+  try {
+    await fetch("/api/files/abort-upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ objectKey }),
+    });
+  } catch (err) {
+    console.warn("Failed to notify abort-upload cleanup:", err);
+  }
+}
+
+/**
+ * Upload ciphertext Blob directly to presigned URL with genuine network progress and abort support.
+ * Operates on native Blob chunks to avoid duplicate monolithic memory allocations in the browser.
+ */
+function uploadCiphertextWithProgress(
+  presignedUrl: string,
+  ciphertext: Blob,
+  onProgress?: (percent: number) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      return reject(new Error("Upload aborted"));
+    }
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", presignedUrl);
+    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+
+    if (onProgress) {
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && e.total > 0) {
+          // Scale network transfer smoothly between 50% and 90%
+          const pct = 50 + Math.round((e.loaded / e.total) * 40);
+          onProgress(Math.min(pct, 90));
+        }
+      };
+    }
+
+    const abortHandler = () => {
+      xhr.abort();
+      reject(new Error("Upload aborted"));
+    };
+
+    if (signal) {
+      signal.addEventListener("abort", abortHandler, { once: true });
+    }
+
+    xhr.onload = () => {
+      if (signal) {
+        signal.removeEventListener("abort", abortHandler);
+      }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        if (onProgress) onProgress(90);
+        resolve();
+      } else {
+        reject(
+          new Error(`Direct storage upload failed with status ${xhr.status}`)
+        );
+      }
+    };
+
+    xhr.onerror = () => {
+      if (signal) {
+        signal.removeEventListener("abort", abortHandler);
+      }
+      reject(new Error("Network error during direct storage upload"));
+    };
+
+    xhr.onabort = () => {
+      if (signal) {
+        signal.removeEventListener("abort", abortHandler);
+      }
+      reject(new Error("Upload aborted"));
+    };
+
+    xhr.send(ciphertext);
+  });
+}
+
+/**
  * Encrypt a local file client-side and upload directly to Neon Object Storage via presigned URL.
+ * Memory-optimized: Uses Blob slicing to load only 1 chunk into RAM at a time, eliminating duplicate monolithic buffers.
  */
 export async function uploadEncryptedFile({
   file,
@@ -52,103 +140,104 @@ export async function uploadEncryptedFile({
   };
   const encryptedMetadata = await encryptMetadata(metadata, vaultKey);
 
-  // 3. Request presigned upload URL from Next.js server
-  const authRes = await fetch("/api/files/authorize-upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ estimatedSize: file.size + 1024 }),
-    signal,
-  });
+  let allocatedObjectKey: string | null = null;
+  let isRecorded = false;
 
-  const authData = await authRes.json();
-  if (!authRes.ok || !authData.success) {
-    throw new Error(authData.error || "Failed to authorize file upload");
-  }
+  try {
+    // 3. Request presigned upload URL from Next.js server
+    const authRes = await fetch("/api/files/authorize-upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estimatedSize: file.size + 1024 }),
+      signal,
+    });
 
-  const { objectKey, presignedUrl } = authData as {
-    objectKey: string;
-    presignedUrl: string;
-  };
-
-  // 4. Encrypt file using XChaCha20-Poly1305 secretstream
-  const encryptState = await initStreamEncryption(fileKey);
-  const streamHeaderHex = sodium.to_hex(encryptState.header);
-
-  // Read file as ArrayBuffer and encrypt in chunks
-  const fileBuffer = await file.arrayBuffer();
-  const fileBytes = new Uint8Array(fileBuffer);
-
-  const CHUNK_SIZE = 1024 * 1024; // 1 MB chunks
-  const totalChunks = Math.ceil(fileBytes.length / CHUNK_SIZE) || 1;
-  const encryptedChunks: Uint8Array[] = [];
-
-  for (let i = 0; i < totalChunks; i++) {
-    if (signal?.aborted) {
-      throw new Error("Upload aborted");
+    const authData = await authRes.json();
+    if (!authRes.ok || !authData.success) {
+      throw new Error(authData.error || "Failed to authorize file upload");
     }
 
-    const start = i * CHUNK_SIZE;
-    const end = Math.min(start + CHUNK_SIZE, fileBytes.length);
-    const chunk = fileBytes.subarray(start, end);
-    const isFinal = i === totalChunks - 1;
+    const { objectKey, presignedUrl } = authData as {
+      objectKey: string;
+      presignedUrl: string;
+    };
+    allocatedObjectKey = objectKey;
 
-    const cipherChunk = await encryptStreamChunk(encryptState, chunk, isFinal);
-    encryptedChunks.push(cipherChunk);
+    // 4. Encrypt file using XChaCha20-Poly1305 secretstream
+    const encryptState = await initStreamEncryption(fileKey);
+    const streamHeaderHex = sodium.to_hex(encryptState.header);
 
-    if (onProgress) {
-      // 0 - 50% progress allocated to client encryption
-      onProgress(Math.round(((i + 1) / totalChunks) * 50));
+    // Memory optimization: Slice file into 1 MB chunks without buffering full file into RAM
+    const CHUNK_SIZE = STREAM_CHUNK_SIZE;
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE) || 1;
+    const encryptedChunks: Uint8Array[] = [];
+
+    for (let i = 0; i < totalChunks; i++) {
+      if (signal?.aborted) {
+        throw new Error("Upload aborted");
+      }
+
+      const start = i * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, file.size);
+      const chunkBlob = file.slice(start, end);
+      const chunkBuffer = await chunkBlob.arrayBuffer();
+      const chunkBytes = new Uint8Array(chunkBuffer);
+      const isFinal = i === totalChunks - 1;
+
+      const cipherChunk = await encryptStreamChunk(encryptState, chunkBytes, isFinal);
+      encryptedChunks.push(cipherChunk);
+
+      if (onProgress) {
+        // 0 - 50% progress allocated to client-side encryption
+        onProgress(Math.round(((i + 1) / totalChunks) * 50));
+      }
     }
+
+    // Assemble ciphertext into a Blob for streaming upload (avoids a second duplicate full-file byte copy)
+    const totalLength = encryptedChunks.reduce((acc, c) => acc + c.length, 0);
+    const ciphertextBlob = new Blob(encryptedChunks as unknown as BlobPart[], {
+      type: "application/octet-stream",
+    });
+
+    // 5. Upload raw ciphertext directly to Neon Object Storage via presigned PUT with network telemetry
+    await uploadCiphertextWithProgress(
+      presignedUrl,
+      ciphertextBlob,
+      onProgress,
+      signal
+    );
+
+    // 6. Record encrypted metadata and opaque reference in PostgreSQL
+    const recordRes = await fetch("/api/files/record", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        objectKey,
+        folderId,
+        streamHeader: streamHeaderHex,
+        encryptedKey,
+        encryptedMetadata,
+        ciphertextFileSize: totalLength,
+      }),
+      signal,
+    });
+
+    const recordData = await recordRes.json();
+    if (!recordRes.ok || !recordData.success) {
+      throw new Error(recordData.error || "Failed to record encrypted file metadata");
+    }
+
+    isRecorded = true;
+    if (onProgress) onProgress(100);
+
+    return { fileId: recordData.fileId };
+  } catch (error) {
+    if (allocatedObjectKey && !isRecorded) {
+      // Clean up orphaned ciphertext object from S3
+      cleanupAbortedUpload(allocatedObjectKey);
+    }
+    throw error;
   }
-
-  // Combine encrypted chunks into single binary blob
-  const totalLength = encryptedChunks.reduce((acc, c) => acc + c.length, 0);
-  const combinedCiphertext = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const chunk of encryptedChunks) {
-    combinedCiphertext.set(chunk, offset);
-    offset += chunk.length;
-  }
-
-  // 5. Upload raw ciphertext directly to Neon Object Storage via presigned PUT
-  const uploadRes = await fetch(presignedUrl, {
-    method: "PUT",
-    body: combinedCiphertext,
-    headers: {
-      "Content-Type": "application/octet-stream",
-    },
-    signal,
-  });
-
-  if (!uploadRes.ok) {
-    throw new Error(`Direct storage upload failed with status ${uploadRes.status}`);
-  }
-
-  if (onProgress) onProgress(90);
-
-  // 6. Record encrypted metadata and opaque reference in PostgreSQL
-  const recordRes = await fetch("/api/files/record", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      objectKey,
-      folderId,
-      streamHeader: streamHeaderHex,
-      encryptedKey,
-      encryptedMetadata,
-      ciphertextFileSize: totalLength,
-    }),
-    signal,
-  });
-
-  const recordData = await recordRes.json();
-  if (!recordRes.ok || !recordData.success) {
-    throw new Error(recordData.error || "Failed to record encrypted file metadata");
-  }
-
-  if (onProgress) onProgress(100);
-
-  return { fileId: recordData.fileId };
 }
 
 export interface DownloadEncryptedFileOptions {
@@ -160,6 +249,7 @@ export interface DownloadEncryptedFileOptions {
 
 /**
  * Retrieve encrypted ciphertext from Neon Object Storage, authenticate, decrypt, and trigger download.
+ * Memory-optimized: Reconstructs the downloaded file directly as a Blob from decrypted chunks without monolithic duplicate buffers.
  */
 export async function downloadAndDecryptFile({
   fileId,
@@ -208,21 +298,47 @@ export async function downloadAndDecryptFile({
 
   if (onProgress) onProgress(60);
 
-  // 4. Decrypt secretstream
+  // 4. Decrypt secretstream chunk by chunk
   const streamHeaderBytes = sodium.from_hex(file.streamHeader);
   const decryptState = await initStreamDecryption(streamHeaderBytes, fileKey);
 
-  // For single chunk or stream, pull decrypted bytes
-  const decryptedResult = await decryptStreamChunk(decryptState, ciphertextBytes);
+  const CIPHER_CHUNK_SIZE =
+    STREAM_CHUNK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+  const decryptedChunks: Uint8Array[] = [];
+  let readOffset = 0;
+  let isFinalSeen = false;
 
-  if (!decryptedResult.isFinal) {
+  while (readOffset < ciphertextBytes.length) {
+    if (signal?.aborted) {
+      throw new Error("Download aborted");
+    }
+
+    const end = Math.min(readOffset + CIPHER_CHUNK_SIZE, ciphertextBytes.length);
+    const cipherChunk = ciphertextBytes.subarray(readOffset, end);
+    readOffset = end;
+
+    const res = await decryptStreamChunk(decryptState, cipherChunk);
+    decryptedChunks.push(res.plaintext);
+
+    if (onProgress) {
+      onProgress(60 + Math.round((readOffset / ciphertextBytes.length) * 30));
+    }
+
+    if (res.isFinal) {
+      isFinalSeen = true;
+      break;
+    }
+  }
+
+  if (!isFinalSeen) {
     throw new Error("Stream integrity error: file was truncated or incomplete.");
   }
 
-  if (onProgress) onProgress(90);
+  if (onProgress) onProgress(95);
 
-  // 5. Trigger browser download of authenticated plaintext
-  const plaintextBlob = new Blob([decryptedResult.plaintext as unknown as BlobPart], {
+  // 5. Trigger browser download of authenticated plaintext directly from decrypted chunk parts
+  // (Avoids allocating a duplicate monolithic Uint8Array in memory)
+  const plaintextBlob = new Blob(decryptedChunks as unknown as BlobPart[], {
     type: metadata.mimeType,
   });
   const objectUrl = URL.createObjectURL(plaintextBlob);

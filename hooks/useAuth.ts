@@ -43,9 +43,7 @@ export function useAuth() {
     mutationFn: authApi.logout,
 
     onSuccess: () => {
-      queryClient.removeQueries({
-        queryKey: ["auth"],
-      });
+      queryClient.clear(); // Wipes all cached queries (auth, vault, files, folders) so session state never leaks
     },
   });
 

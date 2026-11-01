@@ -46,12 +46,12 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch vault record if authenticated
+  // Fetch vault record if authenticated (tied to specific user ID)
   const vaultQuery = useQuery({
-    queryKey: ["vault", "status"],
+    queryKey: ["vault", "status", user?.id],
     queryFn: vaultApi.getVault,
-    enabled: isAuthenticated && !!user,
-    staleTime: 5 * 60 * 1000,
+    enabled: !!isAuthenticated && !!user?.id,
+    staleTime: 10 * 1000, // 10s fresh cache
     retry: 1,
   });
 
@@ -105,18 +105,19 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     };
   }, [vaultKey, resetInactivityTimer]);
 
-  // Lock vault on user logout
+  // Lock vault and wipe vault cache on logout or user change
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       lockVault();
+      queryClient.removeQueries({ queryKey: ["vault"] });
     }
-  }, [isAuthenticated, lockVault]);
+  }, [isAuthenticated, user, lockVault, queryClient]);
 
   // 1. Initial Enrollment
   const enrollMutation = useMutation({
     mutationFn: vaultApi.enrollVault,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vault", "status"] });
+      queryClient.invalidateQueries({ queryKey: ["vault"] });
     },
   });
 
@@ -200,7 +201,7 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const rotateMutation = useMutation({
     mutationFn: vaultApi.rotatePassphrase,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vault", "status"] });
+      queryClient.invalidateQueries({ queryKey: ["vault"] });
     },
   });
 
