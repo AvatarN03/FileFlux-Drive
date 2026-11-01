@@ -1,37 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Trash2, RotateCcw, AlertTriangle, FileText, CheckCircle2 } from "lucide-react";
 import { formatFileSize } from "@/lib/file";
 import toastC from "@/lib/toast";
 
+interface TrashItem {
+  id: string;
+  name: string;
+  extension: string;
+  size: number;
+  deletedAt: string;
+  expiresIn: string;
+}
+
 const TrashPage = () => {
-  const [trashItems, setTrashItems] = useState([
-    {
-      id: "tr-1",
-      name: "Old-Design-Tokens-v1",
-      extension: "json",
-      size: 45000,
-      deletedAt: "3 days ago",
-      expiresIn: "27 days",
-    },
-    {
-      id: "tr-2",
-      name: "Unused-Raw-Footage",
-      extension: "mov",
-      size: 34500000,
-      deletedAt: "10 days ago",
-      expiresIn: "20 days",
-    },
-    {
-      id: "tr-3",
-      name: "Outdated-Candidate-List",
-      extension: "csv",
-      size: 210000,
-      deletedAt: "18 days ago",
-      expiresIn: "12 days",
-    },
-  ]);
+  const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
 
   const handleRestore = (name: string, id: string) => {
     setTrashItems((prev) => prev.filter((item) => item.id !== id));
@@ -63,7 +48,7 @@ const TrashPage = () => {
 
         <div className="flex items-center gap-3">
           <div className="px-3 py-1 bg-brand-violet text-brand-peach border border-brand-peach text-[11px] font-bold font-mono uppercase tracking-wider">
-            Static Preview Mode
+            Retention Active
           </div>
           {trashItems.length > 0 && (
             <button
@@ -88,14 +73,20 @@ const TrashPage = () => {
       {/* Trash Table */}
       <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] overflow-hidden">
         {trashItems.length === 0 ? (
-          <div className="py-16 text-center">
+          <div className="py-16 text-center flex flex-col items-center justify-center">
             <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
               <CheckCircle2 className="w-6 h-6 text-emerald-700" />
             </div>
             <h3 className="text-sm font-bold text-brand-violet">Trash is clean</h3>
-            <p className="text-xs text-brand-violet/60 mt-1">
-              No files are marked for deletion.
+            <p className="text-xs text-brand-violet/60 mt-1 max-w-sm">
+              No files are marked for deletion in your vault.
             </p>
+            <Link
+              href="/dashboard"
+              className="mt-4 px-4 py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all"
+            >
+              Back to Dashboard
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -151,4 +142,3 @@ const TrashPage = () => {
 };
 
 export default TrashPage;
-

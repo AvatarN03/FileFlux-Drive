@@ -1,44 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Link2, Copy, Eye, Clock, ShieldAlert, Check, Plus, ExternalLink } from "lucide-react";
 import toastC from "@/lib/toast";
 
+interface SharedFileItem {
+  id: string;
+  fileName: string;
+  link: string;
+  views: number;
+  downloads: number;
+  expiresAt: string;
+  permission: string;
+  status: string;
+}
+
 const SharedPage = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const mockSharedFiles = [
-    {
-      id: "sh-1",
-      fileName: "Brand-Tokens-Export.json",
-      link: "https://fileflux.io/share/7b3a9c1e",
-      views: 48,
-      downloads: 19,
-      expiresAt: "In 6 days",
-      permission: "Download & View",
-      status: "Active",
-    },
-    {
-      id: "sh-2",
-      fileName: "Executive-Summary-Pitch.pdf",
-      link: "https://fileflux.io/share/8e2f4a01",
-      views: 112,
-      downloads: 42,
-      expiresAt: "In 14 days",
-      permission: "View Only",
-      status: "Active",
-    },
-    {
-      id: "sh-3",
-      fileName: "Product-Preview-Video.mp4",
-      link: "https://fileflux.io/share/9c4d2b77",
-      views: 230,
-      downloads: 65,
-      expiresAt: "Expired",
-      permission: "View Only",
-      status: "Expired",
-    },
-  ];
+  const [sharedFiles] = useState<SharedFileItem[]>([]);
 
   const handleCopy = (link: string, id: string) => {
     navigator.clipboard.writeText(link);
@@ -65,7 +45,7 @@ const SharedPage = () => {
         </div>
 
         <div className="px-3 py-1 bg-brand-violet text-brand-peach border border-brand-peach text-[11px] font-bold font-mono uppercase tracking-wider self-start sm:self-auto">
-          Static Preview Mode
+          Access Control
         </div>
       </div>
 
@@ -73,95 +53,106 @@ const SharedPage = () => {
       <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] overflow-hidden">
         <div className="flex items-center justify-between p-4 bg-brand-cream-muted border-b-2 border-brand-border">
           <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-            Active Public Links ({mockSharedFiles.length})
+            Active Public Links ({sharedFiles.length})
           </h2>
-          <button
-            type="button"
+          <Link
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-brand-peach" />
             Create Share Link
-          </button>
+          </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-brand-cream-muted/70 text-[10px] font-bold uppercase tracking-wider border-b border-brand-border text-brand-violet">
-                <th className="py-2.5 px-4">Shared Asset</th>
-                <th className="py-2.5 px-4">Permissions</th>
-                <th className="py-2.5 px-4">Telemetry</th>
-                <th className="py-2.5 px-4">Expires</th>
-                <th className="py-2.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-brand-border/60">
-              {mockSharedFiles.map((item) => (
-                <tr key={item.id} className="hover:bg-brand-cream-muted/40 transition-colors">
-                  <td className="py-3 px-4 font-bold text-brand-violet">
-                    <div>{item.fileName}</div>
-                    <span className="text-[10px] font-mono text-brand-brown">
-                      {item.link}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-brand-cream-muted border border-brand-border text-brand-violet">
-                      {item.permission}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-[11px] font-mono text-brand-violet/80">
-                    <div>{item.views} views</div>
-                    <div className="text-[10px] text-brand-violet/60">
-                      {item.downloads} downloads
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-[11px] font-mono">
-                    <span
-                      className={
-                        item.status === "Expired"
-                          ? "text-red-600 font-bold"
-                          : "text-brand-violet/80"
-                      }
-                    >
-                      {item.expiresAt}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="inline-flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(item.link, item.id)}
-                        className="px-2.5 py-1 bg-brand-cream-muted border border-brand-border hover:bg-brand-peach text-brand-violet font-bold text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
-                      >
-                        {copiedId === item.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-700" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5 text-brand-brown" />
-                            Copy
-                          </>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        className="px-2.5 py-1 bg-red-100 border border-red-400 hover:bg-red-200 text-red-800 font-bold text-xs cursor-pointer transition-colors"
-                      >
-                        Revoke
-                      </button>
-                    </div>
-                  </td>
+        {sharedFiles.length === 0 ? (
+          <div className="py-16 text-center flex flex-col items-center justify-center">
+            <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
+              <Link2 className="w-6 h-6 text-brand-brown" />
+            </div>
+            <h3 className="text-sm font-bold text-brand-violet">No active share links</h3>
+            <p className="text-xs text-brand-violet/60 mt-1 max-w-sm">
+              You haven't generated any public or time-expiring share links yet.
+            </p>
+            <Link
+              href="/dashboard"
+              className="mt-4 px-4 py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all"
+            >
+              Browse Files to Share
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-brand-cream-muted/70 text-[10px] font-bold uppercase tracking-wider border-b border-brand-border text-brand-violet">
+                  <th className="py-2.5 px-4">Shared Asset</th>
+                  <th className="py-2.5 px-4">Permissions</th>
+                  <th className="py-2.5 px-4">Telemetry</th>
+                  <th className="py-2.5 px-4">Expires</th>
+                  <th className="py-2.5 px-4 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-brand-border/60">
+                {sharedFiles.map((item) => (
+                  <tr key={item.id} className="hover:bg-brand-cream-muted/40 transition-colors">
+                    <td className="py-3 px-4 font-bold text-brand-violet">
+                      <div>{item.fileName}</div>
+                      <span className="text-[10px] font-mono text-brand-brown">
+                        {item.link}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="inline-block px-2 py-0.5 text-[10px] font-bold bg-brand-cream-muted border border-brand-border text-brand-violet">
+                        {item.permission}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-[11px] font-mono text-brand-violet/80">
+                      <div>{item.views} views</div>
+                      <div className="text-[10px] text-brand-violet/60">
+                        {item.downloads} downloads
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-[11px] font-mono">
+                      <span
+                        className={
+                          item.status === "Expired"
+                            ? "text-red-600 font-bold"
+                            : "text-brand-violet/80"
+                        }
+                      >
+                        {item.expiresAt}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="inline-flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(item.link, item.id)}
+                          className="px-2.5 py-1 bg-brand-cream-muted border border-brand-border hover:bg-brand-peach text-brand-violet font-bold text-xs inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          {copiedId === item.id ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-700" />
+                              Copied
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-brand-brown" />
+                              Copy
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default SharedPage;
-

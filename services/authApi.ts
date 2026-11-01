@@ -45,6 +45,25 @@ const authApi = {
     return data.data!;
   },
 
+  async updateName(name: string): Promise<any> {
+    const res = await fetch("/api/auth/profile", {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    const data: ApiResponse<User> = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to update profile name");
+    }
+
+    return data.data!;
+  },
+
   async signup(credentials: AuthCredentials): Promise<User> {
     const res = await fetch(AUTH_API_ENDPOINTS.SIGNUP, {
       method: "POST",

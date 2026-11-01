@@ -661,6 +661,14 @@ const DashboardContent = () => {
                 >
                   Lock Vault Now
                 </button>
+              ) : isEnrolled === false ? (
+                <button
+                  type="button"
+                  onClick={() => setShowSetupModal(true)}
+                  className="w-full py-2 bg-brand-peach hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
+                >
+                  Setup Vault Key
+                </button>
               ) : (
                 <button
                   type="button"
