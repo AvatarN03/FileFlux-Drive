@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -42,7 +42,8 @@ const AuthContent = () => {
   const [isLogin, setIsLogin] = useState(true);
   const continueTo = searchParams.get("continueTo");
 
-  const { isAuthenticated, isLoading, user, googleLogin } = useAuth();
+  const { isAuthenticated, isLoading, user, googleLogin, isAuthRequestPending } = useAuth();
+  const googleLoginStarted = useRef(false);
 
   const handleSwitch = () => {
     setIsLogin(prev => !prev);
@@ -67,6 +68,8 @@ const AuthContent = () => {
   const handleGoogleSuccess = async (
     credentialResponse: CredentialResponse
   ) => {
+    if (googleLoginStarted.current) return;
+    googleLoginStarted.current = true;
 
     try {
       if (!credentialResponse.credential) {
@@ -74,6 +77,7 @@ const AuthContent = () => {
           data: "Unable to login.",
           type: "error"
         });
+        googleLoginStarted.current = false;
         return;
       }
 
@@ -104,6 +108,8 @@ const AuthContent = () => {
         type: "error"
       });
 
+    } finally {
+      googleLoginStarted.current = false;
     }
   };
 
@@ -146,16 +152,20 @@ const AuthContent = () => {
             </div>
 
             {/* Google Authentication */}
-            <div className="flex justify-center w-full">
+            <div
+              className={`flex justify-center w-full ${isAuthRequestPending ? "pointer-events-none opacity-60" : ""}`}
+              aria-busy={isAuthRequestPending}
+            >
               <GoogleLogin
                 theme="filled_black"
                 shape="rectangular"
                 size="large"
                 width="100%"
                 onSuccess={handleGoogleSuccess}
-                onError={() =>
+                onError={() => {
+                  googleLoginStarted.current = false;
                   toastC({ data: "Google Sign In failed", type: "error" })
-                }
+                }}
               />
             </div>
           </div>
@@ -168,7 +178,8 @@ const AuthContent = () => {
             <button
               type="button"
               onClick={handleSwitch}
-              className="font-bold text-brand-peach-vibrant hover:text-brand-peach underline underline-offset-4 cursor-pointer transition-colors"
+              disabled={isAuthRequestPending}
+              className="font-bold text-brand-peach-vibrant hover:text-brand-peach underline underline-offset-4 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLogin ? "Sign Up" : "Log In"}
             </button>

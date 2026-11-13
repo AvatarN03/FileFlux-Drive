@@ -15,7 +15,7 @@ const SignupForm = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const { signup, isLoading } = useAuth();
+  const { signup, isSignupPending, isAuthRequestPending } = useAuth();
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -116,9 +116,9 @@ const SignupForm = () => {
       <button
         type="submit"
         className="w-full px-5 py-3 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-sm font-bold border-2 border-brand-brown shadow-[3px_3px_0px_0px_#FFA552] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#FFA552] transition-all rounded-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
-        disabled={isLoading}
+        disabled={isAuthRequestPending}
       >
-        {isLoading ? (
+        {isSignupPending ? (
           <div className="flex items-center justify-center gap-2">
             <LoaderCircle className="w-4 h-4 animate-spin text-brand-peach" />
             <span>Creating account...</span>

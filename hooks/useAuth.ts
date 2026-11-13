@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, useIsMutating } from "@tanstack/react-query";
 
 import authApi from "@/services/authApi";
 
@@ -8,6 +8,7 @@ import { AuthCredentials } from "@/types/auth";
 
 export function useAuth() {
   const queryClient = useQueryClient();
+  const isAuthRequestPending = useIsMutating({ mutationKey: ["auth", "request"] }) > 0;
 
   const userQuery = useQuery({
     queryKey: ["auth", "user"],
@@ -24,6 +25,7 @@ export function useAuth() {
   });
 
   const loginMutation = useMutation({
+    mutationKey: ["auth", "request"],
     mutationFn: authApi.login,
 
     onSuccess: (user) => {
@@ -32,6 +34,7 @@ export function useAuth() {
   });
 
   const signupMutation = useMutation({
+    mutationKey: ["auth", "request"],
     mutationFn: authApi.signup,
 
     onSuccess: (user) => {
@@ -63,6 +66,7 @@ export function useAuth() {
   });
 
   const googleLoginMutation = useMutation({
+    mutationKey: ["auth", "request"],
     mutationFn: authApi.googleLogin,
 
     onSuccess: (user) => {
@@ -84,6 +88,10 @@ export function useAuth() {
     user: userQuery.data ?? null,
 
     isAuthenticated: !!userQuery.data,
+
+    isLoginPending: loginMutation.isPending,
+    isSignupPending: signupMutation.isPending,
+    isAuthRequestPending,
 
     isLoading:
       userQuery.isPending ||
