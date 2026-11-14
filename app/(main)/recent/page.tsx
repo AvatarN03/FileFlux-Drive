@@ -1,13 +1,12 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Clock, Search, FileText, Download, Eye, Loader2 } from "lucide-react";
 import { useFiles } from "@/hooks/useFileQueries";
 import { useVault } from "@/context/VaultContext";
 import { formatFileSize } from "@/lib/file";
 import { FileItem } from "@/types/file";
-import { decryptMetadata } from "@/lib/crypto";
 import { downloadAndDecryptFile } from "@/lib/storage/encryptedFileTransfer";
 import { toastSuccess, toastError } from "@/lib/toast";
 import FilePreviewModal from "../../_components/FilePreviewModel";
@@ -37,55 +36,17 @@ const RecentFileRow = ({
   onPreview: (file: FileItem) => void;
 }) => {
   const { vaultKey } = useVault();
-  const [decryptedName, setDecryptedName] = useState<string | null>(null);
-  const [decryptedExt, setDecryptedExt] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-    if (
-      file.isEncrypted &&
-      file.encryptedMetadataCiphertext &&
-      file.encryptedMetadataNonce &&
-      vaultKey
-    ) {
-      decryptMetadata(
-        {
-          nonce: file.encryptedMetadataNonce,
-          ciphertext: file.encryptedMetadataCiphertext,
-        },
-        vaultKey
-      )
-        .then((meta) => {
-          if (isMounted) {
-            setDecryptedName(meta.name);
-            setDecryptedExt(meta.extension);
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to decrypt file metadata:", err);
-        });
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [
-    file.isEncrypted,
-    file.encryptedMetadataCiphertext,
-    file.encryptedMetadataNonce,
-    vaultKey,
-  ]);
 
   const displayName = file.isEncrypted
     ? vaultKey
-      ? decryptedName ?? "[Decrypting...]"
+      ? file.name
       : "[Encrypted File]"
     : file.name;
 
   const displayExt = file.isEncrypted
     ? vaultKey
-      ? decryptedExt ?? ""
+      ? file.extension
       : ""
     : file.extension;
 
@@ -102,7 +63,7 @@ const RecentFileRow = ({
         await downloadAndDecryptFile({ fileId: file.id, vaultKey });
         toastSuccess("File decrypted and downloaded successfully!");
       } catch (err: unknown) {
-        console.error(err);
+        console.error("Recent-file download failed");
         toastError(
           (err as Error)?.message || "Failed to decrypt and download file"
         );
@@ -178,7 +139,8 @@ const RecentPage = () => {
   const { data: rawFiles = [], isLoading } = useFiles({ folderId: null });
   const [searchTerm, setSearchTerm] = useState("");
   const [timeFilter, setTimeFilter] = useState<"all" | "today" | "week">("all");
-  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [previewFileId, setPreviewFileId] = useState<string | null>(null);
+  const previewFile = rawFiles.find((file) => file.id === previewFileId) ?? null;
 
   const filteredFiles = useMemo(() => {
     const currentTime = Date.now();
@@ -313,7 +275,7 @@ const RecentPage = () => {
               <RecentFileRow
                 key={file.id}
                 file={file}
-                onPreview={(f) => setPreviewFile(f)}
+                onPreview={(f) => setPreviewFileId(f.id)}
               />
             ))}
           </div>
@@ -324,7 +286,7 @@ const RecentPage = () => {
       {previewFile && (
         <FilePreviewModal
           file={previewFile}
-          onClose={() => setPreviewFile(null)}
+          onClose={() => setPreviewFileId(null)}
         />
       )}
     </div>

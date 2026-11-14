@@ -1,7 +1,11 @@
 "use client";
 
-import { FileText, Download } from "lucide-react";
-import { useFolderFiles } from "@/hooks/useFileQueries";
+import { useState } from "react";
+import { FileText, Download, Lock } from "lucide-react";
+import { useFiles } from "@/hooks/useFileQueries";
+import { useVault } from "@/context/VaultContext";
+import { downloadAndDecryptFile } from "@/lib/storage/encryptedFileTransfer";
+import { toastError, toastSuccess } from "@/lib/toast";
 import { formatFileSize } from "@/lib/file";
 
 interface FileGridProps {
@@ -9,7 +13,32 @@ interface FileGridProps {
 }
 
 const FileGrid = ({ folderId }: FileGridProps) => {
-  const { data, isLoading, isError } = useFolderFiles(folderId);
+  const { data: files = [], isLoading, isError } = useFiles({ folderId });
+  const { vaultKey } = useVault();
+  const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null);
+
+  const handleDownload = async (fileId: string, isEncrypted: boolean, url?: string) => {
+    if (!isEncrypted) {
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+      else toastError("No download URL available for this file.");
+      return;
+    }
+
+    if (!vaultKey) {
+      toastError("Unlock your vault to decrypt and download this file.");
+      return;
+    }
+
+    setDownloadingFileId(fileId);
+    try {
+      await downloadAndDecryptFile({ fileId, vaultKey });
+      toastSuccess("File decrypted and downloaded successfully!");
+    } catch (error) {
+      toastError((error as Error)?.message || "Failed to decrypt and download file.");
+    } finally {
+      setDownloadingFileId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -28,8 +57,6 @@ const FileGrid = ({ folderId }: FileGridProps) => {
       </div>
     );
   }
-
-  const files = data?.files ?? [];
 
   if (!files.length) {
     return (
@@ -66,33 +93,35 @@ const FileGrid = ({ folderId }: FileGridProps) => {
                 <FileText className="h-5 w-5" />
               </div>
               <span className="text-[10px] font-mono font-bold bg-brand-peach px-2 py-0.5 border border-brand-border uppercase">
-                {file.extension}
+                {file.extension || (file.isEncrypted ? "LOCKED" : "FILE")}
               </span>
             </div>
 
             <div>
               <h3
                 className="font-bold text-xs text-brand-violet truncate mb-1"
-                title={file.originalName}
+                title={file.extension ? `${file.name}.${file.extension}` : file.name}
               >
-                {file.originalName}
+                {file.extension ? `${file.name}.${file.extension}` : file.name}
               </h3>
               <p className="text-[10px] font-mono text-brand-violet/60">
                 {formatFileSize(file.size)}
               </p>
             </div>
 
-            {file.url && (
-              <a
-                href={file.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-brand-cream-muted hover:bg-brand-peach border border-brand-border text-brand-violet text-xs font-bold transition-colors"
-              >
-                <Download className="w-3.5 h-3.5 text-brand-brown" />
-                Download
-              </a>
-            )}
+            <button
+              type="button"
+              onClick={() => handleDownload(file.id, !!file.isEncrypted, file.url)}
+              disabled={downloadingFileId === file.id}
+              className="mt-3 inline-flex items-center justify-center gap-1.5 border border-brand-border bg-brand-cream-muted px-3 py-1.5 text-xs font-bold text-brand-violet transition-colors hover:bg-brand-peach disabled:cursor-wait disabled:opacity-50"
+            >
+              {file.isEncrypted && !vaultKey ? (
+                <Lock className="h-3.5 w-3.5 text-brand-brown" />
+              ) : (
+                <Download className="h-3.5 w-3.5 text-brand-brown" />
+              )}
+              {downloadingFileId === file.id ? "Downloading…" : "Download"}
+            </button>
           </div>
         ))}
       </div>

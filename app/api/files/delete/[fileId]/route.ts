@@ -4,6 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { files } from "@/db/schema";
 import { isAuthError, verifyAuth } from "../../../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 interface RouteParams {
   params: Promise<{
@@ -87,7 +88,7 @@ export async function DELETE(req: Request, { params }: RouteParams) {
         }
       );
     }
-    console.error("Delete file error:", error);
+    logServerError("Delete file", error);
 
     return NextResponse.json(
       {

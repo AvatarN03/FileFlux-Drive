@@ -1,5 +1,6 @@
 
 import emailValidator from "node-email-verifier";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function verifyEmailAddress(email: string) {
   try {
@@ -12,7 +13,7 @@ export async function verifyEmailAddress(email: string) {
 
     return result;
   } catch (err) {
-    console.error("emailVerifier error:", err);
+    logServerError("Email verification lookup", err);
     // if fail on DNS etc., return a simple false status
     return { valid: false };
   }

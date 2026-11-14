@@ -43,7 +43,7 @@ const Hero = () => {
             >
               <span className="w-2 h-2 bg-brand-peach-vibrant inline-block animate-pulse" />
               <Sparkles className="w-3.5 h-3.5 text-brand-peach-vibrant" />
-              <span>Next-Gen Encrypted File Platform</span>
+              <span>Encrypted Personal File Vault</span>
             </motion.div>
 
             {/* Main Headline with Distinct Font Contrast */}
@@ -53,9 +53,9 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-3xl sm:text-5xl xl:text-6xl font-extrabold text-brand-violet tracking-tight leading-[1.08] mb-6"
             >
-              Upload, Encrypt & Command Your Files{" "}
+              Your Files, Encrypted{" "}
               <span className="text-brand-brown block mt-1">
-                With Absolute Confidence.
+                Before They Leave Your Device.
               </span>
               <div className="mt-3">
                 <span className="inline-block bg-brand-violet text-brand-peach border-2 border-brand-violet-dark px-3.5 py-1 text-xl sm:text-2xl lg:text-3xl font-extrabold shadow-[4px_4px_0px_0px_#FFA552] rounded-none">
@@ -71,9 +71,10 @@ const Hero = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-sm sm:text-base lg:text-lg text-brand-violet/85 max-w-2xl mb-8 font-medium leading-relaxed"
             >
-              Engineered with client-side libsodium cryptographic vaults, instant
-              lossless file previews, granular public sharing controls, and real-time
-              quota telemetry. Zero tracking. Zero unencrypted storage.
+              FileFlux encrypts every file in your browser with your personal
+              vault passphrase before anything is uploaded. Instant image and
+              video previews, organized folders, and a clear view of your
+              storage — no tracking, no plaintext on our servers.
             </motion.p>
 
             {/* Action CTA Buttons */}
@@ -107,15 +108,15 @@ const Hero = () => {
             >
               <div className="flex items-center gap-2 text-xs font-semibold text-brand-violet">
                 <ShieldCheck className="w-4 h-4 text-brand-brown shrink-0" />
-                <span>Client-Side AES & libsodium</span>
+                <span>Encrypted in your browser</span>
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-brand-violet">
                 <Zap className="w-4 h-4 text-brand-peach-vibrant shrink-0" />
-                <span>Instant In-Browser Previews</span>
+                <span>Image & Video Previews</span>
               </div>
               <div className="flex items-center gap-2 text-xs font-semibold text-brand-violet col-span-2 sm:col-span-1">
                 <LockKeyhole className="w-4 h-4 text-brand-violet shrink-0" />
-                <span>Zero Server Telemetry</span>
+                <span>Keys Never Leave Your Device</span>
               </div>
             </motion.div>
           </div>
@@ -142,7 +143,7 @@ const Hero = () => {
                 <div className="flex items-center gap-2">
                   <span className="inline-flex items-center gap-1 bg-brand-brown text-brand-cream px-2 py-0.5 text-[10px] font-mono font-bold border border-brand-peach-vibrant/40">
                     <HardDrive className="w-3 h-3" />
-                    24.5 MB / 500 MB
+                    18.2 MB / 50 MB
                   </span>
                 </div>
               </div>
@@ -174,7 +175,7 @@ const Hero = () => {
                 {[
                   {
                     name: "Financial-Audit-2026.pdf",
-                    badge: "Verified",
+                    badge: "Encrypted",
                     badgeClass: "bg-brand-peach/60 text-brand-violet border-brand-border",
                     size: "3.2 MB",
                     icon: FileText,
@@ -190,15 +191,15 @@ const Hero = () => {
                   },
                   {
                     name: "Brand-Tokens.json",
-                    badge: "Public Link",
+                    badge: "Private",
                     badgeClass: "bg-brand-peach-vibrant/20 text-brand-brown-dark border-brand-brown",
                     size: "24.8 KB",
                     icon: FileCode,
                     iconColor: "text-brand-brown",
                   },
                   {
-                    name: "Telemetry-Archive.zip",
-                    badge: "Cold Storage",
+                    name: "Project-Archive.zip",
+                    badge: "Archived",
                     badgeClass: "bg-brand-cream-muted text-brand-violet/80 border-brand-border",
                     size: "18.5 MB",
                     icon: FileText,
@@ -234,12 +235,12 @@ const Hero = () => {
                     </div>
                     <div>
                       <div className="text-[11px] font-bold text-brand-cream">Personal Vault Active</div>
-                      <div className="text-[9px] text-brand-peach/80 font-mono">Argon2id Hash Key Derived</div>
+                      <div className="text-[9px] text-brand-peach/80 font-mono">Argon2id Key Derivation</div>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className="inline-block bg-brand-peach-vibrant text-brand-violet-dark px-2 py-0.5 text-[10px] font-bold">
-                      Zero-Knowledge
+                      E2E Encrypted
                     </span>
                   </div>
                 </div>
@@ -253,7 +254,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="mt-14 sm:mt-16 grid grid-cols-1 md:grid-cols-3 gap-5 w-full"
+          className="mt-14 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full"
         >
           {/* Card 1: Personal Vault */}
           <div className="bg-brand-cream border-2 border-brand-brown p-5 shadow-[4px_4px_0px_0px_#BA5624] rounded-none flex items-start gap-3.5 hover:translate-x-[1px] hover:translate-y-[1px] transition-all">
@@ -265,7 +266,7 @@ const Hero = () => {
                 Personal Encrypted Vault
               </h3>
               <p className="text-xs text-brand-violet/80 mt-1 leading-relaxed">
-                Client-side libsodium passphrase encryption ensuring private files remain unreadable to any server or host.
+                Files are encrypted in your browser with your personal vault passphrase — unreadable to our servers and your storage provider.
               </p>
             </div>
           </div>
@@ -277,25 +278,25 @@ const Hero = () => {
             </div>
             <div>
               <h3 className="text-base font-bold text-brand-violet">
-                Lossless Instant Previews
+                Instant In-Browser Previews
               </h3>
               <p className="text-xs text-brand-violet/80 mt-1 leading-relaxed">
-                Fast browser-side inspection for PDFs, images, JSON schemas, and code files with zero quality degradation.
+                Preview images and videos right in the browser, decrypted locally on demand — no download required.
               </p>
             </div>
           </div>
 
-          {/* Card 3: Granular Sharing */}
-          <div className="bg-brand-cream border-2 border-brand-violet p-5 shadow-[4px_4px_0px_0px_#381D2A] rounded-none flex items-start gap-3.5 hover:translate-x-[1px] hover:translate-y-[1px] transition-all">
+          {/* Card 3: Private by Default */}
+          <div className="bg-brand-cream border-2 border-brand-violet p-5 shadow-[4px_4px_0px_0px_#381D2A] rounded-none flex items-start gap-3.5 hover:translate-x-[1px] hover:translate-y-[1px] transition-all sm:col-span-2 lg:col-span-1">
             <div className="w-10 h-10 bg-brand-violet text-brand-peach border-2 border-brand-violet flex items-center justify-center shrink-0 rounded-none shadow-[2px_2px_0px_0px_#381D2A]">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-brand-violet">
-                Granular Public Sharing
+                Private by Default
               </h3>
               <p className="text-xs text-brand-violet/80 mt-1 leading-relaxed">
-                One-click link generation, customizable download rules, and real-time access telemetry for public assets.
+                Your files stay private to your vault unless you decide otherwise. Public share links with expiring access are on our roadmap.
               </p>
             </div>
           </div>

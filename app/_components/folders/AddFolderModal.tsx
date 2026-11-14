@@ -8,6 +8,8 @@ const AddFolderModal = ({
   onClose,
   onKeyPress,
   isPending,
+  title = "Create New Folder",
+  submitLabel = "Create Folder",
 }: AddFolderModalProps) => {
   return (
     <div
@@ -27,7 +29,7 @@ const AddFolderModal = ({
             </div>
             <div>
               <h2 className="text-base font-extrabold text-brand-violet tracking-tight">
-                Create New Folder
+                {title}
               </h2>
               <p className="text-xs text-brand-violet/70">
                 Organize your encrypted assets
@@ -82,7 +84,7 @@ const AddFolderModal = ({
               disabled={isPending || !value.trim() || value.trim().length < 3}
               className="px-5 py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              {isPending ? "Creating..." : "Create Folder"}
+              {isPending ? "Saving..." : submitLabel}
             </button>
           </div>
         </div>

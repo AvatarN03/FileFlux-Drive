@@ -43,6 +43,12 @@ const FolderHeader = ({
           setShowModal(false);
           toastC({ data: "Folder created successfully", type: "success" });
         },
+        onError: (err) => {
+          toastC({
+            data: err.message || "Failed to create folder",
+            type: "error",
+          });
+        },
       }
     );
   };

@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         className={`flex items-center gap-3 px-3 py-2.5 transition-all text-sm font-bold border-2 cursor-pointer ${
           active
             ? "bg-brand-brown text-brand-cream border-brand-brown-dark shadow-[3px_3px_0px_0px_#26131D]"
-            : "border-transparent text-brand-cream/80 hover:text-brand-peach hover:bg-brand-violet"
+            : "border-brand-violet-light/40 text-brand-cream/80 hover:text-brand-peach hover:bg-brand-violet hover:border-brand-peach hover:shadow-[2px_2px_0px_0px_#26131D] hover:translate-x-[1px] hover:translate-y-[1px]"
         }`}
       >
         <Icon
@@ -45,7 +45,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   return (
     <>
       {/* Desktop rail — logo pinned at top, icons below */}
-      <aside className="hidden md:flex flex-col w-64 h-screen h-dvh bg-brand-violet-dark text-brand-cream p-4 border-r-2 border-brand-violet shrink-0 select-none z-30">
+      <aside className="hidden md:flex flex-col w-60 h-screen h-dvh bg-brand-violet-dark text-brand-cream p-4 border-r-2 border-brand-violet shrink-0 select-none z-30">
         <div className="flex items-center justify-start pb-4 pt-2">
           <Logo classes="text-brand-cream" />
         </div>

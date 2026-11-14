@@ -163,7 +163,7 @@ const FileUpload = () => {
 
       timeoutRef.current = setTimeout(resetState, 1000);
     } catch (error) {
-      console.error(error);
+      console.error("File upload failed");
       const isAbort =
         (error as Error)?.message === "Upload aborted" ||
         (error as DOMException)?.name === "AbortError" ||

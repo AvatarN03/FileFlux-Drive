@@ -8,26 +8,26 @@ interface LoadingProps {
 }
 
 const Loading = ({
-  statusText = "INITIALIZING ENCRYPTED VAULT",
-  subText = "Validating zero-knowledge keys & encrypted state...",
+  statusText = "VERIFYING SESSION",
+  subText = "Checking your secure session...",
 }: LoadingProps) => {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 bg-brand-cream bg-pattern-network text-brand-violet selection:bg-brand-peach selection:text-brand-violet overflow-hidden">
       {/* Neo-Brutalist Technical Corner Decals */}
-      <div className="absolute top-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute top-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
         <span className="w-2 h-2 bg-brand-brown animate-pulse shrink-0"></span>
         <span>SYS://FILEFLUX/ENCRYPTED_VAULT</span>
       </div>
 
-      <div className="absolute top-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute top-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
         <span>SECURITY: ZERO-KNOWLEDGE</span>
       </div>
 
-      <div className="absolute bottom-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
-        <span>PROTOCOL: CLIENT_SIDE_AES_GCM</span>
+      <div aria-hidden="true" className="absolute bottom-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+        <span>PROTOCOL: XCHACHA20-POLY1305</span>
       </div>
 
-      <div className="absolute bottom-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute bottom-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
         <span>STATUS: BOOTSTRAPPING</span>
       </div>
 

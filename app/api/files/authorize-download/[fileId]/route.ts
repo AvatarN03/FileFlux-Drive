@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { files } from "@/db/schema";
 import { getAuthUser, isAuthError } from "../../../_services";
 import { generateDownloadPresignedUrl } from "@/lib/storage/s3";
+import { logServerError } from "@/lib/security/safeLogging";
 
 interface RouteParams {
   params: Promise<{
@@ -91,7 +92,7 @@ export async function GET(req: Request, { params }: RouteParams) {
         { status: 401 }
       );
     }
-    console.error("Authorize download error:", error);
+    logServerError("Authorize download", error);
     return NextResponse.json(
       { success: false, error: "Failed to authorize download" },
       { status: 500 }

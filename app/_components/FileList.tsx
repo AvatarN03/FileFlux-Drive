@@ -73,8 +73,8 @@ const FileList = ({ file }: { file: FileItem }) => {
           setDisplayName(meta.name);
           setDisplayExt(meta.extension);
         })
-        .catch((err) => {
-          console.error("Failed to decrypt file metadata:", err);
+        .catch(() => {
+          console.error("Failed to decrypt file metadata");
         });
     } else if (file.isEncrypted && !vaultKey) {
       setDisplayName("[Encrypted File]");
@@ -114,7 +114,7 @@ const FileList = ({ file }: { file: FileItem }) => {
         await downloadAndDecryptFile({ fileId: file.id, vaultKey });
         toastSuccess("File decrypted and downloaded successfully!");
       } catch (err: unknown) {
-        console.error(err);
+        console.error("File download failed");
         toastError(
           (err as Error)?.message || "Failed to decrypt and download file"
         );

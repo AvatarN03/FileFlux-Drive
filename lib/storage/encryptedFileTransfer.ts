@@ -34,8 +34,8 @@ async function cleanupAbortedUpload(objectKey: string): Promise<void> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ objectKey }),
     });
-  } catch (err) {
-    console.warn("Failed to notify abort-upload cleanup:", err);
+  } catch {
+    console.warn("Failed to notify abort-upload cleanup");
   }
 }
 
@@ -321,6 +321,11 @@ export async function downloadAndDecryptFile({
       const { done, value } = await reader.read();
 
       if (value) {
+        if (isFinalSeen && value.length > 0) {
+          await reader.cancel();
+          throw new Error("Stream integrity error: data found after the final chunk.");
+        }
+
         bytesReceived += value.length;
         const newBuffer = new Uint8Array(buffer.length + value.length);
         newBuffer.set(buffer, 0);
@@ -344,6 +349,11 @@ export async function downloadAndDecryptFile({
           isFinalSeen = true;
           break;
         }
+      }
+
+      if (isFinalSeen && buffer.length > 0) {
+        await reader.cancel();
+        throw new Error("Stream integrity error: data found after the final chunk.");
       }
 
       if (done) {
@@ -383,6 +393,9 @@ export async function downloadAndDecryptFile({
 
       if (res.isFinal) {
         isFinalSeen = true;
+        if (readOffset < ciphertextBytes.length) {
+          throw new Error("Stream integrity error: data found after the final chunk.");
+        }
         break;
       }
     }

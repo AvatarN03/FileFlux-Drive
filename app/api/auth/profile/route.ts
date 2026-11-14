@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
 import { getAuthUser, isAuthError } from "../../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function PATCH(req: Request) {
   try {
@@ -46,7 +47,7 @@ export async function PATCH(req: Request) {
         { status: 401 }
       );
     }
-    console.error("Update profile error:", error);
+    logServerError("Update profile", error);
     return NextResponse.json(
       { success: false, error: "Failed to update profile name" },
       { status: 500 }

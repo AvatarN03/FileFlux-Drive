@@ -4,6 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
 import { isAuthError, verifyAuth } from "../../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 interface RouteParams {
   params: Promise<{
@@ -97,7 +98,7 @@ export async function GET(
         }
       );
     }
-    console.error(error);
+    logServerError("Fetch files by folder", error);
 
     return NextResponse.json(
       {

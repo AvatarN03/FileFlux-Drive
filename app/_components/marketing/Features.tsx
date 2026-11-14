@@ -10,9 +10,7 @@ import {
   Eye,
   Zap,
   Sparkles,
-  ArrowUpRight,
   Share2,
-  FileCode,
   Layers,
 } from "lucide-react";
 
@@ -30,14 +28,14 @@ const Features = () => {
         <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border-l-4 border-brand-peach-vibrant border-y border-r border-brand-violet-dark bg-brand-violet text-brand-peach text-xs font-bold uppercase tracking-wider mb-4 shadow-[2px_2px_0px_0px_#BA5624] rounded-none">
             <Sparkles className="w-3.5 h-3.5 text-brand-peach-vibrant" />
-            <span>Architecture & Engine Capabilities</span>
+            <span>What FileFlux Offers</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-violet tracking-tight mb-4">
-            Everything You Need to Command Your Files
+            Everything You Need to Manage Your Files
           </h2>
           <p className="text-base sm:text-lg text-brand-violet/85 leading-relaxed">
-            Crafted for speed, zero-knowledge privacy, and total operational
-            clarity. Explore the architectural modules driving the FileFlux platform.
+            Built for speed and privacy — here&apos;s what FileFlux gives you
+            today, and what&apos;s coming next.
           </p>
         </div>
 
@@ -50,7 +48,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="col-span-12 lg:col-span-8 bg-brand-cream-muted border-2 border-brand-brown p-6 sm:p-8 flex flex-col justify-between shadow-[6px_6px_0px_0px_#BA5624] hover:shadow-[4px_4px_0px_0px_#BA5624] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
+            className="md:col-span-2 lg:col-span-8 bg-brand-cream-muted border-2 border-brand-brown p-6 sm:p-8 flex flex-col justify-between shadow-[6px_6px_0px_0px_#BA5624] hover:shadow-[4px_4px_0px_0px_#BA5624] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
           >
             <div>
               {/* Top Meta Bar */}
@@ -84,7 +82,7 @@ const Features = () => {
                   <span>// CLIENT ENCRYPTION PIPELINE</span>
                   <span className="text-emerald-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    HARDWARE ACCELERATED
+                    RUNS ENTIRELY IN YOUR BROWSER
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -96,7 +94,7 @@ const Features = () => {
                   <div className="bg-brand-brown/40 p-3 border border-brand-brown flex flex-col justify-between">
                     <div>
                       <div className="text-brand-peach-vibrant text-[10px] uppercase font-bold">2. Salt & Derivation</div>
-                      <div className="font-mono text-brand-cream truncate mt-1">Argon2id (m=64M, t=3)</div>
+                      <div className="font-mono text-brand-cream truncate mt-1">Argon2id key derivation</div>
                     </div>
                     <div className="text-[10px] text-brand-peach mt-0.5">256-bit entropy</div>
                   </div>
@@ -110,10 +108,8 @@ const Features = () => {
             </div>
 
             <div className="mt-6 pt-4 border-t border-brand-border flex items-center justify-between text-xs font-semibold text-brand-violet/75">
-              <span>Full cryptographic protection included with every account</span>
-              <span className="inline-flex items-center gap-1 text-brand-brown font-bold group-hover:translate-x-1 transition-transform">
-                Read Security Spec <ArrowUpRight className="w-4 h-4" />
-              </span>
+              <span>Encrypted locally — only ciphertext ever leaves your device</span>
+              <Lock className="w-4 h-4 text-brand-brown shrink-0" />
             </div>
           </motion.div>
 
@@ -123,7 +119,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="col-span-12 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-violet p-6 sm:p-7 flex flex-col justify-between shadow-[6px_6px_0px_0px_#381D2A] hover:shadow-[4px_4px_0px_0px_#381D2A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
+            className="md:col-span-2 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-violet p-6 sm:p-7 flex flex-col justify-between shadow-[6px_6px_0px_0px_#381D2A] hover:shadow-[4px_4px_0px_0px_#381D2A] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
           >
             <div>
               <div className="flex items-center justify-between mb-5">
@@ -131,22 +127,23 @@ const Features = () => {
                   <HardDrive className="w-5 h-5" />
                 </div>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-brand-peach text-brand-violet border border-brand-border">
-                  LIVE TELEMETRY
+                  AUTO-UPDATED
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-brand-violet mb-2 group-hover:text-brand-brown transition-colors">
-                Storage & Quota Telemetry
+                Storage & Quota Overview
               </h3>
               <p className="text-sm text-brand-violet/85 leading-relaxed mb-6">
-                Sub-millisecond capacity metrics tracking byte usage, folder distribution, and allocation quotas.
+                Track storage usage by file type, folder counts, and remaining
+                quota — recalculated as you upload.
               </p>
 
               {/* Visual Telemetry Gauge */}
               <div className="p-4 bg-brand-cream border-2 border-brand-border space-y-3">
                 <div className="flex justify-between items-baseline">
                   <span className="text-xs font-bold text-brand-violet">Vault Allocation</span>
-                  <span className="font-mono text-xs font-bold text-brand-brown">24.5 MB / 500 MB</span>
+                  <span className="font-mono text-xs font-bold text-brand-brown">18.2 MB / 50 MB</span>
                 </div>
                 <div className="w-full h-3 bg-brand-cream-muted border border-brand-border flex overflow-hidden">
                   <div className="bg-brand-brown h-full w-[50%]" title="Docs: 12.4 MB" />
@@ -173,9 +170,9 @@ const Features = () => {
             <div className="mt-6 pt-3 border-t border-brand-border flex items-center justify-between text-xs font-bold text-brand-violet">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
-                Real-time sync active
+                Recalculated as you upload
               </span>
-              <span className="font-mono text-brand-brown">0ms lag</span>
+              <Zap className="w-4 h-4 text-brand-brown" />
             </div>
           </motion.div>
 
@@ -185,7 +182,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
-            className="col-span-12 md:col-span-6 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-peach-vibrant p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#FFA552] hover:shadow-[4px_4px_0px_0px_#FFA552] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
+            className="md:col-span-1 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-peach-vibrant p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#FFA552] hover:shadow-[4px_4px_0px_0px_#FFA552] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
           >
             <div>
               <div className="flex items-center justify-between mb-5">
@@ -193,36 +190,37 @@ const Features = () => {
                   <Eye className="w-5 h-5 text-brand-violet" />
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-brand-peach-vibrant/20 text-brand-brown-dark border border-brand-peach-vibrant">
-                  &lt; 80MS LATENCY
+                  IN-BROWSER
                 </span>
               </div>
 
               <h3 className="text-xl font-bold text-brand-violet mb-2 group-hover:text-brand-brown transition-colors">
-                Instant Lossless Previews
+                Instant In-Browser Previews
               </h3>
               <p className="text-sm text-brand-violet/85 leading-relaxed mb-5">
-                Native in-browser inspection for PDFs, high-res images, spreadsheets, JSON schemas, and code files.
+                Preview images and videos right in the browser, decrypted locally
+                on demand — more formats coming.
               </p>
 
               {/* Supported Format Dock */}
               <div className="grid grid-cols-3 gap-2 bg-brand-cream border-2 border-brand-border p-3 text-center">
                 <div className="p-2 bg-brand-cream-muted border border-brand-border">
-                  <div className="font-mono font-bold text-xs text-brand-brown">.PDF</div>
-                  <div className="text-[9px] text-brand-violet/70">Lossless vector</div>
+                  <div className="font-mono font-bold text-xs text-brand-brown">.PNG/.JPG</div>
+                  <div className="text-[9px] text-brand-violet/70">Images</div>
                 </div>
                 <div className="p-2 bg-brand-cream-muted border border-brand-border">
-                  <div className="font-mono font-bold text-xs text-brand-violet">.JSON</div>
-                  <div className="text-[9px] text-brand-violet/70">Syntax colored</div>
+                  <div className="font-mono font-bold text-xs text-brand-violet">.MP4/.WEBM</div>
+                  <div className="text-[9px] text-brand-violet/70">Video</div>
                 </div>
                 <div className="p-2 bg-brand-cream-muted border border-brand-border">
-                  <div className="font-mono font-bold text-xs text-brand-brown-dark">.PNG/.SVG</div>
-                  <div className="text-[9px] text-brand-violet/70">Raw fidelity</div>
+                  <div className="font-mono font-bold text-xs text-brand-brown-dark">.PDF</div>
+                  <div className="text-[9px] text-brand-violet/70">Coming soon</div>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-3 border-t border-brand-border flex items-center justify-between text-xs font-semibold text-brand-violet/80">
-              <span>Zero local conversion lag</span>
+              <span>No download-and-open round trips</span>
               <Zap className="w-4 h-4 text-brand-peach-vibrant" />
             </div>
           </motion.div>
@@ -233,7 +231,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="col-span-12 md:col-span-6 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-violet p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#BA5624] hover:shadow-[4px_4px_0px_0px_#BA5624] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
+            className="md:col-span-1 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-violet p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#BA5624] hover:shadow-[4px_4px_0px_0px_#BA5624] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
           >
             <div>
               <div className="flex items-center justify-between mb-5">
@@ -241,7 +239,7 @@ const Features = () => {
                   <Share2 className="w-5 h-5 text-brand-peach" />
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-brand-cream text-brand-violet border border-brand-border">
-                  TOKEN ACCESS
+                  COMING SOON
                 </span>
               </div>
 
@@ -249,29 +247,31 @@ const Features = () => {
                 Granular Access & Sharing
               </h3>
               <p className="text-sm text-brand-violet/85 leading-relaxed mb-5">
-                Generate expiring public access tokens, or enforce strict personal vault privacy with one click.
+                Every file is private to your vault by default. Expiring public
+                share links are planned for an upcoming release.
               </p>
 
-              {/* Share Config Simulation Panel */}
+              {/* Access State Panel */}
               <div className="bg-brand-cream border-2 border-brand-border p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-brand-violet">Public Access Token</span>
+                  <span className="font-bold text-brand-violet">Default Access</span>
                   <span className="font-mono text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
-                    ENABLED
+                    PRIVATE
                   </span>
                 </div>
-                <div className="p-2 bg-brand-violet-dark text-brand-peach font-mono text-[11px] truncate border border-brand-violet">
-                  https://fileflux.app/share/v92x...
+                <div className="p-2 bg-brand-violet-dark text-brand-peach font-mono text-[11px] truncate border border-brand-violet flex items-center gap-2">
+                  <Lock className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">Only you can decrypt your files</span>
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-brand-violet/75">
-                  <span>Auto-destruct: 24 hours</span>
-                  <span className="font-bold text-brand-brown">Passphrase Locked</span>
+                  <span>Public links: planned</span>
+                  <span className="font-bold text-brand-brown">Expiring · Revocable</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-3 border-t border-brand-border flex items-center justify-between text-xs font-semibold text-brand-violet/80">
-              <span>Instant permission revocation</span>
+              <span>Private until you choose to share</span>
               <Lock className="w-3.5 h-3.5 text-brand-brown" />
             </div>
           </motion.div>
@@ -282,7 +282,7 @@ const Features = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="col-span-12 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-brown p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#FFA552] hover:shadow-[4px_4px_0px_0px_#FFA552] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
+            className="md:col-span-2 lg:col-span-4 bg-brand-cream-muted border-2 border-brand-brown p-6 flex flex-col justify-between shadow-[6px_6px_0px_0px_#FFA552] hover:shadow-[4px_4px_0px_0px_#FFA552] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-none group"
           >
             <div>
               <div className="flex items-center justify-between mb-5">

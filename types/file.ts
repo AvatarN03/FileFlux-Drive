@@ -70,6 +70,7 @@ export interface FileItem {
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
   folder: FileFolder | null;
   downloads?: number;
   views?: number;

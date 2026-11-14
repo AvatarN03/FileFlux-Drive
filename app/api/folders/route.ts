@@ -6,17 +6,26 @@ import { isAuthError, verifyAuth } from "../_services";
 
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
+import { logServerError } from "@/lib/security/safeLogging";
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // CREATE FOLDER
 export async function POST(req: Request) {
   try {
     const { id: userId } = await verifyAuth();
 
-    const { name, parentId } = await req.json();
+    const { encryptedMetadata, parentId } = await req.json();
 
-    if (!name || !name.trim()) {
+    if (
+      !encryptedMetadata ||
+      typeof encryptedMetadata.nonce !== "string" ||
+      !encryptedMetadata.nonce ||
+      typeof encryptedMetadata.ciphertext !== "string" ||
+      !encryptedMetadata.ciphertext
+    ) {
       return NextResponse.json(
-        { success: false, error: "Folder name is required" },
+        { success: false, error: "Encrypted folder metadata is required" },
         { status: 400 },
       );
     }
@@ -24,7 +33,10 @@ export async function POST(req: Request) {
     const [folder] = await db
       .insert(folders)
       .values({
-        name,
+        name: "[Encrypted Folder]",
+        encryptedMetadataNonce: encryptedMetadata.nonce,
+        encryptedMetadataCiphertext: encryptedMetadata.ciphertext,
+        isEncrypted: true,
         parentId: parentId ?? null,
         userId,
       })
@@ -38,7 +50,7 @@ export async function POST(req: Request) {
         { status: 401 },
       );
     }
-    console.error("Create folder error:", error);
+    logServerError("Create folder", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 },
@@ -71,6 +83,9 @@ export async function GET(req: Request) {
         id: folders.id,
         name: folders.name,
         isFavorite: folders.isFavorite,
+        isEncrypted: folders.isEncrypted,
+        encryptedMetadataNonce: folders.encryptedMetadataNonce,
+        encryptedMetadataCiphertext: folders.encryptedMetadataCiphertext,
       })
       .from(folders)
       .leftJoin(
@@ -91,7 +106,7 @@ export async function GET(req: Request) {
         { status: 401 },
       );
     }
-    console.error("Fetch folders error:", error);
+    logServerError("Fetch folders", error);
     return NextResponse.json(
       {
         success: false,
@@ -187,7 +202,7 @@ export async function DELETE(req: Request) {
         { status: 401 },
       );
     }
-    console.error("Delete folder error:", error);
+    logServerError("Delete folder", error);
 
     return NextResponse.json(
       {
@@ -208,11 +223,15 @@ export async function PATCH(req: Request) {
     const {
       folderId,
       name,
+      encryptedMetadata,
       parentId,
+      isFavorite,
     }: {
       folderId: string;
       name?: string;
+      encryptedMetadata?: { nonce?: unknown; ciphertext?: unknown };
       parentId?: string | null;
+      isFavorite?: boolean;
     } = await req.json();
 
     if (!folderId) {
@@ -222,7 +241,30 @@ export async function PATCH(req: Request) {
       );
     }
 
-    if (name === undefined && parentId === undefined) {
+    if (!UUID_PATTERN.test(folderId)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid folder ID" },
+        { status: 400 },
+      );
+    }
+
+    if (
+      parentId !== undefined &&
+      parentId !== null &&
+      (typeof parentId !== "string" || !UUID_PATTERN.test(parentId))
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Invalid destination folder ID" },
+        { status: 400 },
+      );
+    }
+
+    if (
+      name === undefined &&
+      encryptedMetadata === undefined &&
+      parentId === undefined &&
+      isFavorite === undefined
+    ) {
       return NextResponse.json(
         { success: false, error: "Nothing to update" },
         { status: 400 },
@@ -247,11 +289,91 @@ export async function PATCH(req: Request) {
       );
     }
 
+    if (parentId !== undefined && parentId !== null) {
+      let ancestorId: string | null = parentId;
+      const visited = new Set<string>();
+
+      while (ancestorId !== null) {
+        if (ancestorId === folderId) {
+          return NextResponse.json(
+            { success: false, error: "A folder cannot be moved into itself or a descendant." },
+            { status: 400 },
+          );
+        }
+
+        if (visited.has(ancestorId)) {
+          return NextResponse.json(
+            { success: false, error: "Destination folder hierarchy is invalid." },
+            { status: 409 },
+          );
+        }
+        visited.add(ancestorId);
+
+        const [ancestor] = await db
+          .select({ id: folders.id, parentId: folders.parentId })
+          .from(folders)
+          .where(
+            and(
+              eq(folders.id, ancestorId),
+              eq(folders.userId, userId),
+              isNull(folders.deletedAt),
+            ),
+          );
+
+        if (!ancestor) {
+          return NextResponse.json(
+            { success: false, error: "Destination folder not found." },
+            { status: 404 },
+          );
+        }
+
+        ancestorId = ancestor.parentId;
+      }
+    }
+
+    if (isFavorite !== undefined && typeof isFavorite !== "boolean") {
+      return NextResponse.json(
+        { success: false, error: "isFavorite must be a boolean" },
+        { status: 400 },
+      );
+    }
+
+    if (name !== undefined) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Folder names must be updated through the encrypted metadata flow.",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (encryptedMetadata !== undefined) {
+      if (
+        !encryptedMetadata ||
+        typeof encryptedMetadata.nonce !== "string" ||
+        !encryptedMetadata.nonce ||
+        typeof encryptedMetadata.ciphertext !== "string" ||
+        !encryptedMetadata.ciphertext
+      ) {
+        return NextResponse.json(
+          { success: false, error: "Valid encrypted folder metadata is required." },
+          { status: 400 },
+        );
+      }
+    }
+
     await db
       .update(folders)
       .set({
-        ...(name !== undefined && { name: name.trim() }),
+        ...(encryptedMetadata !== undefined && {
+          name: "[Encrypted Folder]",
+          encryptedMetadataNonce: encryptedMetadata.nonce as string,
+          encryptedMetadataCiphertext: encryptedMetadata.ciphertext as string,
+          isEncrypted: true,
+        }),
         ...(parentId !== undefined && { parentId }),
+         ...(isFavorite !== undefined && { isFavorite }),
       })
       .where(eq(folders.id, folderId));
 
@@ -271,7 +393,7 @@ export async function PATCH(req: Request) {
         { status: 401 },
       );
     }
-    console.error("Update folder error:", error);
+    logServerError("Update folder", error);
     return NextResponse.json(
       {
         success: false,

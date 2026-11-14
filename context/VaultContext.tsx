@@ -69,7 +69,11 @@ export function VaultProvider({ children }: { children: ReactNode }) {
       }
     }
     setVaultKey(null);
-  }, [vaultKey]);
+    // Clear cached metadata that may contain decrypted file or folder names.
+    queryClient.removeQueries({ queryKey: ["folders"] });
+    queryClient.removeQueries({ queryKey: ["files"] });
+    queryClient.removeQueries({ queryKey: ["file"] });
+  }, [vaultKey, queryClient]);
 
   // Activity listener for inactivity auto-lock
   const resetInactivityTimer = useCallback(() => {

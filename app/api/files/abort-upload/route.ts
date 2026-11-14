@@ -5,6 +5,8 @@ import { db } from "@/db";
 import { files } from "@/db/schema";
 import { getAuthUser, isAuthError } from "../../_services";
 import { deleteStoredObject } from "@/lib/storage/s3";
+import { isOwnedVaultObjectKey } from "@/lib/storage/authorization";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     // Security check: Must belong strictly to the authenticated user's vault namespace
-    if (!objectKey.startsWith(`vaults/${user.id}/`)) {
+    if (!isOwnedVaultObjectKey(objectKey, user.id)) {
       return NextResponse.json(
         { success: false, error: "Unauthorized object namespace" },
         { status: 403 }
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
       await deleteStoredObject(objectKey);
     } catch (storageError) {
       // If object was never created in S3 or was empty, ignore 404/NoSuchKey
-      console.warn("Storage cleanup note for aborted upload:", storageError);
+      logServerError("Aborted-upload storage cleanup", storageError);
     }
 
     return NextResponse.json({
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    console.error("Abort upload error:", error);
+    logServerError("Abort upload", error);
     return NextResponse.json(
       { success: false, error: "Failed to abort upload" },
       { status: 500 }

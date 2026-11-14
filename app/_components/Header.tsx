@@ -86,14 +86,11 @@ const Header = ({
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div>
+        <div className="hidden sm:block">
           <h1 className="text-base sm:text-xl font-extrabold text-brand-violet tracking-tight">
             Welcome back,{" "}
             <span className="text-brand-brown">{user?.name || "Explorer"}</span>
           </h1>
-          <p className="text-[11px] text-brand-violet/70 font-mono hidden sm:block">
-            fileflux://console/dashboard · Encrypted Workspace
-          </p>
         </div>
       </div>
 
@@ -107,12 +104,12 @@ const Header = ({
             aria-expanded={isOpen}
             aria-haspopup="true"
             aria-label="User account menu"
-            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-[2px_2px_0px_0px_#BA5624] hover:shadow-[1px_1px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-[2px_2px_0px_0px_#BA5624] hover:shadow-[1px_1px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer max-sm:p-0 max-sm:bg-transparent max-sm:border-0 max-sm:shadow-none"
           >
             <span className="hidden lg:inline text-xs font-bold text-brand-violet">
               {user?.name || "User"}
             </span>
-            <div className="relative w-8 h-8 border-2 border-brand-brown overflow-hidden bg-brand-peach">
+            <div className="relative w-8 h-8 sm:w-8 sm:h-8 border-2 border-brand-brown overflow-hidden bg-brand-peach max-sm:w-9 max-sm:h-9">
               <Image
                 src={user?.avatarUrl || "/default-avatar.webp"}
                 alt="User Avatar"

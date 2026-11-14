@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { HardDrive, Zap, ArrowRight, FileText, Inbox } from "lucide-react";
+import { HardDrive, Zap, ArrowRight, FileText, Inbox, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFiles } from "@/hooks/useFileQueries";
 import { formatFileSize } from "@/lib/file";
@@ -10,7 +10,11 @@ import { getFileCategoryFilter } from "@/lib/file/operations";
 
 const StoragePage = () => {
   const { user } = useAuth();
-  const { data: rawFiles = [], isLoading } = useFiles({
+  const {
+    data: rawFiles = [],
+    isLoading,
+    isError,
+  } = useFiles({
     folderId: null,
   });
 
@@ -106,6 +110,15 @@ const StoragePage = () => {
         </div>
       </div>
 
+      {!isError && (
+        <div className="flex items-start gap-2 bg-brand-peach border-2 border-brand-violet px-4 py-3 text-xs text-brand-violet shadow-[2px_2px_0px_0px_#381D2A]">
+          <Lock className="w-4 h-4 text-brand-brown shrink-0 mt-0.5" />
+          <p>
+            Vault contents stay encrypted on the client. Quota and size analytics remain available while the vault is locked; file names are only shown after local unlock.
+          </p>
+        </div>
+      )}
+
       {/* Main Quota Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
@@ -144,6 +157,13 @@ const StoragePage = () => {
               <div className="py-4 text-center text-xs text-brand-violet/60 font-mono">
                 Loading allocation breakdown...
               </div>
+            ) : isError ? (
+              <div className="py-4 px-3 bg-brand-cream-muted border border-dashed border-brand-brown text-center">
+                <p className="text-xs font-bold text-brand-violet">Storage data is temporarily unavailable</p>
+                <p className="text-[11px] font-mono text-brand-violet/60 mt-0.5">
+                  Refresh the page and try again.
+                </p>
+              </div>
             ) : breakdowns.length === 0 ? (
               <div className="py-4 px-3 bg-brand-cream-muted border border-dashed border-brand-border text-center">
                 <p className="text-xs font-bold text-brand-violet">No storage allocation data</p>
@@ -180,7 +200,7 @@ const StoragePage = () => {
               Upgrade to 500 MB Encrypted Storage
             </h3>
             <p className="text-xs text-brand-peach/80 leading-relaxed mb-4">
-              Expand your zero-knowledge storage with priority chunk uploads, team workspaces, and custom retention rules.
+              Review the available plan options for your encrypted workspace.
             </p>
           </div>
 
@@ -207,6 +227,13 @@ const StoragePage = () => {
         {isLoading ? (
           <div className="py-6 text-center text-xs text-brand-violet/60 font-mono">
             Loading stored files...
+          </div>
+        ) : isError ? (
+          <div className="py-8 px-4 bg-brand-cream-muted border-2 border-dashed border-brand-brown text-center">
+            <p className="text-xs font-bold text-brand-violet">Stored files are temporarily unavailable</p>
+            <p className="text-[11px] font-mono text-brand-violet/60 mt-1">
+              Refresh the page and try again.
+            </p>
           </div>
         ) : largestFiles.length === 0 ? (
           <div className="py-8 px-4 bg-brand-cream-muted border-2 border-dashed border-brand-border text-center flex flex-col items-center justify-center">

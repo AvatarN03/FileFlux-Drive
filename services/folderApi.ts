@@ -1,8 +1,12 @@
 import { ApiResponse } from "@/types";
-import { CreateFolderPayload, GetAllFolders, UpdateFolderPayload } from "@/types/folder";
+import {
+  CreateEncryptedFolderPayload,
+  GetAllFolders,
+  UpdateFolderPayload,
+} from "@/types/folder";
 
 const folderApi = {
-  create: async (payload: CreateFolderPayload) => {
+  create: async (payload: CreateEncryptedFolderPayload) => {
     const res = await fetch("/api/folders", {
       method: "POST",
       headers: {
@@ -31,8 +35,6 @@ const folderApi = {
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to fetch folders");
     }
-
-    console.log("Fetched folders:", data);
 
     return data.data;
   },
