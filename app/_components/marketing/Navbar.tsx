@@ -21,16 +21,6 @@ const Navbar = ({ navColor }: NavbarProps) => {
             <Logo classes="text-brand-cream" />
           </div>
 
-          {/* Section Anchor Links */}
-          <div className="flex items-center gap-4 sm:gap-6">
-            <Link
-              href="#features"
-              className="hidden md:inline-block text-xs sm:text-sm font-bold text-brand-cream/85 hover:text-brand-peach transition-colors"
-            >
-              Features
-            </Link>
-          </div>
-
           {/* Action Button: Dashboard */}
           <div className="flex items-center">
             <Link

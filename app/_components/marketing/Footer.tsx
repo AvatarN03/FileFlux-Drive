@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GithubIcon, LinkedinIcon, ArrowUpRight } from "lucide-react";
 import Logo from "../Logo";
+import FooterWordmark from "./FooterWordmark";
 
 const Footer = () => {
   return (
@@ -112,14 +113,7 @@ const Footer = () => {
       </div>
 
       {/* Giant Decorative Brand Wordmark — flush with bottom edge */}
-      <div
-        aria-hidden="true"
-        className="select-none pointer-events-none overflow-hidden"
-      >
-        <div className="w-full text-center font-extrabold uppercase whitespace-nowrap text-transparent opacity-30 [-webkit-text-stroke:2px_#FFA552] text-[18vw] leading-[0.78] tracking-tight translate-y-[14%]">
-          FILEFLUX
-        </div>
-      </div>
+      <FooterWordmark />
     </footer>
   );
 };
