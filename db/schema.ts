@@ -60,6 +60,11 @@ export const folders = pgTable(
 
     color: text("color"),
 
+    // Zero-knowledge encrypted folder metadata (name remains for legacy rows)
+    encryptedMetadataNonce: text("encrypted_metadata_nonce"),
+    encryptedMetadataCiphertext: text("encrypted_metadata_ciphertext"),
+    isEncrypted: boolean("is_encrypted").default(false).notNull(),
+
     isFavorite: boolean("is_favorite").default(false).notNull(),
 
     deletedAt: timestamp("deleted_at"),

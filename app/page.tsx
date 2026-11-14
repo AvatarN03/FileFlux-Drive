@@ -4,9 +4,9 @@ import Features from "./_components/marketing/Features";
 import Footer from "./_components/marketing/Footer";
 
 export const metadata = {
-  title: "FileFlux | Intelligent File & Folder Management Platform",
+  title: "FileFlux | Encrypted Personal File Vault",
   description:
-    "A fast, secure, and modern file management platform featuring encrypted personal vaults, granular file sharing, and real-time usage metrics.",
+    "A privacy-first personal file vault. Your files are encrypted in your browser before upload — your keys never leave your device.",
 };
 
 const LandingPage = () => {

@@ -10,6 +10,7 @@ import { usersTable } from "@/db/schema";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
 
 import { COOLDOWN_MS } from "@/constant";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function POST() {
   try {
@@ -74,12 +75,12 @@ export async function POST() {
       message: "Verification email sent successfully.",
     });
   } catch (error) {
-    console.error(error);
+    logServerError("Resend verification", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal Server Error",
+        error: "Internal Server Error",
       },
       { status: 500 }
     );

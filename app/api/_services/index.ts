@@ -166,8 +166,20 @@ export function getThumbnailUrl(
 export async function buildFolderPath(
   folderId: string,
   userId: string
-): Promise<{ id: string; name: string }[]> {
-  const path: { id: string; name: string }[] = [];
+): Promise<{
+  id: string;
+  name: string;
+  isEncrypted: boolean;
+  encryptedMetadataNonce: string | null;
+  encryptedMetadataCiphertext: string | null;
+}[]> {
+  const path: {
+    id: string;
+    name: string;
+    isEncrypted: boolean;
+    encryptedMetadataNonce: string | null;
+    encryptedMetadataCiphertext: string | null;
+  }[] = [];
   const visited = new Set<string>();
   let currentId: string | null = folderId;
 
@@ -179,6 +191,9 @@ export async function buildFolderPath(
         id: folders.id,
         name: folders.name,
         parentId: folders.parentId,
+        isEncrypted: folders.isEncrypted,
+        encryptedMetadataNonce: folders.encryptedMetadataNonce,
+        encryptedMetadataCiphertext: folders.encryptedMetadataCiphertext,
       })
       .from(folders)
       .where(
@@ -191,7 +206,14 @@ export async function buildFolderPath(
 
     if (!folder) break;
 
-    path.unshift({ id: folder.id, name: folder.name });
+    path.unshift({
+      id: folder.id,
+      // Never expose the database name for folders using encrypted metadata.
+      name: folder.isEncrypted ? "[Encrypted Folder]" : folder.name,
+      isEncrypted: folder.isEncrypted,
+      encryptedMetadataNonce: folder.encryptedMetadataNonce,
+      encryptedMetadataCiphertext: folder.encryptedMetadataCiphertext,
+    });
     currentId = folder.parentId;
   }
 

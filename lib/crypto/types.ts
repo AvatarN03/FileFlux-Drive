@@ -42,3 +42,8 @@ export interface EncryptedFileMetadata {
   mimeType: string;
   customAttributes?: Record<string, unknown>;
 }
+
+/** Sensitive folder metadata that must be encrypted before reaching the database. */
+export interface EncryptedFolderMetadata {
+  name: string;
+}

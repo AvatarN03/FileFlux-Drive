@@ -58,10 +58,18 @@ const DashboardContent = () => {
   const [showSetupModal, setShowSetupModal] = useState(false);
 
   // Queries
-  const { data: rawFiles = [], isLoading: filesLoading } = useFiles({
+  const {
+    data: rawFiles = [],
+    isLoading: filesLoading,
+    isError: filesError,
+  } = useFiles({
     folderId: null,
   });
-  const { data: folders = [], isLoading: foldersLoading } = useFoldersAll(null);
+  const {
+    data: folders = [],
+    isLoading: foldersLoading,
+    isError: foldersError,
+  } = useFoldersAll(null);
   const { mutate: createFolder, isPending: isCreatingFolder } = useFolderCreate();
 
   const { mode, file: modalFile, closeModal } = useFileModal();
@@ -180,14 +188,14 @@ const DashboardContent = () => {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-brand-violet text-brand-peach text-[11px] font-mono font-bold uppercase tracking-wider">
             <span className="w-1.5 h-1.5 bg-brand-peach-vibrant inline-block animate-pulse" />
-            fileflux://vault/active · Zero-Knowledge Storage
+            Zero-Knowledge Encrypted Storage
           </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-brand-violet tracking-tight">
-            Encrypted Workspace Console
+            Encrypted Workspace
           </h1>
           <p className="text-xs text-brand-violet/75 font-medium max-w-xl">
-            Client-side libsodium authenticated encryption is active. Your keys
-            never leave your browser, ensuring complete privacy.
+            Your files are encrypted in your browser before upload — your keys
+            never leave your device.
           </p>
         </div>
 
@@ -285,7 +293,7 @@ const DashboardContent = () => {
               {rawFiles.length}
             </div>
             <div className="text-[11px] font-mono text-brand-violet/60 mt-0.5">
-              Zero-knowledge encrypted items
+              Zero-knowledge encrypted files
             </div>
           </div>
           <Link
@@ -311,7 +319,7 @@ const DashboardContent = () => {
               {folders.length}
             </div>
             <div className="text-[11px] font-mono text-brand-violet/60 mt-0.5">
-              Root organization units
+              Folders in your vault
             </div>
           </div>
           <Link
@@ -337,12 +345,12 @@ const DashboardContent = () => {
               {isUnlocked ? "Unlocked" : "Locked"}
             </div>
             <div className="text-[11px] font-mono text-brand-violet/60 mt-0.5">
-              Argon2id + XChaCha20-Poly1305
+              End-to-end encrypted vault
             </div>
           </div>
           <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            Client-side Verified
+            Keys never leave your device
           </div>
         </div>
       </div>
@@ -353,7 +361,7 @@ const DashboardContent = () => {
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-brand-brown" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-              Storage Distribution by Asset Type
+              Storage by File Type
             </h2>
           </div>
           <span className="text-[11px] font-mono text-brand-violet/70">
@@ -481,6 +489,15 @@ const DashboardContent = () => {
                   <div key={i} className="h-14 bg-brand-cream-muted border border-brand-border" />
                 ))}
               </div>
+            ) : foldersError ? (
+              <div className="p-6 bg-brand-cream-muted border-2 border-dashed border-brand-brown text-center">
+                <p className="text-xs font-bold text-brand-violet mb-1">
+                  Folders are temporarily unavailable.
+                </p>
+                <p className="text-[11px] font-mono text-brand-violet/60">
+                  Refresh the page and try again.
+                </p>
+              </div>
             ) : folders.length === 0 ? (
               <div className="p-6 bg-brand-cream-muted border-2 border-dashed border-brand-border text-center">
                 <p className="text-xs font-bold text-brand-violet mb-2">
@@ -509,9 +526,6 @@ const DashboardContent = () => {
                       <h3 className="text-xs font-bold text-brand-violet truncate">
                         {folder.name}
                       </h3>
-                      <p className="text-[10px] font-mono text-brand-violet/60">
-                        Folder workspace
-                      </p>
                     </div>
                   </Link>
                 ))}
@@ -577,17 +591,26 @@ const DashboardContent = () => {
                   <div key={i} className="aspect-square bg-brand-cream-muted border border-brand-border" />
                 ))}
               </div>
+            ) : filesError ? (
+              <div className="py-12 px-4 text-center bg-brand-cream-muted border-2 border-dashed border-brand-brown">
+                <h3 className="text-sm font-extrabold text-brand-violet mb-1">
+                  Files are temporarily unavailable
+                </h3>
+                <p className="text-xs text-brand-violet/70 max-w-sm mx-auto">
+                  Refresh the page and try again. Your encrypted files remain in the vault.
+                </p>
+              </div>
             ) : filteredFiles.length === 0 ? (
               <div className="py-12 px-4 text-center bg-brand-cream-muted border-2 border-dashed border-brand-border">
                 <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
                   <UploadCloud className="w-6 h-6 text-brand-brown" />
                 </div>
                 <h3 className="text-sm font-extrabold text-brand-violet mb-1">
-                  No files match your query
+                  No files found
                 </h3>
                 <p className="text-xs text-brand-violet/70 max-w-sm mx-auto mb-4 font-medium">
-                  Upload an encrypted file using the ingestion portal on the
-                  right to populate your workspace.
+                  Upload a file using the panel on the right to fill your
+                  workspace.
                 </p>
                 {searchTerm && (
                   <button
@@ -622,11 +645,11 @@ const DashboardContent = () => {
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-brand-peach" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-brand-cream">
-                  Cryptographic Engine
+                  Vault Security
                 </h3>
               </div>
               <span className="text-[10px] font-mono bg-brand-brown text-brand-cream px-2 py-0.5 border border-brand-peach-vibrant/40 font-bold">
-                XChaCha20
+                E2E Encrypted
               </span>
             </div>
 
@@ -638,16 +661,12 @@ const DashboardContent = () => {
                     isUnlocked ? "text-emerald-400" : "text-brand-peach-vibrant"
                   }`}
                 >
-                  {isUnlocked ? "Unlocked & Ready" : "Locked (Passphrase Req)"}
+                  {isUnlocked ? "Unlocked & Ready" : "Locked"}
                 </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-brand-violet-light/50">
-                <span className="text-brand-cream/70">Key Derivation:</span>
-                <span className="font-mono text-brand-peach">Argon2id (SUMO)</span>
               </div>
               <div className="flex justify-between items-center py-1">
                 <span className="text-brand-cream/70">Server Visibility:</span>
-                <span className="font-bold text-brand-peach">0% (Zero Metadata)</span>
+                <span className="font-bold text-brand-peach">None (Zero-Knowledge)</span>
               </div>
             </div>
 
@@ -660,6 +679,14 @@ const DashboardContent = () => {
                   className="w-full py-2 bg-brand-violet border border-brand-peach text-brand-peach hover:bg-brand-brown hover:text-brand-cream text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
                   Lock Vault Now
+                </button>
+              ) : isEnrolled === false ? (
+                <button
+                  type="button"
+                  onClick={() => setShowSetupModal(true)}
+                  className="w-full py-2 bg-brand-peach hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
+                >
+                  Setup Vault Key
                 </button>
               ) : (
                 <button
@@ -679,16 +706,17 @@ const DashboardContent = () => {
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-brand-brown" />
                 <h3 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-                  Recent Telemetry
+                  Recently Added
                 </h3>
               </div>
-              <span className="text-[10px] font-mono font-bold bg-brand-cream-muted px-2 py-0.5 border border-brand-border text-brand-violet/70">
-                Live
-              </span>
             </div>
 
             <div className="space-y-3">
-              {rawFiles.slice(0, 4).map((file, idx) => (
+              {filesError ? (
+                <div className="text-center py-6 text-xs text-brand-violet/60">
+                  Recent files are temporarily unavailable.
+                </div>
+              ) : rawFiles.slice(0, 4).map((file, idx) => (
                 <div
                   key={file.id || idx}
                   className="flex items-start gap-2.5 p-2 bg-brand-cream-muted border border-brand-border text-xs"
@@ -710,9 +738,9 @@ const DashboardContent = () => {
                 </div>
               ))}
 
-              {rawFiles.length === 0 && (
+              {!filesError && rawFiles.length === 0 && (
                 <div className="text-center py-6 text-xs text-brand-violet/60">
-                  No activity events recorded yet.
+                  No uploads yet.
                 </div>
               )}
             </div>
@@ -727,8 +755,7 @@ const DashboardContent = () => {
               </h3>
             </div>
             <p className="text-xs text-brand-violet/85 font-medium mb-4 leading-relaxed">
-              Need more encrypted capacity? Expand to 500 MB with FileFlux Pro,
-              including granular sharing and team vaults.
+              Review your current encrypted quota and available plan options.
             </p>
             <Link
               href="/#pricing"

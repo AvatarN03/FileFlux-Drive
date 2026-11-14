@@ -55,21 +55,11 @@ const fileApi = {
 
   async getFiles({
     folderId,
-    search,
-    category,
   }: FileQueryParams): Promise<FilesResponse[]> {
     const params = new URLSearchParams();
 
     if (folderId) {
       params.set("folderId", folderId);
-    }
-
-    if (search) {
-      params.set("search", search);
-    }
-
-    if (category && category !== "all") {
-      params.set("category", category);
     }
 
     const res = await fetch(`${FILE_API_ENDPOINTS.GET}?${params.toString()}`);
@@ -93,6 +83,17 @@ const fileApi = {
     }
 
     return data.data!;
+  },
+
+  async getTrashFiles(): Promise<FilesResponse[]> {
+    const res = await fetch("/api/files/trash");
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch trash");
+    }
+
+    return (data.files ?? []) as FilesResponse[];
   },
 
   getFolderFiles: async (folderId: string): Promise<FolderFilesResponse> => {

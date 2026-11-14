@@ -42,3 +42,21 @@ next-env.d.ts
 
 /public/Post
 /public/FileFux-Voice
+
+# Local agent context pack (keep untracked until explicitly approved)
+/.agents/
+/test/
+/AGENTS.md
+/MANIFEST.md
+/README-FIRST.md
+/docs/ARCHITECTURE.md
+/docs/CURRENT_STATE.md
+/docs/DECISIONS.md
+/docs/DESIGN_DIRECTION.md
+/docs/PRODUCT_BRIEF.md
+/docs/ROADMAP.md
+/docs/SECURITY_MODEL.md
+/docs/TASK_BOARD.md
+/docs/fileflux-agent-context-pack/
+/docs/fileflux-agent-context-pack.zip
+/prompts/

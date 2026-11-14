@@ -11,6 +11,7 @@ import { generateEmailVerification } from "../../_services";
 import { db } from "@/db";
 import { usersTable } from "@/db/schema";
 import { publicUserSelect } from "@/db/selection";
+import { logServerError } from "@/lib/security/safeLogging";
 
 import { signupSchema } from "@/lib/validations/auth";
 import { sendVerificationEmail } from "@/lib/email/sendVerifyEmail";
@@ -130,7 +131,7 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
-    console.error(error);
+    logServerError("Signup", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 },

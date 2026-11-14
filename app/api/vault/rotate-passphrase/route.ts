@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { vaults } from "@/db/schema";
 import { isAuthError, verifyAuth } from "../../_services";
 import { KdfParameters, EncryptedEnvelope } from "@/lib/crypto/types";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function PATCH(req: Request) {
   try {
@@ -65,7 +66,7 @@ export async function PATCH(req: Request) {
         { status: 401 }
       );
     }
-    console.error("Rotate passphrase envelope error:", error);
+    logServerError("Rotate passphrase envelope", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }

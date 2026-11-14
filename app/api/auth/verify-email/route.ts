@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { usersTable, verificationTokens } from "@/db/schema";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function POST(req: NextRequest) {
   try {
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
       message: "Email verified successfully.",
     });
   } catch (error) {
-    console.error(error);
+    logServerError("Verify email", error);
 
     return NextResponse.json(
       {

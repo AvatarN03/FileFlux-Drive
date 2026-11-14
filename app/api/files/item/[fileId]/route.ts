@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { files, folders } from "@/db/schema";
 import { isAuthError, verifyAuth } from "../../../_services";
 import { FileDetail } from "@/types/file";
+import { logServerError } from "@/lib/security/safeLogging";
 
 interface RouteParams {
   params: Promise<{
@@ -142,7 +143,7 @@ export async function GET(req: Request, { params }: RouteParams) {
         }
       );
     }
-    console.error("Single file fetch error:", error);
+    logServerError("Single file fetch", error);
 
     return NextResponse.json(
       {

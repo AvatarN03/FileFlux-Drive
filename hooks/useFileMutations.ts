@@ -113,6 +113,10 @@ export function useFileMutations() {
         queryKey: ["trash-files"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["storage"],
+      });
+
       if (variables.fileId) {
         queryClient.invalidateQueries({
           queryKey: ["file", variables.fileId],

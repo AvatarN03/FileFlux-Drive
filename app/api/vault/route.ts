@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { vaults } from "@/db/schema";
 import { vaultEnvelopesSelect } from "@/db/selection";
 import { isAuthError, verifyAuth } from "../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function GET() {
   try {
@@ -35,7 +36,7 @@ export async function GET() {
         { status: 401 }
       );
     }
-    console.error("Fetch vault error:", error);
+    logServerError("Fetch vault", error);
     return NextResponse.json(
       { success: false, error: "Internal Server Error" },
       { status: 500 }

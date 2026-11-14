@@ -1,12 +1,29 @@
 import folderApi from "@/services/folderApi";
 import { CreateFolderPayload, UpdateFolderPayload } from "@/types/folder";
+import { encryptFolderMetadata } from "@/lib/crypto";
+import { useVault } from "@/context/VaultContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useFolderCreate = () => {
   const queryClient = useQueryClient();
+  const { vaultKey } = useVault();
 
   return useMutation({
-    mutationFn: (payload: CreateFolderPayload) => folderApi.create(payload),
+    mutationFn: async (payload: CreateFolderPayload) => {
+      if (!vaultKey) {
+        throw new Error("Unlock your vault before creating an encrypted folder.");
+      }
+
+      const encryptedMetadata = await encryptFolderMetadata(
+        { name: payload.name },
+        vaultKey
+      );
+
+      return folderApi.create({
+        encryptedMetadata,
+        parentId: payload.parentId,
+      });
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["folders", variables.parentId],
@@ -17,12 +34,32 @@ export const useFolderCreate = () => {
 
 export const useFolderUpdate = ()=>{
     const queryClient = useQueryClient();
+    const { vaultKey } = useVault();
 
     return useMutation({
-        mutationFn: (payload: UpdateFolderPayload) => folderApi.update(payload),
+        mutationFn: async (payload: UpdateFolderPayload) => {
+            if (payload.name !== undefined) {
+                if (!vaultKey) {
+                    throw new Error("Unlock your vault before renaming an encrypted folder.");
+                }
+
+                const encryptedMetadata = await encryptFolderMetadata(
+                    { name: payload.name },
+                    vaultKey
+                );
+
+                return folderApi.update({
+                    folderId: payload.folderId,
+                    encryptedMetadata,
+                    parentId: payload.parentId,
+                });
+            }
+
+            return folderApi.update(payload);
+        },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({
-                queryKey: ["folders", variables.parentId],
+                queryKey: ["folders"],
             });
         }
     });

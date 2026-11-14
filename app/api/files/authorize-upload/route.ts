@@ -3,6 +3,11 @@ import crypto from "node:crypto";
 
 import { getAuthUser, isAuthError } from "../../_services";
 import { generateUploadPresignedUrl } from "@/lib/storage/s3";
+import { logServerError } from "@/lib/security/safeLogging";
+import {
+  getUploadSizeError,
+  MAX_ENCRYPTED_FILE_BYTES,
+} from "@/lib/storage/uploadPolicy";
 
 export async function POST(req: Request) {
   try {
@@ -20,15 +25,34 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const { estimatedSize } = body as { estimatedSize?: number };
+    const sizeError = getUploadSizeError(
+      estimatedSize ?? Number.NaN,
+      user.storageUsed,
+      user.storageLimit,
+    );
 
-    // Check storage limits if size provided
-    if (estimatedSize && typeof estimatedSize === "number") {
-      if (user.storageUsed + estimatedSize > user.storageLimit) {
-        return NextResponse.json(
-          { success: false, error: "Storage limit exceeded" },
-          { status: 400 }
-        );
-      }
+    if (sizeError === "invalid") {
+      return NextResponse.json(
+        { success: false, error: "A valid upload size is required" },
+        { status: 400 },
+      );
+    }
+
+    if (sizeError === "too_large") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Encrypted files cannot exceed ${MAX_ENCRYPTED_FILE_BYTES} bytes`,
+        },
+        { status: 413 },
+      );
+    }
+
+    if (sizeError === "quota_exceeded") {
+      return NextResponse.json(
+        { success: false, error: "Storage limit exceeded" },
+        { status: 413 },
+      );
     }
 
     // Generate opaque object key: vaults/<user-id>/<uuid>.enc
@@ -52,7 +76,7 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    console.error("Authorize upload error:", error);
+    logServerError("Authorize upload", error);
     return NextResponse.json(
       { success: false, error: "Failed to authorize upload" },
       { status: 500 }

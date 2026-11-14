@@ -5,6 +5,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { files, folders } from "@/db/schema";
 import { getAuthUser, isAuthError } from "../../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 export async function PATCH(req: Request) {
   try {
@@ -82,7 +83,7 @@ export async function PATCH(req: Request) {
         { status: 401 }
       );
     }
-    console.error(err);
+    logServerError("Move file", err);
     return NextResponse.json(
       { success: false, error: "Failed to move file" },
       { status: 500 }

@@ -130,6 +130,27 @@
     animation: fadeIn 0.3s ease-out;
   }
 
+  @keyframes brutalistStripes {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: 36px 0;
+    }
+  }
+
+  .animate-brutalist-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--brand-brown),
+      var(--brand-brown) 12px,
+      var(--brand-peach-vibrant) 12px,
+      var(--brand-peach-vibrant) 24px
+    );
+    background-size: 36px 36px;
+    animation: brutalistStripes 1.2s linear infinite;
+  }
+
   /* ---- Typography ---- */
 
   .gradient-logo {

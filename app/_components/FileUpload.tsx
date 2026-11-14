@@ -106,6 +106,11 @@ const FileUpload = () => {
   const handleUpload = useCallback(async () => {
     if (!state.file || !user) return;
 
+    if (!user.emailVerified) {
+      toastError("Please verify your email before uploading files.");
+      return;
+    }
+
     // Storage check
     if (canUploadFile(state.file, user) === false) {
       toastError("Storage limit exceeded.");
@@ -158,8 +163,15 @@ const FileUpload = () => {
 
       timeoutRef.current = setTimeout(resetState, 1000);
     } catch (error) {
-      console.error(error);
-      if (axios.isCancel(error) || (error as { code?: string })?.code === "ERR_CANCELED") {
+      console.error("File upload failed");
+      const isAbort =
+        (error as Error)?.message === "Upload aborted" ||
+        (error as DOMException)?.name === "AbortError" ||
+        axios.isCancel(error) ||
+        (error as { code?: string })?.code === "ERR_CANCELED";
+
+      if (isAbort) {
+        toastError("Upload canceled");
         resetState();
         return;
       }

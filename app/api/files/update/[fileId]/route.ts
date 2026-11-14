@@ -4,6 +4,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { files } from "@/db/schema";
 import { isAuthError, verifyAuth } from "../../../_services";
+import { logServerError } from "@/lib/security/safeLogging";
 
 interface RouteParams {
   params: Promise<{
@@ -249,7 +250,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
         }
       );
     }
-    console.error("File update error:", error);
+    logServerError("File update", error);
 
     return NextResponse.json(
       {
