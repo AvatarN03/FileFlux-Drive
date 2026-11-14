@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 
 import { Providers } from "./provider";
 
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta-sans",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-});
 
 export const metadata: Metadata = {
   title: "FileFlux - Drive",
@@ -36,10 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body
-        className={`${plusJakartaSans.className} ${spaceGrotesk.variable} antialiased`}
-        suppressHydrationWarning
-      >
+      <body className="antialiased" suppressHydrationWarning>
         <Providers>{children}
 
           <ToastContainer />

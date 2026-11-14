@@ -10,7 +10,7 @@ export const useFoldersAll = (parentId?: string | null) => {
   return useQuery({
     queryKey: ["folders", parentId, vaultKey !== null],
     queryFn: async () => {
-      const folders = await folderApi.getAll(parentId);
+      const folders = (await folderApi.getAll(parentId)) ?? [];
 
       return Promise.all(
         folders.map(async (folder) => {
