@@ -24,7 +24,6 @@ import { getFileCategoryFilter } from "@/lib/file/operations";
 import { useFileMutations } from "@/hooks/useFileMutations";
 import { useVault } from "@/context/VaultContext";
 import { downloadAndDecryptFile } from "@/lib/storage/encryptedFileTransfer";
-import { decryptMetadata } from "@/lib/crypto";
 import { toastError, toastSuccess } from "@/lib/toast";
 import FileModal from "./FileModal";
 
@@ -47,50 +46,14 @@ const CategoryIcon = ({ file }: { file: FileItem }) => {
 const FileList = ({ file }: { file: FileItem }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [displayName, setDisplayName] = useState(file.name);
-  const [displayExt, setDisplayExt] = useState(file.extension);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { openModal } = useFileModal();
-  const { remove } = useFileMutations();
+  const { remove, update } = useFileMutations();
   const { vaultKey } = useVault();
 
-  useEffect(() => {
-    if (
-      file.isEncrypted &&
-      file.encryptedMetadataCiphertext &&
-      file.encryptedMetadataNonce &&
-      vaultKey
-    ) {
-      decryptMetadata(
-        {
-          nonce: file.encryptedMetadataNonce,
-          ciphertext: file.encryptedMetadataCiphertext,
-        },
-        vaultKey
-      )
-        .then((meta) => {
-          setDisplayName(meta.name);
-          setDisplayExt(meta.extension);
-        })
-        .catch(() => {
-          console.error("Failed to decrypt file metadata");
-        });
-    } else if (file.isEncrypted && !vaultKey) {
-      setDisplayName("[Encrypted File]");
-      setDisplayExt("");
-    } else {
-      setDisplayName(file.name);
-      setDisplayExt(file.extension);
-    }
-  }, [
-    file.isEncrypted,
-    file.encryptedMetadataCiphertext,
-    file.encryptedMetadataNonce,
-    file.name,
-    file.extension,
-    vaultKey,
-  ]);
+  const displayName = file.name;
+  const displayExt = file.extension;
 
   const handleDelete = async () => {
     try {
@@ -99,6 +62,22 @@ const FileList = ({ file }: { file: FileItem }) => {
       setShowDeleteConfirm(false);
     } catch {
       toastError("Failed to delete file");
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    try {
+      await update.mutateAsync({
+        fileId: file.id,
+        isFavorite: !file.isFavorite,
+      });
+      toastSuccess(
+        file.isFavorite ? "Removed from favorites" : "Added to favorites"
+      );
+    } catch (error) {
+      toastError(
+        (error as Error)?.message || "Failed to update favorite status"
+      );
     }
   };
 
@@ -151,40 +130,51 @@ const FileList = ({ file }: { file: FileItem }) => {
   ];
 
   return (
-    <div className="group relative bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-[2px_2px_0px_0px_#BA5624] p-2.5 transition-all flex flex-col justify-between">
+    <div
+      className={`group relative bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-[2px_2px_0px_0px_#BA5624] p-2.5 transition-all flex flex-col justify-between ${
+        menuOpen ? "z-20" : "z-0"
+      }`}
+    >
       {/* Thumbnail area */}
       <div
-        className="relative w-full aspect-square bg-brand-cream-muted border border-brand-border overflow-hidden mb-2.5 flex items-center justify-center cursor-pointer"
+        className="relative w-full aspect-square bg-brand-cream-muted border border-brand-border mb-2.5 cursor-pointer"
         onDoubleClick={() => openModal("preview", file)}
       >
-        {file.thumbnailUrl ? (
-          <Image
-            src={file.thumbnailUrl}
-            alt={file.name}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-1">
-            <CategoryIcon file={file} />
-            {file.isEncrypted && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-brand-brown">
-                <Lock className="w-2.5 h-2.5" />
-                Zero-Knowledge
-              </span>
-            )}
-          </div>
-        )}
+        <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
+          {file.thumbnailUrl ? (
+            <Image
+              src={file.thumbnailUrl}
+              alt={file.name}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+              <CategoryIcon file={file} />
+              {file.isEncrypted && (
+                <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-brand-brown">
+                  <Lock className="w-2.5 h-2.5" />
+                  Zero-Knowledge
+                </span>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Favorite toggle badge */}
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            void handleFavoriteToggle();
           }}
+          disabled={update.isPending}
           aria-label={file.isFavorite ? "Unfavorite" : "Favorite"}
-          className={`absolute top-1.5 left-1.5 p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] transition-opacity cursor-pointer ${
-            file.isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          aria-pressed={file.isFavorite}
+          className={`absolute z-10 top-1.5 left-1.5 p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-wait ${
+            file.isFavorite
+              ? "opacity-100"
+              : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100"
           }`}
         >
           <Star
@@ -198,7 +188,7 @@ const FileList = ({ file }: { file: FileItem }) => {
         </button>
 
         {/* Options menu button */}
-        <div className="absolute top-1.5 right-1.5" ref={menuRef}>
+        <div className="absolute z-20 top-1.5 right-1.5" ref={menuRef}>
           <button
             type="button"
             onClick={(e) => {
@@ -206,17 +196,27 @@ const FileList = ({ file }: { file: FileItem }) => {
               setMenuOpen((prev) => !prev);
             }}
             aria-label="File options"
-            className="p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] text-brand-violet opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity cursor-pointer"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            className={`p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] text-brand-violet transition-opacity cursor-pointer ${
+              menuOpen
+                ? "opacity-100"
+                : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100"
+            }`}
           >
             <MoreVertical size={13} />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-36 bg-brand-cream border-2 border-brand-violet shadow-[3px_3px_0px_0px_#BA5624] py-1 z-30">
+            <div
+              role="menu"
+              className="absolute right-0 mt-1 w-36 bg-brand-cream border-2 border-brand-violet shadow-[3px_3px_0px_0px_#BA5624] py-1 z-30"
+            >
               {menuActions.map(({ label, icon: Icon, handler, danger }) => (
                 <button
                   key={label}
                   type="button"
+                  role="menuitem"
                   onClick={(e) => {
                     e.stopPropagation();
                     setMenuOpen(false);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GithubIcon, LinkedinIcon, ArrowUpRight } from "lucide-react";
-import Logo from "../Logo";
+import Logo from "@/app/_components/Logo";
 import FooterWordmark from "./FooterWordmark";
 
 const Footer = () => {

@@ -12,7 +12,6 @@ import {
   Search,
   Sparkles,
   Lock,
-  Unlock,
   FolderPlus,
   Activity,
   Zap,
@@ -183,68 +182,25 @@ const DashboardContent = () => {
 
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
-      {/* Top Banner / System Ribbon */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-brand-violet text-brand-peach text-[11px] font-mono font-bold uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 bg-brand-peach-vibrant inline-block animate-pulse" />
-            Zero-Knowledge Encrypted Storage
-          </div>
+      {/* Overview introduction */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
+        <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-brand-violet tracking-tight">
-            Encrypted Workspace
+            Workspace Overview
           </h1>
-          <p className="text-xs text-brand-violet/75 font-medium max-w-xl">
-            Your files are encrypted in your browser before upload — your keys
-            never leave your device.
+          <p className="mt-1 text-sm text-brand-violet/75 font-medium max-w-2xl">
+            Review your encrypted files, storage, and folders from one secure workspace.
           </p>
         </div>
 
-        {/* Quick Top Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {isEnrolled === false && (
-            <button
-              type="button"
-              onClick={() => setShowSetupModal(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-peach text-brand-violet font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] hover:bg-brand-peach-vibrant transition-all cursor-pointer"
-            >
-              <ShieldCheck className="w-4 h-4 text-brand-brown" />
-              Setup Vault Key
-            </button>
-          )}
-
-          {isEnrolled === true && (
-            <button
-              type="button"
-              onClick={() => (isUnlocked ? lockVault() : setShowUnlockModal(true))}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer ${
-                isUnlocked
-                  ? "bg-emerald-600/15 text-emerald-800 border-emerald-700"
-                  : "bg-brand-brown text-brand-cream hover:bg-brand-brown-dark"
-              }`}
-            >
-              {isUnlocked ? (
-                <>
-                  <Unlock className="w-4 h-4 text-emerald-700" />
-                  Vault Unlocked (Click to Lock)
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4 text-brand-peach" />
-                  Unlock Vault
-                </>
-              )}
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setShowAddFolder(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-cream-muted text-brand-violet hover:bg-brand-peach font-bold text-xs border-2 border-brand-violet shadow-[2px_2px_0px_0px_#BA5624] transition-all cursor-pointer"
-          >
-            <FolderPlus className="w-4 h-4 text-brand-brown" />
-            + New Folder
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowAddFolder(true)}
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-cream-muted text-brand-violet hover:bg-brand-peach font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-brown-2 transition-all cursor-pointer shrink-0"
+        >
+          <FolderPlus className="w-4 h-4 text-brand-brown" />
+          Add Folder
+        </button>
       </div>
 
       {/* 4 Primary Metric Stat Cards */}

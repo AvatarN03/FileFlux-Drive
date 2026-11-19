@@ -4,9 +4,9 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import Header from "../_components/Header";
-import Sidebar from "../_components/Sidebar";
-import Loading from "../_components/marketing/Loading";
+import Loading from "@/components/marketing/Loading";
 
+import Sidebar from "@/components/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 
 const Layout = ({ children }: { children: ReactNode }) => {
@@ -37,7 +37,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <div className="relative w-full h-screen h-dvh overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
+    <div className="relative w-full  h-dvh overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-brand-cream">

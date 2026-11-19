@@ -60,6 +60,11 @@
     background-color: var(--brand-cream);
   }
 
+  ::selection {
+    background-color: var(--brand-peach);
+    color: var(--brand-violet);
+  }
+
   /* Scrollbar Styling - Sharp Corners */
   ::-webkit-scrollbar {
     width: 8px;
@@ -111,6 +116,94 @@
   .max-7 {
     max-width: var(--container-7xl);
     margin: 0 auto;
+  }
+
+  .shadow-brand-button {
+    box-shadow: 2px 2px 0 0 var(--brand-peach-vibrant);
+  }
+
+  .shadow-brand-button:hover {
+    box-shadow: 1px 1px 0 0 var(--brand-peach-vibrant);
+  }
+
+  @media (min-width: 640px) {
+    .shadow-brand-button {
+      box-shadow: 3px 3px 0 0 var(--brand-peach-vibrant);
+    }
+  }
+
+  .shadow-brown-2 {
+    box-shadow: 2px 2px 0 0 var(--brand-brown);
+  }
+
+  .shadow-brown-3 {
+    box-shadow: 3px 3px 0 0 var(--brand-brown);
+  }
+
+  .shadow-brown-4 {
+    box-shadow: 4px 4px 0 0 var(--brand-brown);
+  }
+
+  .shadow-peach-vibrant-2 {
+    box-shadow: 2px 2px 0 0 var(--brand-peach-vibrant);
+  }
+
+  .shadow-peach-vibrant-4 {
+    box-shadow: 4px 4px 0 0 var(--brand-peach-vibrant);
+  }
+
+  .shadow-violet-1 {
+    box-shadow: 1px 1px 0 0 var(--brand-violet);
+  }
+
+  .shadow-violet-2 {
+    box-shadow: 2px 2px 0 0 var(--brand-violet);
+  }
+
+  .hover-shadow-violet-2:hover {
+    box-shadow: 2px 2px 0 0 var(--brand-violet);
+  }
+
+  .shadow-violet-3 {
+    box-shadow: 3px 3px 0 0 var(--brand-violet);
+  }
+
+  .shadow-violet-4 {
+    box-shadow: 4px 4px 0 0 var(--brand-violet);
+  }
+
+  .shadow-feature-brown {
+    box-shadow: 6px 6px 0 0 var(--brand-brown);
+  }
+
+  .shadow-feature-brown:hover {
+    box-shadow: 4px 4px 0 0 var(--brand-brown);
+  }
+
+  .shadow-feature-violet {
+    box-shadow: 6px 6px 0 0 var(--brand-violet);
+  }
+
+  .shadow-feature-violet:hover {
+    box-shadow: 4px 4px 0 0 var(--brand-violet);
+  }
+
+  .shadow-feature-peach-vibrant {
+    box-shadow: 6px 6px 0 0 var(--brand-peach-vibrant);
+  }
+
+  .shadow-feature-peach-vibrant:hover {
+    box-shadow: 4px 4px 0 0 var(--brand-peach-vibrant);
+  }
+
+  .shadow-brown-responsive {
+    box-shadow: 8px 8px 0 0 var(--brand-brown);
+  }
+
+  @media (min-width: 640px) {
+    .shadow-brown-responsive {
+      box-shadow: 12px 12px 0 0 var(--brand-brown);
+    }
   }
 
   /* ---- Animations ---- */

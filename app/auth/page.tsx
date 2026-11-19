@@ -196,7 +196,7 @@ const AuthContent = () => {
             priority
           />
           {/* Brand Accent Stripe on Divider */}
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-brand-brown via-brand-peach-vibrant to-brand-peach" />
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-linear-to-b from-brand-brown via-brand-peach-vibrant to-brand-peach" />
         </div>
       </div>
     </div>
