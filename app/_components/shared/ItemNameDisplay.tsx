@@ -1,10 +1,23 @@
 import Link from "next/link";
+import type { FocusEvent, KeyboardEvent, ReactNode } from "react";
 
 import { ChevronRight } from "lucide-react";
-import { ItemNameDisplayProps } from "@/types/ui";
 
+type BreadcrumbItem = {
+  id: string | number;
+  name: string;
+};
 
-
+type ItemNameDisplayProps = {
+  name: string;
+  icon?: ReactNode;
+  isEditing?: boolean;
+  editName?: string;
+  path?: BreadcrumbItem[];
+  onEditChange: (value: string) => void;
+  onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
+};
 
 const ItemNameDisplay = ({
   name,

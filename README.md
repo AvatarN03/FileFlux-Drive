@@ -2,10 +2,12 @@
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+
+![FileFlux-Drive](public/logo-cabinet.svg)
 
 **A modern, cloud-powered file management system built for the web**
 
@@ -17,7 +19,7 @@
 
 ## 🌟 Overview
 
-FileFlux-Drive is a feature-rich file and folder management web application that brings desktop-like file organization to your browser. Built with cutting-edge web technologies, it provides seamless file uploads, intelligent organization, and real-time state management for an exceptional user experience.
+FileFlux-Drive is a privacy-first, zero-knowledge file and folder management web application that brings desktop-like file organization to your browser. Files are encrypted in the browser with XChaCha20-Poly1305 (key derived from your vault passphrase via Argon2id) and transferred as ciphertext to private Neon Object Storage via presigned URLs — the server never receives plaintext or your vault keys. Built with cutting-edge web technologies, it provides seamless file uploads, intelligent organization, and real-time state management for an exceptional user experience.
 
 For a maintainer-focused explanation of how the app is wired and how to update it safely after schema changes, see [Project Architecture and Schema Update Guide](docs/project-architecture-and-schema-update-guide.md).
 
@@ -31,18 +33,23 @@ For a maintainer-focused explanation of how the app is wired and how to update i
 - **⚡ Lightning Fast** - Built on Next.js for optimal performance and SEO
 - **📱 Responsive Design** - Works seamlessly across desktop, tablet, and mobile devices
 - **🎨 Intuitive Interface** - Clean, modern UI that's easy to navigate
+- **🔒 Zero-Knowledge Vault Encryption** - Vault passphrase derives an Argon2id key-encryption key; the raw vault key never reaches the server
+- **📦 Encrypted Storage Transfer** - Ciphertext streams directly to private Neon Object Storage via presigned URLs (XChaCha20-Poly1305); the server never sees file contents or keys
+- **⚡ Streaming Decryption** - Chunk-by-chunk decryption for arbitrarily large downloaded files
+- **🧹 Workspace Hardening** - Auth deduplication, authorization hardening, and secure upload lifecycle management (abort + orphan cleanup)
 
 ## 🛠 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | Next.js 14 with App Router |
-| **State Management** | Zustand |
+| **Frontend** | Next.js 16 with App Router, React 19 |
+| **State Management** | Zustand + TanStack Query 5 |
 | **Networking** | Axios |
-| **File Storage** | Cloudinary |
-| **Database** | Drizzle ORM |
+| **File Storage** | Neon Object Storage (private) via AWS SDK v3 presigned URLs — client-side encrypted transfer (XChaCha20-Poly1305); legacy uploads still on Cloudinary |
+| **Database** | Drizzle ORM on Neon PostgreSQL (serverless) |
 | **Language** | TypeScript |
-| **Styling** | Tailwind CSS (or your choice) |
+| **Styling** | Tailwind CSS 4 |
+| **Auth & Security** | Custom email/password (bcrypt + JWT cookie), Google OAuth, email verification, libsodium (Argon2id + XChaCha20-Poly1305) |
 
 ## 📦 Getting Started
 

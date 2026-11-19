@@ -1,5 +1,16 @@
-import { AddFolderModalProps } from "@/types/folder";
+import type { KeyboardEvent } from "react";
 import { FolderPlus, X } from "lucide-react";
+
+type AddFolderModalProps = {
+  value: string;
+  onChange: (value: string) => void;
+  onAdd: () => void;
+  onClose: () => void;
+  onKeyPress: (event: KeyboardEvent<HTMLInputElement>) => void;
+  isPending: boolean;
+  title?: string;
+  submitLabel?: string;
+};
 
 const AddFolderModal = ({
   value,

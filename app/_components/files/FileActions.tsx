@@ -1,7 +1,13 @@
 import { Download, Edit, FolderInput, Trash2, Eye } from "lucide-react";
 
 import  ActionButton  from "../shared/ActionButton";
-import { FileActionsProps } from "@/types/ui";
+type FileActionsProps = {
+  onView: () => void;
+  onDownload: () => void;
+  onEdit: () => void;
+  onMove: () => void;
+  onDelete: () => void;
+};
 
 
 

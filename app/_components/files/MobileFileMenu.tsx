@@ -1,7 +1,14 @@
 import { Download, Edit, FolderInput, Trash2, Eye } from "lucide-react";
 
 import  MobileActionMenu  from "../shared/MobileActionMenu";
-import { MobileFileMenuProps } from "@/types/ui";
+type MobileFileMenuProps = {
+  onView: () => void;
+  onDownload: () => void;
+  onEdit: () => void;
+  onMove: () => void;
+  onDelete: () => void;
+  onClose: () => void;
+};
 
 
 

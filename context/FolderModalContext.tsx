@@ -1,12 +1,27 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import {
-  FolderItem,
-  FolderModalContextValue,
-  FolderModalState,
-  FolderModalMode,
-} from "@/types/folder";
+
+type FolderItem = {
+  id: string;
+  name: string;
+  isFavorite: boolean;
+};
+
+type FolderModalMode = "details" | "edit" | "move" | "delete" | null;
+
+type FolderModalState = {
+  mode: FolderModalMode;
+  folder: FolderItem | null;
+};
+
+type FolderModalContextValue = FolderModalState & {
+  openModal: (
+    mode: Exclude<FolderModalMode, null>,
+    folder: FolderItem
+  ) => void;
+  closeModal: () => void;
+};
 
 const FolderModalContext = createContext<FolderModalContextValue | null>(null);
 

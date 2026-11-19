@@ -144,7 +144,7 @@ const Header = ({
               {/* Navigation & actions */}
               <div className="space-y-1.5">
                 <Link
-                  href="/dashboard/profile"
+                  href="/profile"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-bold text-brand-violet bg-brand-cream-muted border border-brand-border hover:bg-brand-peach hover:border-brand-violet transition-colors cursor-pointer"
                 >

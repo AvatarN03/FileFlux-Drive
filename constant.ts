@@ -1,14 +1,8 @@
 import {
-  Cloud,
   Folder,
-  Download,
   Eye,
-  BarChart3,
   Zap,
-  Crown,
-  Upload,
   ShieldCheck,
-  Users,
   HardDrive,
   Home,
   FolderTree,
@@ -28,128 +22,7 @@ import {
   Layers,
 } from "lucide-react";
 
-
-// ui
-
-export const navLinks = [
-  {
-    name:"Home", 
-    link:"#home"
-  },
-  {
-    name:"Features", 
-    link:"#features"
-  },
-  {
-    name:"Pricing", 
-    link:"#pricing"
-  },
-]
-
-export const features = [
-  {
-    title: "Secure Cloud Storage",
-    description:
-      "Store your files safely with quota enforcement, high availability, and resilient infrastructure.",
-    icon: Cloud,
-    tag: "Security",
-  },
-  {
-    title: "Organize Files & Folders",
-    description:
-      "Create hierarchical folders, upload files, manage details, and organize your digital assets cleanly.",
-    icon: Folder,
-    tag: "Organization",
-  },
-  {
-    title: "Instant Preview & Download",
-    description:
-      "Preview images, documents, spreadsheets, and media directly in the browser with lossless download speeds.",
-    icon: Download,
-    tag: "Performance",
-  },
-  {
-    title: "Granular Access Sharing",
-    description:
-      "Share files with customizable public visibility toggles—keep personal assets strictly confidential.",
-    icon: Eye,
-    tag: "Privacy",
-  },
-  {
-    title: "Activity & Storage Analytics",
-    description:
-      "Track your upload metrics, capacity utilization, file distribution, and recent activity from a central console.",
-    icon: BarChart3,
-    tag: "Analytics",
-  },
-  {
-    title: "Client-Side Encrypted Vault",
-    description:
-      "Protect your most confidential documents with master passphrases, libsodium crypto, and recovery keys.",
-    icon: ShieldCheck,
-    tag: "Vault",
-  },
-];
-
-export const PRICING_PLANS = [
-  {
-    id: "free",
-    name: "Free",
-    price: "₹0",
-    duration: "Forever",
-    icon: Cloud,
-    description: "For personal use and small file storage",
-    features: [
-      { label: "20 MB Storage", icon: HardDrive },
-      { label: "Basic File Upload", icon: Upload },
-      { label: "Folder Management", icon: Folder },
-      { label: "Standard Security", icon: ShieldCheck },
-    ],
-    limits: {
-      storageMB: 20,
-      maxFileSizeMB: 25,
-    },
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "₹199",
-    duration: "per month",
-    icon: Zap,
-    highlight: true,
-    description: "For developers and power users",
-    features: [
-      { label: "500 MB Storage", icon: HardDrive },
-      { label: "Large File Uploads", icon: Upload },
-      { label: "Advanced Folder System", icon: Folder },
-      { label: "Enhanced Security", icon: ShieldCheck },
-      { label: "Priority Support", icon: Users },
-    ],
-    limits: {
-      storageMB: 500,
-      maxFileSizeMB: 500,
-    },
-  },
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    price: "Custom",
-    duration: "Contact us",
-    icon: Crown,
-    description: "For teams and organizations",
-    features: [
-      { label: "500 MB Storage", icon: HardDrive },
-      { label: "Unlimited File Size", icon: Upload },
-      { label: "Team Collaboration", icon: Users },
-      { label: "Enterprise-grade Security", icon: ShieldCheck },
-    ],
-    limits: {
-      storageMB: 5120,
-      maxFileSizeMB: 500,
-    },
-  },
-];
-
+// Authenticated workspace navigation
 export const topSections = [
   { key: "home", icon: Home, label: "Overview", href: "/dashboard" },
   { key: "files", icon: Folder, label: "Files", href: "/files" },
@@ -161,12 +34,13 @@ export const topSections = [
 ];
 
 export const bottomSections = [
-  { key: "storage", icon: HardDrive, label: "Storage", href: "/dashboard/storage" },
-  { key: "activity", icon: Activity, label: "Activity", href: "/dashboard/activity" },
-  { key: "settings", icon: Settings, label: "Settings", href: "/dashboard/settings" },
-  { key: "profile", icon: User, label: "Profile", href: "/dashboard/profile" },
+  { key: "storage", icon: HardDrive, label: "Storage", href: "/storage" },
+  { key: "activity", icon: Activity, label: "Activity", href: "/activity" },
+  { key: "settings", icon: Settings, label: "Settings", href: "/settings" },
+  { key: "profile", icon: User, label: "Profile", href: "/profile" },
 ];
 
+// Landing page hero content
 export const HERO_VAULT_FILES = [
   {
     name: "Financial-Audit-2026.pdf",
@@ -235,6 +109,7 @@ export const HERO_CAPABILITY_CARDS = [
   },
 ] as const;
 
+// Landing page feature content
 export const FEATURES_SECTION_CONTENT = {
   eyebrow: "What FileFlux Offers",
   title: "Everything You Need to Manage Your Files",
@@ -458,9 +333,7 @@ export const FEATURE_BENTO_CARDS = [
   },
 ] as const;
 
-// file 
-
-//upload file initial state
+// File upload form state
 export const INITIAL_STATE = {
   file: null,
   fileName: "",
@@ -471,12 +344,10 @@ export const INITIAL_STATE = {
   uploadComplete: false,
 };
 
-// rate limiting constant
+// Authentication rate limiting
 export const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
 
-// api endpoints
-
-//user api endpoint
+// Client API endpoints
 export const AUTH_API_ENDPOINTS = {
   LOGIN: "/api/auth/login",
   SIGNUP: "/api/auth/signup",
@@ -489,23 +360,16 @@ export const AUTH_API_ENDPOINTS = {
   UPLOAD: "/api/files/upload",
 } as const;
 
-// file api endpoint
 export const FILE_API_ENDPOINTS = {
-  UPLOAD: "/api/files/upload",
   GET: "/api/files",
   ITEM: "/api/files/item",
   DELETE: "/api/files/delete",
   UPDATE: "/api/files/update",
   MOVE: "/api/files/move",
   RESTORE: "/api/files/restore",
-  DOWNLOAD: "/api/files/download",
 } as const;
 
-// ---
-
-// toast messages 
-
-// auth toast 
+// Authentication toast messages
 export const AUTH_TOAST_MESSAGES = {
   LOGIN_SUCCESS: "Login successful 🎉",
   LOGIN_FAILED: "Login failed",
@@ -524,14 +388,9 @@ export const AUTH_TOAST_MESSAGES = {
   RESEND_VERIFICATION_FAILED: "Failed to send verification email",
   EMAIL_VERIFICATION_SUCCESS: "Email verified successfully 🎉",
   EMAIL_VERIFICATION_FAILED: "Email verification failed",
-
 } as const;
 
-
-
-
-
-// file type constant
+// File extension labels
 export const FileType = {
   pdf: "PDF",
   doc: "Word Document",

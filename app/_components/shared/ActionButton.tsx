@@ -1,5 +1,15 @@
-import { ActionButtonProps } from "@/types/ui";
+import type { MouseEvent, ReactNode } from "react";
 
+type ActionButtonVariant = "primary" | "secondary" | "danger" | "success";
+
+type ActionButtonProps = {
+  onClick?: (event?: MouseEvent) => void;
+  icon?: ReactNode;
+  label?: string;
+  variant?: ActionButtonVariant;
+  title?: string;
+  className?: string;
+};
 
 const ActionButton = ({
   onClick,

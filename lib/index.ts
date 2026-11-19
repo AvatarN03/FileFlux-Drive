@@ -1,8 +1,12 @@
 import axios, { AxiosError } from "axios";
 
 import { AUTH_TOAST_MESSAGES } from "@/constant";
-import { ApiError } from "@/types";
 
+type ApiError = {
+  error?: string;
+  message?: string;
+  success: boolean;
+};
 
 // general error message
 const getErrorMessage = (error: unknown): string => {

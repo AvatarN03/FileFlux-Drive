@@ -1,6 +1,6 @@
-import { ApiResponse } from ".";
+import type { ApiResponse } from ".";
 
-// Auth input (login / signup)
+// Shared authentication types
 export interface AuthCredentials {
   name?: string;
   email: string;
@@ -10,10 +10,6 @@ export interface AuthCredentials {
 export interface ResendVerificationResponse extends ApiResponse {
   coolDownMs?: number; // Only present when status is 429
 }
-
-export type ResendState = "idle" | "sending" | "sent" | "error";
-
-export type Status = "verifying" | "success" | "error";
 
 export type PublicUser = {
   id: string;

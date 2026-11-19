@@ -10,7 +10,6 @@ import {
   Plus,
   ArrowRight,
   Search,
-  Sparkles,
   Lock,
   FolderPlus,
   Activity,
@@ -28,6 +27,7 @@ import FileList from "../../_components/FileList";
 import FilePreviewModal from "../../_components/FilePreviewModel";
 import FileDetailsModal from "../../_components/FileDetailModel";
 import FileEditModal from "../../_components/FileEditModel";
+import FileMoveModal from "../../_components/files/FileMoveModal";
 import AddFolderModal from "../../_components/folders/AddFolderModal";
 import VaultUnlockModal from "../../_components/vault/VaultUnlockModal";
 import VaultSetupModal from "../../_components/vault/VaultSetupModal";
@@ -702,25 +702,6 @@ const DashboardContent = () => {
             </div>
           </div>
 
-          {/* Storage Quota Card */}
-          <div className="bg-brand-peach border-2 border-brand-violet shadow-[4px_4px_0px_0px_#381D2A] p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-brand-brown" />
-              <h3 className="text-xs font-extrabold uppercase tracking-wider text-brand-violet">
-                Upgrade Storage Plan
-              </h3>
-            </div>
-            <p className="text-xs text-brand-violet/85 font-medium mb-4 leading-relaxed">
-              Review your current encrypted quota and available plan options.
-            </p>
-            <Link
-              href="/#pricing"
-              className="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold uppercase tracking-wider border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition-all"
-            >
-              View Available Plans
-              <ArrowRight className="w-3.5 h-3.5 text-brand-peach" />
-            </Link>
-          </div>
         </div>
       </div>
 
@@ -733,6 +714,9 @@ const DashboardContent = () => {
       )}
       {mode === "edit" && modalFile && (
         <FileEditModal file={modalFile} onClose={closeModal} />
+      )}
+      {mode === "move" && modalFile && (
+        <FileMoveModal file={modalFile} onClose={closeModal} />
       )}
 
       {showAddFolder && (

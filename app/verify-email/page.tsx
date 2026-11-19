@@ -8,7 +8,9 @@ import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
 import Logo from "@/app/_components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { formatTime } from "@/lib/email/formatTime";
-import { ResendState, ResendVerificationResponse } from "@/types/auth";
+import type { ResendVerificationResponse } from "@/types/auth";
+
+type ResendState = "idle" | "sending" | "sent" | "error";
 
 const VerifyEmailPage = () => {
   const router = useRouter();

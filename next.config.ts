@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      { source: "/dashboard/storage", destination: "/storage", permanent: false },
+      { source: "/dashboard/activity", destination: "/activity", permanent: false },
+      { source: "/dashboard/settings", destination: "/settings", permanent: false },
+      { source: "/dashboard/profile", destination: "/profile", permanent: false },
+    ];
+  },
   images: {
     remotePatterns: [
       {

@@ -1,8 +1,13 @@
 import folderApi from "@/services/folderApi";
-import { CreateFolderPayload, UpdateFolderPayload } from "@/types/folder";
+import type { UpdateFolderPayload } from "@/types/folder";
 import { encryptFolderMetadata } from "@/lib/crypto";
 import { useVault } from "@/context/VaultContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+type CreateFolderPayload = {
+  name: string;
+  parentId?: string | null;
+};
 
 export const useFolderCreate = () => {
   const queryClient = useQueryClient();

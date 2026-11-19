@@ -1,9 +1,16 @@
 import { ApiResponse } from "@/types";
 import {
-  CreateEncryptedFolderPayload,
   GetAllFolders,
   UpdateFolderPayload,
 } from "@/types/folder";
+
+type CreateEncryptedFolderPayload = {
+  encryptedMetadata: {
+    nonce: string;
+    ciphertext: string;
+  };
+  parentId?: string | null;
+};
 
 const folderApi = {
   create: async (payload: CreateEncryptedFolderPayload) => {

@@ -3,7 +3,12 @@ import Link from "next/link";
 import { Edit, FolderInput, Trash2, Eye } from "lucide-react";
 
 import  ActionButton  from "../shared/ActionButton";
-import { FolderActionsProps } from "@/types/ui";
+type FolderActionsProps = {
+  folderId: string | number;
+  onEdit: () => void;
+  onMove: () => void;
+  onDelete: () => void;
+};
 
 
 

@@ -73,6 +73,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
     }
 
     const { name, extension, isFavorite } = body as Record<string, unknown>;
+    const updatesPlaintextMetadata =
+      name !== undefined || extension !== undefined;
 
     if (
       name === undefined &&
@@ -89,6 +91,44 @@ export async function PATCH(req: Request, { params }: RouteParams) {
           status: 400,
         }
       );
+    }
+
+    if (updatesPlaintextMetadata) {
+      const [existingFile] = await db
+        .select({ isEncrypted: files.isEncrypted })
+        .from(files)
+        .where(
+          and(
+            eq(files.id, fileId),
+            eq(files.userId, userId),
+            isNull(files.deletedAt)
+          )
+        );
+
+      if (!existingFile) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "File not found",
+          },
+          {
+            status: 404,
+          }
+        );
+      }
+
+      if (existingFile.isEncrypted) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Encrypted filenames must be updated through an encrypted metadata flow",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
     }
 
     const updateFields: {

@@ -1,61 +1,18 @@
-import axios, { AxiosProgressEvent } from "axios";
-
 import { ApiResponse } from "@/types";
 import {
   DeleteFilePayload,
-  DownloadFilePayload,
   FileDetail,
+  FileItem,
   FileQueryParams,
-  FilesResponse,
-  FolderFilesResponse,
   MoveFilePayload,
   RestoreFilePayload,
   UpdateFilePayload,
-  UploadFilePayload,
 } from "@/types/file";
 
 import { FILE_API_ENDPOINTS } from "@/constant";
 
 const fileApi = {
-  async upload({ file, folderId, onProgress, signal }: UploadFilePayload) {
-    const formData = new FormData();
-
-    formData.append("fileUpload", file);
-
-    if (folderId) {
-      formData.append("folderId", folderId);
-    }
-
-    const { data } = await axios.post<ApiResponse>(
-      FILE_API_ENDPOINTS.UPLOAD,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        signal,
-        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-          if (!progressEvent.total) return;
-
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total,
-          );
-
-          onProgress?.(progress);
-        },
-      },
-    );
-
-    if (!data.success) {
-      throw new Error(data.error ?? "Upload failed");
-    }
-
-    return data;
-  },
-
-  async getFiles({
-    folderId,
-  }: FileQueryParams): Promise<FilesResponse[]> {
+  async getFiles({ folderId }: FileQueryParams): Promise<FileItem[]> {
     const params = new URLSearchParams();
 
     if (folderId) {
@@ -63,19 +20,17 @@ const fileApi = {
     }
 
     const res = await fetch(`${FILE_API_ENDPOINTS.GET}?${params.toString()}`);
-
     const data = await res.json();
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to fetch files");
     }
 
-    return (data.files ?? data.data ?? []) as FilesResponse[];
+    return (data.files ?? data.data ?? []) as FileItem[];
   },
 
   async getFile(fileId: string): Promise<FileDetail> {
     const res = await fetch(`${FILE_API_ENDPOINTS.ITEM}/${fileId}`);
-
     const data: ApiResponse<FileDetail> = await res.json();
 
     if (!res.ok || !data.success) {
@@ -85,7 +40,7 @@ const fileApi = {
     return data.data!;
   },
 
-  async getTrashFiles(): Promise<FilesResponse[]> {
+  async getTrashFiles(): Promise<FileItem[]> {
     const res = await fetch("/api/files/trash");
     const data = await res.json();
 
@@ -93,19 +48,7 @@ const fileApi = {
       throw new Error(data.error ?? "Failed to fetch trash");
     }
 
-    return (data.files ?? []) as FilesResponse[];
-  },
-
-  getFolderFiles: async (folderId: string): Promise<FolderFilesResponse> => {
-    const res = await fetch(`/api/files/${folderId}`);
-
-    const data: FolderFilesResponse = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error ?? "Failed to fetch files");
-    }
-
-    return data;
+    return (data.files ?? []) as FileItem[];
   },
 
   async update({
@@ -172,20 +115,6 @@ const fileApi = {
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to restore file");
-    }
-
-    return data;
-  },
-
-  async download({ fileId }: DownloadFilePayload) {
-    const res = await fetch(`${FILE_API_ENDPOINTS.DOWNLOAD}/${fileId}`, {
-      method: "POST",
-    });
-
-    const data: ApiResponse = await res.json();
-
-    if (!res.ok || !data.success) {
-      throw new Error(data.error ?? "Failed to download file");
     }
 
     return data;

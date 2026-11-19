@@ -1,12 +1,18 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import Logo from "@/app/_components/Logo";
 import { bottomSections, topSections } from "@/constant";
-import { NavSection } from "@/types/ui";
+
+type NavSection = {
+  key: string;
+  icon: LucideIcon;
+  label: string;
+  href: string;
+};
 
 type SidebarProps = {
   isOpen: boolean;

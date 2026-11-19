@@ -7,8 +7,9 @@ import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
 import Logo from "@/app/_components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import toastC from "@/lib/toast";
-import { Status } from "@/types/auth";
 import { AUTH_TOAST_MESSAGES } from "@/constant";
+
+type Status = "verifying" | "success" | "error";
 
 const VerifyEmailTokenPage = () => {
   const [status, setStatus] = useState<Status>("verifying");

@@ -2,7 +2,17 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { Plus, ChevronRight } from "lucide-react";
-import { FolderListHeaderProps } from "@/types/ui";
+
+type BreadcrumbItem = {
+  id: string | number;
+  name: string;
+};
+
+type FolderListHeaderProps = {
+  onAddClick: () => void;
+  folderName?: string;
+  folderPath?: BreadcrumbItem[];
+};
 
 const FolderListHeader = ({ onAddClick, folderName, folderPath }: FolderListHeaderProps) => {
   const hasPath = folderPath && folderPath.length > 0;

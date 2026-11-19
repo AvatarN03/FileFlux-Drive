@@ -1,5 +1,9 @@
-import { MobileActionMenuProps } from "@/types/ui";
+import type { ReactNode } from "react";
 
+type MobileActionMenuProps = {
+  children: ReactNode;
+  onClose: () => void;
+};
 
 const MobileActionMenu = ({ children, onClose }: MobileActionMenuProps) => {
   return (

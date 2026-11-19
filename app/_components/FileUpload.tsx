@@ -9,7 +9,6 @@ import UploadArea from "./files/UploadArea";
 import FilePreview from "./files/FilePreview";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useFileMutations } from "@/hooks/useFileMutations";
 import { useVault } from "@/context/VaultContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { uploadEncryptedFile } from "@/lib/storage/encryptedFileTransfer";
@@ -19,8 +18,17 @@ import { createRenamedFile, getFileNameWithoutExtension } from "@/lib/file/opera
 
 import { INITIAL_STATE } from "@/constant";
 
-import { UploadState } from "@/types/file";
 import { canUploadFile } from "@/lib/validations/file";
+
+type UploadState = {
+  file: File | null;
+  fileName: string;
+  isEditingFileName: boolean;
+  isDragging: boolean;
+  isUploading: boolean;
+  uploadProgress: number;
+  uploadComplete: boolean;
+};
 
 const FileUpload = () => {
   const [state, setState] = useState<UploadState>(INITIAL_STATE);
@@ -36,7 +44,6 @@ const FileUpload = () => {
   const { user } = useAuth();
   const { vaultKey } = useVault();
   const queryClient = useQueryClient();
-  const { upload } = useFileMutations();
 
   const updateState = useCallback((updates: Partial<UploadState>) => {
     setState((prev) => ({ ...prev, ...updates }));

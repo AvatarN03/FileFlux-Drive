@@ -2,7 +2,19 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-import { FileItem, FileModalContextValue, FileModalState, ModalMode } from "@/types/file";
+import type { FileItem } from "@/types/file";
+
+type ModalMode = "preview" | "details" | "edit" | "move" | null;
+
+type FileModalState = {
+  mode: ModalMode;
+  file: FileItem | null;
+};
+
+type FileModalContextValue = FileModalState & {
+  openModal: (mode: Exclude<ModalMode, null>, file: FileItem) => void;
+  closeModal: () => void;
+};
 
 const FileModalContext = createContext<FileModalContextValue | null>(null);
 

@@ -2,12 +2,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { Edit, X, FileText, FileSpreadsheet, File as FileIcon } from "lucide-react";
 
-import { FilePreviewProps } from "@/types/ui";
 import { formatFileSize } from "@/lib/file";
 import { getFileExtension } from "@/lib/file/operations";
 import { FileType } from "@/constant";
 
 type FileCategory = "image" | "video" | "pdf" | "doc" | "sheet" | "other";
+
+type FilePreviewProps = {
+  file: File;
+  fileName: string;
+  isEditingFileName: boolean;
+  isUploading: boolean;
+  uploadProgress: number;
+  uploadComplete: boolean;
+  onFileNameChange: (name: string) => void;
+  onToggleEdit: () => void;
+  onReset: () => void;
+  onUpload: () => void;
+  onCancelUpload: () => void;
+};
 
 const getFileCategory = (file: File, extension: string): FileCategory => {
   if (file.type.startsWith("image/")) return "image";

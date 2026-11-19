@@ -1,4 +1,5 @@
 import { MoreVertical } from "lucide-react";
+import type { KeyboardEvent } from "react";
 
 import  FileActions  from "./FileActions";
 import MobileFileMenu from "./MobileFileMenu";
@@ -6,8 +7,35 @@ import MobileFileMenu from "./MobileFileMenu";
 import  ItemNameDisplay  from "../shared/ItemNameDisplay";
 
 import { formatFileSize, getFileIcon, getReadableFileType } from "@/lib/file";
-import { FileItemRowProps } from "@/types/ui";
 
+type BreadcrumbItem = {
+  id: string | number;
+  name: string;
+};
+
+type FileItemRowProps = {
+  file: {
+    id: string | number;
+    file_name: string;
+    file_type?: string | null;
+    file_size?: number | null;
+    path?: BreadcrumbItem[];
+    [key: string]: unknown;
+  };
+  isEditing: boolean;
+  editName: string;
+  isMenuOpen: boolean;
+  onEditChange: (value: string) => void;
+  onEditBlur: () => void;
+  onEditKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
+  onView: () => void;
+  onDownload: () => void;
+  onEdit: () => void;
+  onMove: () => void;
+  onDelete: () => void;
+  onToggleMenu: () => void;
+  onCloseMenu: () => void;
+};
 
 const FileItemRow = ({
   file,
@@ -55,7 +83,6 @@ const FileItemRow = ({
         </div>
 
         <FileActions
-          file={file}
           onView={onView}
           onDownload={onDownload}
           onEdit={onEdit}

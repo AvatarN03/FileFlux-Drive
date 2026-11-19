@@ -4,46 +4,13 @@ import fileApi from "@/services/fileApi";
 
 import {
   DeleteFilePayload,
-  DownloadFilePayload,
   MoveFilePayload,
   RestoreFilePayload,
   UpdateFilePayload,
-  UploadFilePayload,
 } from "@/types/file";
 
 export function useFileMutations() {
   const queryClient = useQueryClient();
-
-  const invalidateUpload = (folderId?: string | null) => {
-    queryClient.invalidateQueries({
-      queryKey: ["files"],
-    });
-
-    queryClient.invalidateQueries({
-      queryKey: ["recent-files"],
-    });
-
-    queryClient.invalidateQueries({
-      queryKey: ["storage"],
-    });
-
-    if (folderId) {
-      queryClient.invalidateQueries({
-        queryKey: ["folder-files", folderId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["files", folderId],
-      });
-    }
-  };
-
-  const upload = useMutation({
-    mutationFn: (payload: UploadFilePayload) => fileApi.upload(payload),
-
-    onSuccess: (_, variables) => {
-      invalidateUpload(variables.folderId);
-    },
-  });
 
   const update = useMutation({
     mutationFn: (payload: UpdateFilePayload) => fileApi.update(payload),
@@ -68,31 +35,9 @@ export function useFileMutations() {
   const move = useMutation({
     mutationFn: (payload: MoveFilePayload) => fileApi.move(payload),
 
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["files"],
-      });
-
-      if (variables.fromFolderId) {
-        queryClient.invalidateQueries({
-          queryKey: ["folder-files", variables.fromFolderId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["files", variables.fromFolderId],
-        });
-      }
-
-      if (variables.toFolderId) {
-        queryClient.invalidateQueries({
-          queryKey: ["folder-files", variables.toFolderId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["files", variables.toFolderId],
-        });
-      }
-
-      queryClient.invalidateQueries({
-        queryKey: ["recent-files"],
       });
     },
   });
@@ -143,22 +88,10 @@ export function useFileMutations() {
     },
   });
 
-  const download = useMutation({
-    mutationFn: (payload: DownloadFilePayload) => fileApi.download(payload),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["files"],
-      });
-    },
-  });
-
   return {
-    upload,
     update,
     move,
     remove,
     restore,
-    download,
   };
 }

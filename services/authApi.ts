@@ -45,7 +45,7 @@ const authApi = {
     return data.data!;
   },
 
-  async updateName(name: string): Promise<any> {
+  async updateName(name: string): Promise<User> {
     const res = await fetch("/api/auth/profile", {
       method: "PATCH",
       credentials: "include",

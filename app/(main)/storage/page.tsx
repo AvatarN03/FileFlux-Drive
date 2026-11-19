@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { HardDrive, Zap, ArrowRight, FileText, Inbox, Lock } from "lucide-react";
+import { HardDrive, FileText, Inbox, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFiles } from "@/hooks/useFileQueries";
 import { formatFileSize } from "@/lib/file";
@@ -121,7 +121,7 @@ const StoragePage = () => {
 
       {/* Main Quota Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+        <div className="md:col-span-3 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
@@ -189,28 +189,6 @@ const StoragePage = () => {
           </div>
         </div>
 
-        {/* Upgrade Plan Promo */}
-        <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 flex flex-col justify-between">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brand-brown text-brand-cream text-[10px] font-bold uppercase tracking-wider border border-brand-peach-vibrant/40 mb-3">
-              <Zap className="w-3 h-3 text-brand-peach" />
-              Pro Tier Capacity
-            </div>
-            <h3 className="text-lg font-extrabold text-brand-cream tracking-tight mb-2">
-              Upgrade to 500 MB Encrypted Storage
-            </h3>
-            <p className="text-xs text-brand-peach/80 leading-relaxed mb-4">
-              Review the available plan options for your encrypted workspace.
-            </p>
-          </div>
-
-          <Link
-            href="/#pricing"
-            className="w-full py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border border-brand-peach text-center shadow-[2px_2px_0px_0px_#26131D] transition-all inline-flex items-center justify-center gap-1.5"
-          >
-            Explore Pro Plans <ArrowRight className="w-3.5 h-3.5 text-brand-peach" />
-          </Link>
-        </div>
       </div>
 
       {/* Largest Files Table */}
