@@ -131,7 +131,7 @@ const FileList = ({ file }: { file: FileItem }) => {
 
   return (
     <div
-      className={`group relative bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-[2px_2px_0px_0px_#BA5624] p-2.5 transition-all flex flex-col justify-between ${
+      className={`group relative bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-brown-2 p-2.5 transition-all flex flex-col justify-between ${
         menuOpen ? "z-20" : "z-0"
       }`}
     >
@@ -171,7 +171,7 @@ const FileList = ({ file }: { file: FileItem }) => {
           disabled={update.isPending}
           aria-label={file.isFavorite ? "Unfavorite" : "Favorite"}
           aria-pressed={file.isFavorite}
-          className={`absolute z-10 top-1.5 left-1.5 p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-wait ${
+          className={`absolute z-10 top-1.5 left-1.5 p-1 bg-brand-cream border border-brand-border shadow-violet-1 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-wait ${
             file.isFavorite
               ? "opacity-100"
               : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100"
@@ -198,7 +198,7 @@ const FileList = ({ file }: { file: FileItem }) => {
             aria-label="File options"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
-            className={`p-1 bg-brand-cream border border-brand-border shadow-[1px_1px_0px_0px_#381D2A] text-brand-violet transition-opacity cursor-pointer ${
+            className={`p-1 bg-brand-cream border border-brand-border shadow-violet-1 text-brand-violet transition-opacity cursor-pointer ${
               menuOpen
                 ? "opacity-100"
                 : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus:opacity-100"
@@ -210,7 +210,7 @@ const FileList = ({ file }: { file: FileItem }) => {
           {menuOpen && (
             <div
               role="menu"
-              className="absolute right-0 mt-1 w-36 bg-brand-cream border-2 border-brand-violet shadow-[3px_3px_0px_0px_#BA5624] py-1 z-30"
+              className="absolute right-0 mt-1 w-36 bg-brand-cream border-2 border-brand-violet shadow-brown-3 py-1 z-30"
             >
               {menuActions.map(({ label, icon: Icon, handler, danger }) => (
                 <button
@@ -280,7 +280,7 @@ const FileList = ({ file }: { file: FileItem }) => {
                 type="button"
                 onClick={handleDelete}
                 disabled={remove.isPending}
-                className="px-3 py-1.5 text-xs font-bold text-brand-cream bg-red-600 hover:bg-red-700 border-2 border-red-800 shadow-[2px_2px_0px_0px_#381D2A] cursor-pointer transition-colors"
+                className="px-3 py-1.5 text-xs font-bold text-brand-cream bg-red-600 hover:bg-red-700 border-2 border-red-800 shadow-violet-2 cursor-pointer transition-colors"
               >
                 {remove.isPending ? "Moving..." : "Move to Trash"}
               </button>

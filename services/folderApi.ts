@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/types";
 import {
   GetAllFolders,
+  TrashFolder,
   UpdateFolderPayload,
 } from "@/types/folder";
 
@@ -10,6 +11,8 @@ type CreateEncryptedFolderPayload = {
     ciphertext: string;
   };
   parentId?: string | null;
+  color?: string;
+  isFavorite?: boolean;
 };
 
 const folderApi = {
@@ -46,6 +49,17 @@ const folderApi = {
     return data.data;
   },
 
+  getTrash: async () => {
+    const res = await fetch("/api/folders/trash");
+    const data: ApiResponse<TrashFolder[]> = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch folder trash");
+    }
+
+    return data.data ?? [];
+  },
+
    // Rename / Move folder
   update: async (payload: UpdateFolderPayload) => {
     const res = await fetch("/api/folders", {
@@ -79,6 +93,19 @@ const folderApi = {
 
     if (!res.ok || !data.success) {
       throw new Error(data.error ?? "Failed to delete folder");
+    }
+
+    return data;
+  },
+
+  restore: async (folderId: string) => {
+    const res = await fetch(`/api/folders/restore/${folderId}`, {
+      method: "PATCH",
+    });
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to restore folder");
     }
 
     return data;

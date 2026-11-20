@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 type CreateFolderPayload = {
   name: string;
   parentId?: string | null;
+  color?: string;
+  isFavorite?: boolean;
 };
 
 export const useFolderCreate = () => {
@@ -27,6 +29,8 @@ export const useFolderCreate = () => {
       return folderApi.create({
         encryptedMetadata,
         parentId: payload.parentId,
+        color: payload.color,
+        isFavorite: payload.isFavorite,
       });
     },
     onSuccess: (_, variables) => {
@@ -57,12 +61,13 @@ export const useFolderUpdate = ()=>{
                     folderId: payload.folderId,
                     encryptedMetadata,
                     parentId: payload.parentId,
+                    color: payload.color,
                 });
             }
 
             return folderApi.update(payload);
         },
-        onSuccess: (_, variables) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ["folders"],
             });
@@ -75,10 +80,21 @@ export const useFolderDelete = () => {
 
     return useMutation({
         mutationFn: (folderId: string) => folderApi.delete(folderId),
-        onSuccess: (_, folderId) => {
-            queryClient.invalidateQueries({
-                queryKey: ["folders", folderId],
-            });
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["folders"] });
+            queryClient.invalidateQueries({ queryKey: ["trash-folders"] });
         }
     });
 }
+
+export const useFolderRestore = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (folderId: string) => folderApi.restore(folderId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["folders"] });
+            queryClient.invalidateQueries({ queryKey: ["trash-folders"] });
+        },
+    });
+};

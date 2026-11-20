@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import { isAuthError, verifyAuth } from "../_services";
 
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   try {
     const { id: userId } = await verifyAuth();
 
-    const { encryptedMetadata, parentId } = await req.json();
+    const { encryptedMetadata, parentId, color, isFavorite } = await req.json();
 
     if (
       !encryptedMetadata ||
@@ -30,6 +30,51 @@ export async function POST(req: Request) {
       );
     }
 
+    if (
+      parentId !== undefined &&
+      parentId !== null &&
+      (typeof parentId !== "string" || !UUID_PATTERN.test(parentId))
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Invalid parent folder ID" },
+        { status: 400 },
+      );
+    }
+
+    if (parentId) {
+      const [parentFolder] = await db
+        .select({ id: folders.id })
+        .from(folders)
+        .where(
+          and(
+            eq(folders.id, parentId),
+            eq(folders.userId, userId),
+            isNull(folders.deletedAt),
+          ),
+        );
+
+      if (!parentFolder) {
+        return NextResponse.json(
+          { success: false, error: "Parent folder not found" },
+          { status: 404 },
+        );
+      }
+    }
+
+    if (color !== undefined && (typeof color !== "string" || color.length > 32)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid folder color" },
+        { status: 400 },
+      );
+    }
+
+    if (isFavorite !== undefined && typeof isFavorite !== "boolean") {
+      return NextResponse.json(
+        { success: false, error: "isFavorite must be a boolean" },
+        { status: 400 },
+      );
+    }
+
     const [folder] = await db
       .insert(folders)
       .values({
@@ -39,6 +84,8 @@ export async function POST(req: Request) {
         isEncrypted: true,
         parentId: parentId ?? null,
         userId,
+        ...(color !== undefined && { color }),
+        ...(isFavorite !== undefined && { isFavorite }),
       })
       .returning();
 
@@ -82,6 +129,7 @@ export async function GET(req: Request) {
       .select({
         id: folders.id,
         name: folders.name,
+        color: folders.color,
         isFavorite: folders.isFavorite,
         isEncrypted: folders.isEncrypted,
         encryptedMetadataNonce: folders.encryptedMetadataNonce,
@@ -124,11 +172,11 @@ export async function DELETE(req: Request) {
   try {
     const { id: userId } = await verifyAuth();
 
-    const { folderId }: { folderId: string } = await req.json();
+    const { folderId }: { folderId?: unknown } = await req.json();
 
-    if (!folderId) {
+    if (typeof folderId !== "string" || !UUID_PATTERN.test(folderId)) {
       return NextResponse.json(
-        { success: false, error: "Folder ID is required" },
+        { success: false, error: "Invalid folder ID" },
         { status: 400 },
       );
     }
@@ -151,49 +199,67 @@ export async function DELETE(req: Request) {
       );
     }
 
-    const [{ fileCount }] = await db
-      .select({
-        fileCount: count(),
-      })
-      .from(files)
-      .where(and(eq(files.folderId, folderId), isNull(files.deletedAt)));
+    const userFolders = await db
+      .select({ id: folders.id, parentId: folders.parentId })
+      .from(folders)
+      .where(eq(folders.userId, userId));
 
-    if (fileCount > 0) {
+    const childrenByParent = new Map<string, string[]>();
+    for (const candidate of userFolders) {
+      if (!candidate.parentId) continue;
+      const children = childrenByParent.get(candidate.parentId) ?? [];
+      children.push(candidate.id);
+      childrenByParent.set(candidate.parentId, children);
+    }
+
+    const subtreeIds: string[] = [];
+    const pendingIds = [folderId];
+    while (pendingIds.length > 0) {
+      const currentId = pendingIds.pop();
+      if (!currentId || subtreeIds.includes(currentId)) continue;
+
+      subtreeIds.push(currentId);
+      pendingIds.push(...(childrenByParent.get(currentId) ?? []));
+    }
+
+    const filesInSubtree = await db
+      .select({ id: files.id })
+      .from(files)
+      .where(
+        and(
+          eq(files.userId, userId),
+          inArray(files.folderId, subtreeIds),
+          isNull(files.deletedAt),
+        ),
+      );
+
+    if (filesInSubtree.length > 0) {
       return NextResponse.json(
         {
           success: false,
           error:
-            "Folder contains files. Remove or move them before deleting the folder.",
+            "Folder or nested folders contain files. Remove or move them before sending the folder tree to trash.",
         },
         { status: 400 },
       );
     }
 
-    // Check for child folders
-    const [{ childCount }] = await db
-      .select({
-        childCount: count(),
-      })
-      .from(folders)
-      .where(and(eq(folders.parentId, folderId), isNull(folders.deletedAt)));
-
-    if (childCount > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Folder contains subfolders. Delete them first.",
-        },
-        { status: 400 },
-      );
-    }
-
+    const deletedAt = new Date();
     await db
-      .delete(folders)
-      .where(and(eq(folders.id, folderId), eq(folders.userId, userId)));
+      .update(folders)
+      .set({ deletedAt, updatedAt: deletedAt })
+      .where(
+        and(
+          eq(folders.userId, userId),
+          inArray(folders.id, subtreeIds),
+          isNull(folders.deletedAt),
+        ),
+      );
 
     return NextResponse.json({
       success: true,
-      message: "Folder deleted successfully",
+      message: "Folder tree moved to trash",
+      folderIds: subtreeIds,
     });
   } catch (error) {
     if (isAuthError(error)) {
@@ -225,12 +291,14 @@ export async function PATCH(req: Request) {
       name,
       encryptedMetadata,
       parentId,
+      color,
       isFavorite,
     }: {
       folderId: string;
       name?: string;
       encryptedMetadata?: { nonce?: unknown; ciphertext?: unknown };
       parentId?: string | null;
+      color?: string | null;
       isFavorite?: boolean;
     } = await req.json();
 
@@ -263,6 +331,7 @@ export async function PATCH(req: Request) {
       name === undefined &&
       encryptedMetadata === undefined &&
       parentId === undefined &&
+      color === undefined &&
       isFavorite === undefined
     ) {
       return NextResponse.json(
@@ -338,6 +407,17 @@ export async function PATCH(req: Request) {
       );
     }
 
+    if (
+      color !== undefined &&
+      color !== null &&
+      (typeof color !== "string" || color.length > 32)
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Invalid folder color" },
+        { status: 400 },
+      );
+    }
+
     if (name !== undefined) {
       return NextResponse.json(
         {
@@ -373,9 +453,16 @@ export async function PATCH(req: Request) {
           isEncrypted: true,
         }),
         ...(parentId !== undefined && { parentId }),
+        ...(color !== undefined && { color }),
          ...(isFavorite !== undefined && { isFavorite }),
       })
-      .where(eq(folders.id, folderId));
+      .where(
+        and(
+          eq(folders.id, folderId),
+          eq(folders.userId, userId),
+          isNull(folders.deletedAt),
+        ),
+      );
 
     const [updatedFolder] = await db
       .select()

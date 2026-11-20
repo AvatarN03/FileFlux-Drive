@@ -97,8 +97,8 @@ const VerifyEmailPage = () => {
               </span>
             </div>
 
-            <div className="border-2 border-brand-violet bg-brand-violet p-6 shadow-[4px_4px_0px_0px_#BA5624] text-center mb-6">
-              <div className="w-14 h-14 bg-brand-peach border-2 border-brand-brown mx-auto flex items-center justify-center mb-4 shadow-[2px_2px_0px_0px_#BA5624]">
+            <div className="border-2 border-brand-violet bg-brand-violet p-6 shadow-brown-4 text-center mb-6">
+              <div className="w-14 h-14 bg-brand-peach border-2 border-brand-brown mx-auto flex items-center justify-center mb-4 shadow-brown-2">
                 <Mail className="w-7 h-7 text-brand-brown" strokeWidth={2} />
               </div>
 
@@ -126,7 +126,7 @@ const VerifyEmailPage = () => {
                     type="button"
                     onClick={handleResend}
                     disabled={cooldown > 0 || resendState === "sending"}
-                    className="w-full text-xs font-bold uppercase tracking-wider text-brand-cream bg-brand-brown hover:bg-brand-brown-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all py-2.5 border border-brand-peach-vibrant shadow-[2px_2px_0px_0px_#26131D] cursor-pointer"
+                    className="w-full text-xs font-bold uppercase tracking-wider text-brand-cream bg-brand-brown hover:bg-brand-brown-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all py-2.5 border border-brand-peach-vibrant shadow-violet-dark-2 cursor-pointer"
                   >
                     {resendState === "sending"
                       ? "Sending..."

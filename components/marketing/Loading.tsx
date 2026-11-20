@@ -14,25 +14,25 @@ const Loading = ({
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 bg-brand-cream bg-pattern-network text-brand-violet selection:bg-brand-peach selection:text-brand-violet overflow-hidden">
       {/* Neo-Brutalist Technical Corner Decals */}
-      <div aria-hidden="true" className="absolute top-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute top-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-violet-soft-2 select-none">
         <span className="w-2 h-2 bg-brand-brown animate-pulse shrink-0"></span>
         <span>SYS://FILEFLUX/ENCRYPTED_VAULT</span>
       </div>
 
-      <div aria-hidden="true" className="absolute top-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute top-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-violet-soft-2 select-none">
         <span>SECURITY: ZERO-KNOWLEDGE</span>
       </div>
 
-      <div aria-hidden="true" className="absolute bottom-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute bottom-4 left-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-violet-soft-2 select-none">
         <span>PROTOCOL: XCHACHA20-POLY1305</span>
       </div>
 
-      <div aria-hidden="true" className="absolute bottom-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-[2px_2px_0px_0px_rgba(56,29,42,0.15)] select-none">
+      <div aria-hidden="true" className="absolute bottom-4 right-4 hidden md:flex items-center gap-2 font-mono text-[11px] font-bold text-brand-violet/70 border-2 border-brand-violet/20 px-2.5 py-1 bg-brand-cream/90 shadow-violet-soft-2 select-none">
         <span>STATUS: BOOTSTRAPPING</span>
       </div>
 
       {/* Main Neo-Brutalist Loading Window */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-brand-cream border-2 border-brand-violet shadow-[6px_6px_0px_0px_#381D2A] transition-all">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-brand-cream border-2 border-brand-violet shadow-violet-6 transition-all">
         {/* Retro Window Header Strip */}
         <div className="flex items-center justify-between px-3.5 py-2 bg-brand-violet text-brand-cream border-b-2 border-brand-violet select-none">
           <div className="flex items-center gap-1.5">
@@ -49,7 +49,7 @@ const Loading = ({
         {/* Card Body */}
         <div className="p-6 sm:p-8 flex flex-col items-center text-center">
           {/* Logo Cabinet Emblem with Neo-Brutalist Hard Shadow */}
-          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#FFA552] flex items-center justify-center p-2 mb-4 shrink-0 transition-transform hover:scale-105">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 bg-brand-cream border-2 border-brand-violet shadow-peach-vibrant-4 flex items-center justify-center p-2 mb-4 shrink-0 transition-transform hover:scale-105">
             <Image
               src="/logo-cabinet.svg"
               alt="FileFlux Cabinet Logo"
@@ -71,7 +71,7 @@ const Loading = ({
 
           {/* Neo-Brutalist Animated Hazard / Diagonal Striped Loading Bar */}
           <div className="w-full mt-6">
-            <div className="w-full h-4 sm:h-5 bg-brand-cream-muted border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] p-0.5 overflow-hidden">
+            <div className="w-full h-4 sm:h-5 bg-brand-cream-muted border-2 border-brand-violet shadow-violet-2 p-0.5 overflow-hidden">
               <div className="w-full h-full animate-brutalist-stripes border border-brand-violet/20" />
             </div>
           </div>

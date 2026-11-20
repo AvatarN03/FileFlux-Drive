@@ -9,10 +9,10 @@ export default function FolderBreadcrumbs({ folderId }: { folderId: string | nul
   const { data: path, isLoading, isError } = useFolderPath(folderId);
 
   return (
-    <nav aria-label="Folder breadcrumb" className="flex min-w-0 items-center gap-2 text-xs font-bold text-brand-violet">
+    <nav aria-label="Folder breadcrumb" className="flex shrink-0 min-w-0 items-center gap-2 text-xs font-bold text-brand-violet">
       <Link
         href="/folders"
-        className="shrink-0 border-2 border-brand-border bg-brand-cream px-3 py-1.5 shadow-[2px_2px_0px_0px_#BA5624] transition-colors hover:border-brand-brown"
+        className="shrink-0 border-2 border-brand-border bg-brand-cream px-3 py-1.5 shadow-brown-2 transition-colors hover:border-brand-brown"
       >
         Folders
       </Link>

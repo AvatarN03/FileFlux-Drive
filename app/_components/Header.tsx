@@ -82,7 +82,7 @@ const Header = ({
           type="button"
           onClick={onOpen}
           aria-label="Toggle navigation menu"
-          className="md:hidden p-2 bg-brand-cream-muted border-2 border-brand-violet text-brand-violet hover:bg-brand-peach shadow-[2px_2px_0px_0px_#381D2A] transition-colors cursor-pointer"
+          className="md:hidden p-2 bg-brand-cream-muted border-2 border-brand-violet text-brand-violet hover:bg-brand-peach shadow-violet-2 transition-colors cursor-pointer"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -104,7 +104,7 @@ const Header = ({
             aria-expanded={isOpen}
             aria-haspopup="true"
             aria-label="User account menu"
-            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-[2px_2px_0px_0px_#BA5624] hover:shadow-[1px_1px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer max-sm:p-0 max-sm:bg-transparent max-sm:border-0 max-sm:shadow-none"
+            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-brown-2 hover:shadow-brown-1 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer max-sm:p-0 max-sm:bg-transparent max-sm:border-0 max-sm:shadow-none"
           >
             <span className="hidden lg:inline text-xs font-bold text-brand-violet">
               {user?.name || "User"}
@@ -120,7 +120,7 @@ const Header = ({
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#381D2A] z-50 p-3 space-y-3 animate-fadeIn">
+            <div className="absolute right-0 mt-2 w-64 bg-brand-cream border-2 border-brand-violet shadow-violet-4 z-50 p-3 space-y-3 animate-fadeIn">
               {/* User details in small */}
               <div className="flex items-center gap-3 pb-3 border-b-2 border-brand-border">
                 <div className="relative w-10 h-10 border-2 border-brand-brown overflow-hidden bg-brand-peach shrink-0">

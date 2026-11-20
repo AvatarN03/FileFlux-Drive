@@ -35,7 +35,7 @@ export default function FolderMoveModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="folder-move-title"
-        className="w-full max-w-md border-2 border-brand-violet bg-brand-cream p-5 text-brand-violet shadow-[8px_8px_0px_0px_#BA5624]"
+        className="w-full max-w-md border-2 border-brand-violet bg-brand-cream p-5 text-brand-violet shadow-brown-8"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between border-b-2 border-brand-border pb-3">
@@ -104,7 +104,7 @@ export default function FolderMoveModal({
             type="button"
             disabled={isPending || isLoading || isError}
             onClick={() => onMove(currentParentId)}
-            className="inline-flex items-center gap-1 border-2 border-brand-brown bg-brand-brown px-3 py-2 text-xs font-bold text-brand-cream shadow-[2px_2px_0px_0px_#381D2A] hover:bg-brand-brown-dark disabled:opacity-50"
+            className="inline-flex items-center gap-1 border-2 border-brand-brown bg-brand-brown px-3 py-2 text-xs font-bold text-brand-cream shadow-violet-2 hover:bg-brand-brown-dark disabled:opacity-50"
           >
             <FolderInput className="h-4 w-4" />
             {isPending ? "Moving…" : path.length ? "Move here" : "Move to root"}

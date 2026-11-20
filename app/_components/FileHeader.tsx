@@ -6,6 +6,7 @@ const CATEGORY_TABS: { label: string; value: FileCategoryFilter }[] = [
   { label: "Images", value: "image" },
   { label: "Videos", value: "video" },
   { label: "Documents", value: "document" },
+  { label: "PDFs", value: "pdf" },
   { label: "Spreadsheets", value: "spreadsheet" },
   { label: "Other", value: "other" },
 ];
@@ -29,7 +30,7 @@ const FileHeader = ({
 }: FileHeaderProps) => {
   return (
     <div className="space-y-4 text-brand-violet">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="flex items-center gap-3">
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
             {title}
@@ -79,7 +80,7 @@ const FileHeader = ({
             }}
             className={`shrink-0 px-3.5 py-1.5 text-xs font-bold border-2 transition-all cursor-pointer ${
               category === tab.value
-                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
                 : "bg-brand-cream-muted text-brand-violet border-brand-border hover:bg-brand-cream"
             }`}
           >

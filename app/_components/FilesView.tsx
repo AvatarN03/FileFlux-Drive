@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from "react";
 
-import { Error } from "./Error";
 import FileHeader from "./FileHeader";
 import FileLists from "./FileLists";
 import FilePreviewModal from "./FilePreviewModel";
 import FileDetailsModal from "./FileDetailModel";
 import FileEditModal from "./FileEditModel";
 import FileMoveModal from "./files/FileMoveModal";
+import { Error } from "@/components/folders/Error";
 
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useFiles } from "@/hooks/useFileQueries";

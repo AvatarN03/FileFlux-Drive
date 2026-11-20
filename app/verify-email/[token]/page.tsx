@@ -78,10 +78,10 @@ const VerifyEmailTokenPage = () => {
           <Logo />
         </div>
 
-        <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-[8px_8px_0px_0px_#BA5624] p-8 animate-fadeIn">
+        <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-brown-8 p-8 animate-fadeIn">
           {status === "verifying" && (
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-brand-violet border-2 border-brand-brown mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#BA5624]">
+              <div className="w-16 h-16 bg-brand-violet border-2 border-brand-brown mx-auto flex items-center justify-center shadow-brown-2">
                 <Loader2 className="w-8 h-8 text-brand-peach-vibrant animate-spin" strokeWidth={2.5} />
               </div>
               <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
@@ -95,7 +95,7 @@ const VerifyEmailTokenPage = () => {
 
           {status === "success" && (
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-emerald-600/20 border-2 border-emerald-500 mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#064e3b]">
+              <div className="w-16 h-16 bg-emerald-600/20 border-2 border-emerald-500 mx-auto flex items-center justify-center shadow-emerald-2">
                 <CheckCircle2 className="w-8 h-8 text-emerald-400" strokeWidth={2.5} />
               </div>
               <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
@@ -109,7 +109,7 @@ const VerifyEmailTokenPage = () => {
 
           {status === "error" && (
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-red-600/20 border-2 border-red-500 mx-auto flex items-center justify-center shadow-[2px_2px_0px_0px_#381D2A]">
+              <div className="w-16 h-16 bg-red-600/20 border-2 border-red-500 mx-auto flex items-center justify-center shadow-violet-2">
                 <XCircle className="w-8 h-8 text-red-400" strokeWidth={2.5} />
               </div>
               <h1 className="text-xl font-extrabold text-brand-cream tracking-tight">
@@ -121,7 +121,7 @@ const VerifyEmailTokenPage = () => {
               <button
                 type="button"
                 onClick={() => router.push("/auth")}
-                className="w-full mt-2 inline-flex items-center justify-center gap-2 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border border-brand-peach shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
+                className="w-full mt-2 inline-flex items-center justify-center gap-2 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border border-brand-peach shadow-violet-dark-2 transition-all cursor-pointer"
               >
                 Return to Login <ArrowRight className="w-3.5 h-3.5 text-brand-peach" />
               </button>

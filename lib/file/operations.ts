@@ -29,12 +29,15 @@ export const createRenamedFile = (file: File, newName: string) => {
 };
 
 export const getFileCategoryFilter = (file: FileItem): FileCategoryFilter => {
-  if (file.mimeType.startsWith("image/")) return "image";
-  if (file.mimeType.startsWith("video/")) return "video";
+  const mimeType = file.mimeType.toLowerCase();
+  const ext = file.extension.toLowerCase().replace(/^\./, "");
 
-  const ext = file.extension.toLowerCase();
+  if (mimeType === "application/pdf" || ext === "pdf") return "pdf";
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("video/")) return "video";
+
   if (["xls", "xlsx", "csv"].includes(ext)) return "spreadsheet";
-  if (["doc", "docx", "pdf", "txt"].includes(ext)) return "document";
+  if (["doc", "docx", "txt"].includes(ext)) return "document";
 
   return "other";
 };

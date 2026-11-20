@@ -60,8 +60,8 @@ const FileGrid = ({ folderId }: FileGridProps) => {
 
   if (!files.length) {
     return (
-      <div className="p-10 bg-brand-cream border-2 border-dashed border-brand-border shadow-[4px_4px_0px_0px_#BA5624] text-center">
-        <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
+      <div className="p-10 bg-brand-cream border-2 border-dashed border-brand-border shadow-brown-4 text-center">
+        <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-violet-2">
           <FileText className="h-6 w-6 text-brand-brown" />
         </div>
         <h3 className="text-sm font-extrabold text-brand-violet mb-1">
@@ -86,7 +86,7 @@ const FileGrid = ({ folderId }: FileGridProps) => {
         {files.map((file) => (
           <div
             key={file.id}
-            className="bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-[2px_2px_0px_0px_#BA5624] p-4 transition-all flex flex-col justify-between"
+            className="bg-brand-cream border-2 border-brand-border hover:border-brand-brown shadow-brown-2 p-4 transition-all flex flex-col justify-between"
           >
             <div className="flex items-start justify-between gap-2 mb-3">
               <div className="w-10 h-10 bg-brand-cream-muted border border-brand-border flex items-center justify-center text-brand-brown shrink-0">

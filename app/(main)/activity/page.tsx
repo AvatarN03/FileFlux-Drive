@@ -62,7 +62,7 @@ const ActivityPage = () => {
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
             <Activity className="w-3 h-3 text-brand-brown" />
@@ -88,7 +88,7 @@ const ActivityPage = () => {
           onClick={() => setFilter("all")}
           className={`px-3.5 py-1.5 text-xs font-bold border-2 transition-all cursor-pointer ${
             filter === "all"
-              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
               : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
           }`}
         >
@@ -99,7 +99,7 @@ const ActivityPage = () => {
           onClick={() => setFilter("security")}
           className={`px-3.5 py-1.5 text-xs font-bold border-2 transition-all cursor-pointer ${
             filter === "security"
-              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
               : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
           }`}
         >
@@ -110,7 +110,7 @@ const ActivityPage = () => {
           onClick={() => setFilter("files")}
           className={`px-3.5 py-1.5 text-xs font-bold border-2 transition-all cursor-pointer ${
             filter === "files"
-              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
               : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
           }`}
         >
@@ -119,7 +119,7 @@ const ActivityPage = () => {
       </div>
 
       {/* Activity Timeline List */}
-      <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-4">
           {filtered.map((act) => {
             const Icon = act.icon;

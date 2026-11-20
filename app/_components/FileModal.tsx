@@ -35,7 +35,7 @@ const FileModal = ({
       onClick={onClose}
     >
       <div
-        className={`w-full ${maxWidth} bg-brand-cream border-2 border-brand-violet shadow-[8px_8px_0px_0px_#BA5624] overflow-hidden animate-fadeIn`}
+        className={`w-full ${maxWidth} bg-brand-cream border-2 border-brand-violet shadow-brown-8 overflow-hidden animate-fadeIn`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-3.5 bg-brand-cream-muted border-b-2 border-brand-border">

@@ -8,6 +8,8 @@ import Loading from "@/components/marketing/Loading";
 
 import Sidebar from "@/components/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
+import UploadModal from "@/app/_components/upload/UploadModal";
+import { UploadModalProvider } from "@/context/UploadModalContext";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const { user, isLoading } = useAuth();
@@ -37,16 +39,19 @@ const Layout = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <div className="relative w-full  h-dvh overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <UploadModalProvider>
+      <div className="relative w-full  h-dvh overflow-hidden flex bg-brand-cream text-brand-violet selection:bg-brand-peach selection:text-brand-violet">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-brand-cream">
-        <Header user={user} onOpen={() => setSidebarOpen(true)} />
-        <div className="flex-1 overflow-y-auto bg-brand-cream text-brand-violet">
-          {children}
-        </div>
-      </main>
-    </div>
+        <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-brand-cream">
+          <Header user={user} onOpen={() => setSidebarOpen(true)} />
+          <div className="flex-1 overflow-y-auto bg-brand-cream text-brand-violet">
+            {children}
+          </div>
+        </main>
+      </div>
+      <UploadModal />
+    </UploadModalProvider>
   );
 };
 

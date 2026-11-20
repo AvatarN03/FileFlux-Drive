@@ -100,7 +100,7 @@ const ProfilePage = () => {
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
             <User className="w-3 h-3 text-brand-brown" />
@@ -121,8 +121,8 @@ const ProfilePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Card */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-6 flex flex-col items-center text-center space-y-4">
-          <div className="relative w-24 h-24 border-4 border-brand-brown shadow-[4px_4px_0px_0px_#381D2A] overflow-hidden bg-brand-peach">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-6 flex flex-col items-center text-center space-y-4">
+          <div className="relative w-24 h-24 border-4 border-brand-brown shadow-violet-4 overflow-hidden bg-brand-peach">
             <Image
               src={user?.avatarUrl || "/default-avatar.webp"}
               alt="User Avatar"
@@ -176,7 +176,7 @@ const ProfilePage = () => {
           <button
             type="button"
             onClick={() => setShowSignOutModal(true)}
-            className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 bg-brand-peach border-2 border-brand-violet text-brand-violet text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#BA5624] hover:bg-brand-brown hover:text-brand-cream hover:shadow-[1px_1px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+            className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 bg-brand-peach border-2 border-brand-violet text-brand-violet text-xs font-bold uppercase tracking-wider shadow-brown-2 hover:bg-brand-brown hover:text-brand-cream hover:shadow-brown-1 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4 text-brand-brown" />
             <span>Sign Out</span>
@@ -185,7 +185,7 @@ const ProfilePage = () => {
 
         {/* Identity Details & Telemetry */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-brand-violet pb-3 border-b-2 border-brand-border">
               Authentication & Profile Attributes
             </h3>
@@ -213,7 +213,7 @@ const ProfilePage = () => {
                     type="button"
                     onClick={handleUpdateName}
                     disabled={isUpdatingName || nameInput.trim() === user?.name}
-                    className="px-3.5 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-1"
+                    className="px-3.5 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-violet-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-1"
                   >
                     {isUpdatingName ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -273,7 +273,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Session Management */}
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-3">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-3">
             <div className="flex items-center gap-2 pb-2 border-b-2 border-brand-border">
               <LogOut className="w-4 h-4 text-brand-brown" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
@@ -288,7 +288,7 @@ const ProfilePage = () => {
             <button
               type="button"
               onClick={() => setShowSignOutModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-peach border-2 border-brand-violet text-brand-violet text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_#BA5624] hover:bg-brand-brown hover:text-brand-cream hover:shadow-[1px_1px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-peach border-2 border-brand-violet text-brand-violet text-xs font-bold uppercase tracking-wider shadow-brown-2 hover:bg-brand-brown hover:text-brand-cream hover:shadow-brown-1 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5 text-brand-brown" />
               <span>Sign Out of Account</span>
@@ -296,7 +296,7 @@ const ProfilePage = () => {
           </div>
 
           {/* Danger Zone */}
-          <div className="bg-brand-cream border-2 border-red-600 shadow-[4px_4px_0px_0px_#381D2A] p-5">
+          <div className="bg-brand-cream border-2 border-red-600 shadow-violet-4 p-5">
             <div className="flex items-center gap-2 pb-3 mb-3 border-b border-red-300">
               <AlertOctagon className="w-4 h-4 text-red-600" />
               <h3 className="text-xs font-bold uppercase tracking-wider text-red-600">
@@ -310,7 +310,7 @@ const ProfilePage = () => {
 
             <button
               type="button"
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-brand-cream text-xs font-bold uppercase tracking-wider border-2 border-red-800 shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-brand-cream text-xs font-bold uppercase tracking-wider border-2 border-red-800 shadow-violet-2 transition-all cursor-pointer"
             >
               Delete Account & Clear Vault
             </button>
@@ -321,7 +321,7 @@ const ProfilePage = () => {
       {/* Neo-Brutalist Sign Out Confirmation Modal */}
       {showSignOutModal && (
         <div className="fixed inset-0 z-50 bg-brand-violet-dark/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[6px_6px_0px_0px_#381D2A] w-full max-w-sm p-6 text-brand-violet space-y-4 animate-fadeIn">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-violet-6 w-full max-w-sm p-6 text-brand-violet space-y-4 animate-fadeIn">
             <div className="flex items-center gap-2 pb-2 border-b-2 border-brand-border">
               <LogOut className="w-4 h-4 text-brand-brown" />
               <h3 className="text-sm font-extrabold tracking-tight uppercase">
@@ -338,7 +338,7 @@ const ProfilePage = () => {
                 type="button"
                 onClick={() => setShowSignOutModal(false)}
                 disabled={isSigningOut}
-                className="px-3.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:bg-brand-peach text-brand-violet font-bold text-xs uppercase tracking-wider shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+                className="px-3.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:bg-brand-peach text-brand-violet font-bold text-xs uppercase tracking-wider shadow-violet-2 transition-all cursor-pointer"
               >
                 Cancel
               </button>
@@ -346,7 +346,7 @@ const ProfilePage = () => {
                 type="button"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
-                className="px-4 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
+                className="px-4 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-violet-2 transition-all cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
               >
                 {isSigningOut ? (
                   <>

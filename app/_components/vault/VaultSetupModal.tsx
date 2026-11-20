@@ -131,13 +131,13 @@ IMPORTANT INSTRUCTIONS:
       }}
     >
       <div
-        className="w-full max-w-lg bg-brand-cream border-2 border-brand-violet p-6 shadow-[8px_8px_0px_0px_#BA5624] text-brand-violet relative"
+        className="w-full max-w-lg bg-brand-cream border-2 border-brand-violet p-6 shadow-brown-8 text-brand-violet relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b-2 border-brand-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-peach border-2 border-brand-violet flex items-center justify-center shadow-[2px_2px_0px_0px_#381D2A]">
+            <div className="w-10 h-10 bg-brand-peach border-2 border-brand-violet flex items-center justify-center shadow-violet-2">
               {step === "passphrase" ? (
                 <Shield className="w-5 h-5 text-brand-brown" />
               ) : (
@@ -184,7 +184,7 @@ IMPORTANT INSTRUCTIONS:
             </div>
 
             {error && (
-              <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold shadow-[2px_2px_0px_0px_#e11d48]">
+              <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold shadow-rose-2">
                 {error}
               </div>
             )}
@@ -226,7 +226,7 @@ IMPORTANT INSTRUCTIONS:
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 py-2.5 px-4 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="flex-1 py-2.5 px-4 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-violet-2 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -250,12 +250,12 @@ IMPORTANT INSTRUCTIONS:
         ) : (
           <div className="space-y-4 mt-5">
             {error && (
-              <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold shadow-[2px_2px_0px_0px_#e11d48]">
+              <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold shadow-rose-2">
                 {error}
               </div>
             )}
 
-            <div className="p-3.5 bg-brand-cream-muted border-2 border-brand-violet font-mono text-center tracking-wider text-brand-brown font-extrabold text-xs sm:text-sm break-all select-all shadow-[2px_2px_0px_0px_#381D2A]">
+            <div className="p-3.5 bg-brand-cream-muted border-2 border-brand-violet font-mono text-center tracking-wider text-brand-brown font-extrabold text-xs sm:text-sm break-all select-all shadow-violet-2">
               {recoveryKey}
             </div>
 
@@ -276,7 +276,7 @@ IMPORTANT INSTRUCTIONS:
               <button
                 type="button"
                 onClick={handleDownloadBackup}
-                className="flex-1 py-2 px-3 bg-brand-peach border-2 border-brand-violet hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-[2px_2px_0px_0px_#381D2A]"
+                className="flex-1 py-2 px-3 bg-brand-peach border-2 border-brand-violet hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-violet-2"
               >
                 <Download size={14} /> Download (.txt)
               </button>
@@ -303,7 +303,7 @@ IMPORTANT INSTRUCTIONS:
               type="button"
               onClick={handleFinish}
               disabled={!hasConfirmedSaved}
-              className="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#064e3b] transition-all cursor-pointer"
+              className="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-40 text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-emerald-2 transition-all cursor-pointer"
             >
               Confirm & Unlock Vault
             </button>

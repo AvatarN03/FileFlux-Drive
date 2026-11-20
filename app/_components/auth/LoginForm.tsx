@@ -63,7 +63,7 @@ const LoginForm = () => {
           id="email"
           type="email"
           placeholder="you@example.com"
-          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-peach-vibrant-2 transition-all rounded-none"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -84,7 +84,7 @@ const LoginForm = () => {
           id="password"
           type="password"
           placeholder="••••••••"
-          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-[2px_2px_0px_0px_#FFA552] transition-all rounded-none"
+          className="w-full px-3.5 py-2.5 bg-brand-violet border-2 border-brand-violet-light text-brand-cream placeholder:text-brand-cream/35 font-medium text-sm focus:outline-none focus:border-brand-peach-vibrant focus:shadow-peach-vibrant-2 transition-all rounded-none"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -94,7 +94,7 @@ const LoginForm = () => {
       {/* Sign In Button */}
       <button
         type="submit"
-        className="w-full px-5 py-3 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-sm font-bold border-2 border-brand-brown shadow-[3px_3px_0px_0px_#FFA552] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_#FFA552] transition-all rounded-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+        className="w-full px-5 py-3 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-sm font-bold border-2 border-brand-brown shadow-peach-vibrant-3 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-peach-vibrant-1 transition-all rounded-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
         disabled={isAuthRequestPending}
       >
         {isLoginPending ? (

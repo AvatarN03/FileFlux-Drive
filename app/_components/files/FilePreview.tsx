@@ -188,7 +188,7 @@ const FilePreview = ({
                 e.stopPropagation();
                 onCancelUpload();
               }}
-              className="w-full bg-red-600 hover:bg-red-700 font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-red-800 shadow-[2px_2px_0px_0px_#381D2A] transition-all"
+              className="w-full bg-red-600 hover:bg-red-700 font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-red-800 shadow-violet-2 transition-all"
             >
               Cancel Encryption ({uploadProgress}%)
             </button>
@@ -199,7 +199,7 @@ const FilePreview = ({
                 e.stopPropagation();
                 onUpload();
               }}
-              className="w-full bg-brand-brown hover:bg-brand-brown-dark font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-brand-brown shadow-[3px_3px_0px_0px_#381D2A] hover:shadow-[1px_1px_0px_0px_#381D2A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+              className="w-full bg-brand-brown hover:bg-brand-brown-dark font-bold text-brand-cream cursor-pointer text-xs py-2.5 border-2 border-brand-brown shadow-violet-3 hover:shadow-violet-1 hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
             >
               Encrypt & Store File
             </button>

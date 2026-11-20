@@ -27,6 +27,7 @@ const StoragePage = () => {
 
   const breakdowns = useMemo(() => {
     let docBytes = 0;
+    let pdfBytes = 0;
     let imgBytes = 0;
     let sheetBytes = 0;
     let otherBytes = 0;
@@ -35,6 +36,8 @@ const StoragePage = () => {
       const cat = getFileCategoryFilter(f);
       if (cat === "document") {
         docBytes += f.size;
+      } else if (cat === "pdf") {
+        pdfBytes += f.size;
       } else if (cat === "image" || cat === "video") {
         imgBytes += f.size;
       } else if (cat === "spreadsheet") {
@@ -44,17 +47,24 @@ const StoragePage = () => {
       }
     });
 
-    const totalBytes = docBytes + imgBytes + sheetBytes + otherBytes;
+    const totalBytes = docBytes + pdfBytes + imgBytes + sheetBytes + otherBytes;
 
     if (totalBytes === 0) return [];
 
     const categories = [
       {
-        type: "PDF & Documents",
+        type: "Documents",
         bytes: docBytes,
         size: formatFileSize(docBytes),
         percent: Math.round((docBytes / totalBytes) * 100),
         color: "bg-brand-brown",
+      },
+      {
+        type: "PDFs",
+        bytes: pdfBytes,
+        size: formatFileSize(pdfBytes),
+        percent: Math.round((pdfBytes / totalBytes) * 100),
+        color: "bg-brand-peach",
       },
       {
         type: "Images & Media",
@@ -91,7 +101,7 @@ const StoragePage = () => {
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
             <HardDrive className="w-3 h-3 text-brand-brown" />
@@ -111,7 +121,7 @@ const StoragePage = () => {
       </div>
 
       {!isError && (
-        <div className="flex items-start gap-2 bg-brand-peach border-2 border-brand-violet px-4 py-3 text-xs text-brand-violet shadow-[2px_2px_0px_0px_#381D2A]">
+        <div className="flex items-start gap-2 bg-brand-peach border-2 border-brand-violet px-4 py-3 text-xs text-brand-violet shadow-violet-2">
           <Lock className="w-4 h-4 text-brand-brown shrink-0 mt-0.5" />
           <p>
             Vault contents stay encrypted on the client. Quota and size analytics remain available while the vault is locked; file names are only shown after local unlock.
@@ -121,7 +131,7 @@ const StoragePage = () => {
 
       {/* Main Quota Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-3 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+        <div className="md:col-span-3 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
@@ -192,7 +202,7 @@ const StoragePage = () => {
       </div>
 
       {/* Largest Files Table */}
-      <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+      <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-4">
         <div className="flex items-center justify-between pb-3 border-b-2 border-brand-border">
           <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
             Largest Stored Files
@@ -222,7 +232,7 @@ const StoragePage = () => {
             </p>
             <Link
               href="/dashboard"
-              className="mt-3 px-3 py-1.5 bg-brand-brown text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] hover:bg-brand-brown-dark transition-all"
+              className="mt-3 px-3 py-1.5 bg-brand-brown text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-violet-2 hover:bg-brand-brown-dark transition-all"
             >
               Go to Dashboard to Upload
             </Link>

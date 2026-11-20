@@ -24,7 +24,7 @@ const Logo = ({
       <div
         className={
           iconContainerClass ||
-          "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg overflow-hidden border border-brand-peach/40 shadow-[2px_2px_0px_0px_#FFA552] shrink-0 bg-brand-cream flex items-center justify-center p-0.5 transition-transform group-hover:scale-105"
+          "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-lg overflow-hidden border border-brand-peach/40 shadow-peach-vibrant-2 shrink-0 bg-brand-cream flex items-center justify-center p-0.5 transition-transform group-hover:scale-105"
         }
       >
         <Image

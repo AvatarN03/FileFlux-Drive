@@ -74,6 +74,7 @@ export type FileCategoryFilter =
   | "image"
   | "video"
   | "document"
+  | "pdf"
   | "spreadsheet"
   | "other";
 

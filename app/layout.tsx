@@ -5,6 +5,10 @@ import { Providers } from "./provider";
 
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "FileFlux - Drive",
@@ -24,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning={true} className={cn("font-sans", geist.variable)}>
       <body className="antialiased" suppressHydrationWarning>
         <Providers>{children}
 

@@ -1,10 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import AddFolderModal from "./AddFolderModal";
+
+import { FolderPlus } from "lucide-react";
+
 import { useFolderCreate } from "@/hooks/useFolderMutations";
-import { FolderPlus, FolderTree } from "lucide-react";
+
+import AddFolderModal from "@/components/folders/AddFolderModal";
+
 import toastC from "@/lib/toast";
+
+import { FOLDER_COLOR_OPTIONS } from "@/types/folder";
 
 interface FolderHeaderProps {
   title?: string;
@@ -17,6 +23,8 @@ const FolderHeader = ({
 }: FolderHeaderProps) => {
   const [showModal, setShowModal] = useState(false);
   const [folderName, setFolderName] = useState("");
+  const [folderColor, setFolderColor] = useState<string>(FOLDER_COLOR_OPTIONS[0].value);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { mutate, isPending } = useFolderCreate();
 
@@ -36,10 +44,14 @@ const FolderHeader = ({
       {
         name: trimmedName,
         parentId,
+        color: folderColor,
+        isFavorite,
       },
       {
         onSuccess: () => {
           setFolderName("");
+          setFolderColor(FOLDER_COLOR_OPTIONS[0].value);
+          setIsFavorite(false);
           setShowModal(false);
           toastC({ data: "Folder created successfully", type: "success" });
         },
@@ -55,12 +67,8 @@ const FolderHeader = ({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 text-brand-violet">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
-            <FolderTree className="w-3 h-3 text-brand-brown" />
-            FileFlux Hierarchical File System
-          </div>
+      <div className="flex shrink-0 flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-3 md:p-5 text-brand-violet">
+        <div className="space-y-1">          
           <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight">
             {title}
           </h1>
@@ -72,11 +80,11 @@ const FolderHeader = ({
         <button
           type="button"
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer"
+          className="inline-flex items-center ml-auto gap-1.5 px-4 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-brown shadow-violet-2 hover:translate-x-px hover:translate-y-px transition-all cursor-pointer"
           disabled={isPending}
         >
           <FolderPlus className="w-4 h-4 text-brand-peach" />
-          + New Folder
+          New Folder
         </button>
       </div>
 
@@ -88,6 +96,8 @@ const FolderHeader = ({
           onClose={() => {
             if (isPending) return;
             setFolderName("");
+            setFolderColor(FOLDER_COLOR_OPTIONS[0].value);
+            setIsFavorite(false);
             setShowModal(false);
           }}
           onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -96,6 +106,11 @@ const FolderHeader = ({
             }
           }}
           isPending={isPending}
+          showFolderOptions
+          color={folderColor}
+          onColorChange={setFolderColor}
+          isFavorite={isFavorite}
+          onFavoriteChange={setIsFavorite}
         />
       )}
     </>

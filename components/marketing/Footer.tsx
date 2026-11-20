@@ -24,7 +24,7 @@ const Footer = () => {
                 href="https://github.com/AvatarN03"
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#FFA552] rounded-none"
+                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-peach-vibrant-2 rounded-none"
                 title="GitHub"
               >
                 <GithubIcon className="w-5 h-5" />
@@ -33,7 +33,7 @@ const Footer = () => {
                 href="https://linkedin.com/in/prashanth-naidu03"
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#FFA552] rounded-none"
+                className="w-10 h-10 border border-brand-violet-light bg-brand-violet-dark hover:bg-brand-brown hover:border-brand-brown text-brand-cream flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-peach-vibrant-2 rounded-none"
                 title="LinkedIn"
               >
                 <LinkedinIcon className="w-5 h-5" />

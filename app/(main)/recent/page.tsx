@@ -173,7 +173,7 @@ const RecentPage = () => {
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
             <Clock className="w-3 h-3 text-brand-brown" />
@@ -196,7 +196,7 @@ const RecentPage = () => {
             onClick={() => setTimeFilter("all")}
             className={`px-3 py-1.5 text-xs font-bold border-2 cursor-pointer transition-all ${
               timeFilter === "all"
-                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
                 : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
             }`}
           >
@@ -207,7 +207,7 @@ const RecentPage = () => {
             onClick={() => setTimeFilter("today")}
             className={`px-3 py-1.5 text-xs font-bold border-2 cursor-pointer transition-all ${
               timeFilter === "today"
-                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
                 : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
             }`}
           >
@@ -218,7 +218,7 @@ const RecentPage = () => {
             onClick={() => setTimeFilter("week")}
             className={`px-3 py-1.5 text-xs font-bold border-2 cursor-pointer transition-all ${
               timeFilter === "week"
-                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+                ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
                 : "bg-brand-cream text-brand-violet border-brand-border hover:bg-brand-cream-muted"
             }`}
           >
@@ -240,12 +240,12 @@ const RecentPage = () => {
 
       {/* Main Content Area */}
       {isLoading ? (
-        <div className="py-16 text-center text-xs font-mono text-brand-violet/60 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-8">
+        <div className="py-16 text-center text-xs font-mono text-brand-violet/60 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-8">
           Loading recent files from encrypted storage...
         </div>
       ) : filteredFiles.length === 0 ? (
-        <div className="py-16 text-center flex flex-col items-center justify-center bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-8">
-          <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
+        <div className="py-16 text-center flex flex-col items-center justify-center bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-8">
+          <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-violet-2">
             <Clock className="w-6 h-6 text-brand-brown" />
           </div>
           <h3 className="text-sm font-bold text-brand-violet">No recent files found</h3>
@@ -256,13 +256,13 @@ const RecentPage = () => {
           </p>
           <Link
             href="/dashboard"
-            className="mt-4 px-4 py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+            className="mt-4 px-4 py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-violet shadow-violet-2 transition-all cursor-pointer"
           >
             Go to Dashboard
           </Link>
         </div>
       ) : (
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] overflow-hidden">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 overflow-hidden">
           <div className="grid grid-cols-12 text-[10px] font-bold uppercase tracking-wider text-brand-violet bg-brand-cream-muted border-b-2 border-brand-border py-2.5 px-4">
             <span className="col-span-6 sm:col-span-5">File Name</span>
             <span className="hidden sm:block sm:col-span-3">Last Modified</span>

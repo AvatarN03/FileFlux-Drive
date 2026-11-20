@@ -7,30 +7,26 @@ import {
   FolderTree,
   FileText,
   ShieldCheck,
-  Plus,
   ArrowRight,
   Search,
   Lock,
   FolderPlus,
   Activity,
   Zap,
-  FileSpreadsheet,
-  File as FileIcon,
-  Video as VideoIcon,
   UploadCloud,
   CheckCircle2,
   Clock,
 } from "lucide-react";
 
-import FileUpload from "../../_components/FileUpload";
 import FileList from "../../_components/FileList";
 import FilePreviewModal from "../../_components/FilePreviewModel";
 import FileDetailsModal from "../../_components/FileDetailModel";
 import FileEditModal from "../../_components/FileEditModel";
 import FileMoveModal from "../../_components/files/FileMoveModal";
-import AddFolderModal from "../../_components/folders/AddFolderModal";
+import AddFolderModal from "@/components/folders/AddFolderModal";
 import VaultUnlockModal from "../../_components/vault/VaultUnlockModal";
 import VaultSetupModal from "../../_components/vault/VaultSetupModal";
+import UploadButton from "@/app/_components/upload/UploadButton";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useVault } from "@/context/VaultContext";
@@ -41,9 +37,152 @@ import { FileModalProvider, useFileModal } from "@/context/FileModalContext";
 import { formatFileSize } from "@/lib/file";
 import { getFileCategoryFilter } from "@/lib/file/operations";
 import { FileItem } from "@/types/file";
+import { FOLDER_COLOR_OPTIONS } from "@/types/folder";
 import toastC from "@/lib/toast";
 
-type CategoryFilter = "all" | "document" | "image" | "video" | "spreadsheet";
+type CategoryFilter =
+  | "all"
+  | "document"
+  | "pdf"
+  | "image"
+  | "video"
+  | "spreadsheet";
+
+type StorageSegment = {
+  label: string;
+  count: number;
+  bytes: number;
+  color: string;
+};
+
+const polarToCartesian = (center: number, radius: number, angle: number) => {
+  const radians = ((angle - 90) * Math.PI) / 180;
+
+  return {
+    x: center + radius * Math.cos(radians),
+    y: center + radius * Math.sin(radians),
+  };
+};
+
+const describeDonutSegment = (
+  startAngle: number,
+  endAngle: number,
+  outerRadius: number,
+  innerRadius: number
+) => {
+  const center = 100;
+  const outerStart = polarToCartesian(center, outerRadius, endAngle);
+  const outerEnd = polarToCartesian(center, outerRadius, startAngle);
+  const innerStart = polarToCartesian(center, innerRadius, endAngle);
+  const innerEnd = polarToCartesian(center, innerRadius, startAngle);
+  const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+
+  return [
+    `M ${outerStart.x} ${outerStart.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 0 ${outerEnd.x} ${outerEnd.y}`,
+    `L ${innerEnd.x} ${innerEnd.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${innerStart.x} ${innerStart.y}`,
+    "Z",
+  ].join(" ");
+};
+
+const StorageDonutChart = ({
+  segments,
+  totalBytes,
+}: {
+  segments: StorageSegment[];
+  totalBytes: number;
+}) => {
+  const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
+  const visibleSegments = segments.filter((segment) => segment.bytes > 0);
+  const hoveredSegment = segments.find(
+    (segment) => segment.label === hoveredLabel
+  );
+  const arcs = visibleSegments.map((segment, index) => {
+    const startAngle = visibleSegments
+      .slice(0, index)
+      .reduce(
+        (sum, current) =>
+          sum + (totalBytes ? (current.bytes / totalBytes) * 360 : 0),
+        0
+      );
+    const sweep = totalBytes ? (segment.bytes / totalBytes) * 360 : 0;
+    const endAngle = startAngle + (sweep >= 360 ? 359.999 : sweep);
+
+    return {
+      segment,
+      path: describeDonutSegment(startAngle, endAngle, 78, 47),
+    };
+  });
+
+  const hoveredPercent = hoveredSegment && totalBytes
+    ? Math.round((hoveredSegment.bytes / totalBytes) * 100)
+    : 0;
+
+  return (
+    <div className="relative w-48 h-48" aria-label="Storage distribution">
+      <svg
+        viewBox="0 0 200 200"
+        role="img"
+        className="w-full h-full drop-shadow-violet-3"
+        aria-label={`Storage distribution across ${visibleSegments.length} file categories`}
+      >
+        {arcs.length > 0 ? (
+          arcs.map(({ segment, path }) => (
+            <path
+              key={segment.label}
+              d={path}
+              fill={segment.color}
+              stroke="var(--brand-cream)"
+              strokeWidth="2"
+              tabIndex={0}
+              aria-label={`${segment.label}: ${formatFileSize(segment.bytes)}, ${segment.count} files`}
+              className="cursor-pointer transition-opacity hover:opacity-80 focus:opacity-80 focus:outline-none"
+              onMouseEnter={() => setHoveredLabel(segment.label)}
+              onMouseLeave={() => setHoveredLabel(null)}
+              onFocus={() => setHoveredLabel(segment.label)}
+              onBlur={() => setHoveredLabel(null)}
+            />
+          ))
+        ) : (
+          <circle
+            cx="100"
+            cy="100"
+            r="62"
+            fill="var(--brand-cream-muted)"
+            stroke="var(--brand-cream)"
+            strokeWidth="2"
+          />
+        )}
+      </svg>
+
+      <div className="absolute inset-8 rounded-full bg-brand-cream border-2 border-brand-violet flex flex-col items-center justify-center text-center px-2 pointer-events-none">
+        {hoveredSegment ? (
+          <>
+            <span className="text-xs font-extrabold text-brand-violet truncate max-w-full">
+              {hoveredSegment.label}
+            </span>
+            <span className="text-sm font-extrabold text-brand-brown">
+              {formatFileSize(hoveredSegment.bytes)}
+            </span>
+            <span className="text-[10px] font-mono text-brand-violet/60">
+              {hoveredPercent}% · {hoveredSegment.count} files
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="text-sm font-extrabold text-brand-violet">
+              {formatFileSize(totalBytes)}
+            </span>
+            <span className="text-[10px] font-mono text-brand-violet/60">
+              categorized files
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const DashboardContent = () => {
   const { user } = useAuth();
@@ -53,6 +192,8 @@ const DashboardContent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddFolder, setShowAddFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderColor, setNewFolderColor] = useState<string>(FOLDER_COLOR_OPTIONS[0].value);
+  const [newFolderFavorite, setNewFolderFavorite] = useState(false);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [showSetupModal, setShowSetupModal] = useState(false);
 
@@ -85,12 +226,14 @@ const DashboardContent = () => {
   // Categorized breakdown
   const categoryStats = useMemo(() => {
     let docs = 0;
+    let pdfs = 0;
     let images = 0;
     let videos = 0;
     let sheets = 0;
     let other = 0;
 
     let docBytes = 0;
+    let pdfBytes = 0;
     let imgBytes = 0;
     let vidBytes = 0;
     let sheetBytes = 0;
@@ -101,6 +244,9 @@ const DashboardContent = () => {
       if (cat === "document") {
         docs++;
         docBytes += f.size;
+      } else if (cat === "pdf") {
+        pdfs++;
+        pdfBytes += f.size;
       } else if (cat === "image") {
         images++;
         imgBytes += f.size;
@@ -118,17 +264,62 @@ const DashboardContent = () => {
 
     return {
       docs,
+      pdfs,
       images,
       videos,
       sheets,
       other,
       docBytes,
+      pdfBytes,
       imgBytes,
       vidBytes,
       sheetBytes,
       otherBytes,
     };
   }, [rawFiles]);
+
+  const storageSegments: StorageSegment[] = [
+    {
+      label: "Documents",
+      count: categoryStats.docs,
+      bytes: categoryStats.docBytes,
+      color: "var(--brand-brown)",
+    },
+    {
+      label: "PDFs",
+      count: categoryStats.pdfs,
+      bytes: categoryStats.pdfBytes,
+      color: "var(--brand-peach)",
+    },
+    {
+      label: "Images",
+      count: categoryStats.images,
+      bytes: categoryStats.imgBytes,
+      color: "var(--brand-peach-vibrant)",
+    },
+    {
+      label: "Spreadsheets",
+      count: categoryStats.sheets,
+      bytes: categoryStats.sheetBytes,
+      color: "#059669",
+    },
+    {
+      label: "Media",
+      count: categoryStats.videos,
+      bytes: categoryStats.vidBytes,
+      color: "var(--brand-violet)",
+    },
+    {
+      label: "Other",
+      count: categoryStats.other,
+      bytes: categoryStats.otherBytes,
+      color: "var(--brand-violet-light)",
+    },
+  ];
+  const categorizedBytes = storageSegments.reduce(
+    (total, segment) => total + segment.bytes,
+    0
+  );
 
   // Filtered recent files
   const filteredFiles = useMemo(() => {
@@ -163,10 +354,17 @@ const DashboardContent = () => {
     }
 
     createFolder(
-      { name: trimmed, parentId: null },
+      {
+        name: trimmed,
+        parentId: null,
+        color: newFolderColor,
+        isFavorite: newFolderFavorite,
+      },
       {
         onSuccess: () => {
           setNewFolderName("");
+          setNewFolderColor(FOLDER_COLOR_OPTIONS[0].value);
+          setNewFolderFavorite(false);
           setShowAddFolder(false);
           toastC({ data: "Folder created successfully", type: "success" });
         },
@@ -193,20 +391,26 @@ const DashboardContent = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowAddFolder(true)}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-cream-muted text-brand-violet hover:bg-brand-peach font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-brown-2 transition-all cursor-pointer shrink-0"
-        >
-          <FolderPlus className="w-4 h-4 text-brand-brown" />
-          Add Folder
-        </button>
+        <div className="flex flex-nowrap items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowAddFolder(true)}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-cream-muted text-brand-violet hover:bg-brand-peach font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-brown-2 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <FolderPlus className="w-4 h-4 text-brand-brown" />
+            Add Folder
+          </button>
+          <UploadButton
+            label="Upload File"
+            className="px-4 py-2 bg-brand-peach hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider border-2 border-brand-violet shadow-brown-2 transition-all whitespace-nowrap"
+          />
+        </div>
       </div>
 
       {/* 4 Primary Metric Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Storage Capacity */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col justify-between">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
               Storage Used
@@ -235,7 +439,7 @@ const DashboardContent = () => {
         </div>
 
         {/* Metric 2: Total Files */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col justify-between">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
               Vault Documents
@@ -261,7 +465,7 @@ const DashboardContent = () => {
         </div>
 
         {/* Metric 3: Active Folders */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col justify-between">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
               Folder Workspaces
@@ -287,7 +491,7 @@ const DashboardContent = () => {
         </div>
 
         {/* Metric 4: Security Shield */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col justify-between">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-violet/70">
               Security Protocol
@@ -311,110 +515,12 @@ const DashboardContent = () => {
         </div>
       </div>
 
-      {/* Storage Category Distribution Bar */}
-      <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 sm:p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-brand-border">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-brand-brown" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-              Storage by File Type
-            </h2>
-          </div>
-          <span className="text-[11px] font-mono text-brand-violet/70">
-            {formatFileSize(remainingBytes)} free of {formatFileSize(storageLimit)}
-          </span>
-        </div>
-
-        {/* Visual Multi-Segment Bar */}
-        <div className="w-full bg-brand-cream-muted border-2 border-brand-violet h-4 flex overflow-hidden mb-3">
-          {categoryStats.docs > 0 && (
-            <div
-              title={`Documents: ${categoryStats.docs} files (${formatFileSize(categoryStats.docBytes)})`}
-              style={{
-                width: `${Math.max(4, (categoryStats.docBytes / (storageLimit || 1)) * 100)}%`,
-              }}
-              className="bg-brand-brown h-full border-r border-brand-cream"
-            />
-          )}
-          {categoryStats.images > 0 && (
-            <div
-              title={`Images: ${categoryStats.images} files (${formatFileSize(categoryStats.imgBytes)})`}
-              style={{
-                width: `${Math.max(4, (categoryStats.imgBytes / (storageLimit || 1)) * 100)}%`,
-              }}
-              className="bg-brand-peach-vibrant h-full border-r border-brand-cream"
-            />
-          )}
-          {categoryStats.sheets > 0 && (
-            <div
-              title={`Spreadsheets: ${categoryStats.sheets} files (${formatFileSize(categoryStats.sheetBytes)})`}
-              style={{
-                width: `${Math.max(4, (categoryStats.sheetBytes / (storageLimit || 1)) * 100)}%`,
-              }}
-              className="bg-emerald-600 h-full border-r border-brand-cream"
-            />
-          )}
-          {categoryStats.videos > 0 && (
-            <div
-              title={`Media: ${categoryStats.videos} files (${formatFileSize(categoryStats.vidBytes)})`}
-              style={{
-                width: `${Math.max(4, (categoryStats.vidBytes / (storageLimit || 1)) * 100)}%`,
-              }}
-              className="bg-brand-violet h-full border-r border-brand-cream"
-            />
-          )}
-          {categoryStats.other > 0 && (
-            <div
-              title={`Other: ${categoryStats.other} files (${formatFileSize(categoryStats.otherBytes)})`}
-              style={{
-                width: `${Math.max(4, (categoryStats.otherBytes / (storageLimit || 1)) * 100)}%`,
-              }}
-              className="bg-brand-violet-light h-full"
-            />
-          )}
-        </div>
-
-        {/* Category Legend Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-semibold">
-          <div className="flex items-center gap-2 p-2 bg-brand-cream-muted border border-brand-border">
-            <span className="w-2.5 h-2.5 bg-brand-brown inline-block shrink-0" />
-            <div className="truncate">
-              <span className="font-bold">Docs:</span> {categoryStats.docs}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-brand-cream-muted border border-brand-border">
-            <span className="w-2.5 h-2.5 bg-brand-peach-vibrant inline-block shrink-0" />
-            <div className="truncate">
-              <span className="font-bold">Images:</span> {categoryStats.images}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-brand-cream-muted border border-brand-border">
-            <span className="w-2.5 h-2.5 bg-emerald-600 inline-block shrink-0" />
-            <div className="truncate">
-              <span className="font-bold">Sheets:</span> {categoryStats.sheets}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-brand-cream-muted border border-brand-border">
-            <span className="w-2.5 h-2.5 bg-brand-violet inline-block shrink-0" />
-            <div className="truncate">
-              <span className="font-bold">Media:</span> {categoryStats.videos}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 p-2 bg-brand-cream-muted border border-brand-border col-span-2 sm:col-span-1">
-            <span className="w-2.5 h-2.5 bg-brand-violet-light inline-block shrink-0" />
-            <div className="truncate">
-              <span className="font-bold">Other:</span> {categoryStats.other}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Split: Left 8 Cols (Folders & Recent Files) + Right 4 Cols (Upload & Services) */}
+      {/* Main Split: Left 8 Cols (Folders & Recent Files) + Right 4 Cols (Storage & Services) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Side: Workspaces & Recent Files (8 Cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Quick Folders Strip */}
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
             <div className="flex items-center justify-between pb-3 mb-4 border-b-2 border-brand-border">
               <div className="flex items-center gap-2">
                 <FolderTree className="w-4 h-4 text-brand-brown" />
@@ -423,13 +529,6 @@ const DashboardContent = () => {
                 </h2>
               </div>
               <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddFolder(true)}
-                  className="text-xs font-bold text-brand-brown hover:text-brand-brown-dark flex items-center gap-1 cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" /> New Folder
-                </button>
                 <Link
                   href="/folders"
                   className="text-xs font-bold text-brand-violet/70 hover:text-brand-violet"
@@ -462,7 +561,7 @@ const DashboardContent = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddFolder(true)}
-                  className="px-3 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] cursor-pointer transition-all"
+                  className="px-3 py-1.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold border-2 border-brand-brown shadow-violet-2 cursor-pointer transition-all"
                 >
                   + Create First Folder
                 </button>
@@ -473,7 +572,7 @@ const DashboardContent = () => {
                   <Link
                     key={folder.id}
                     href={`/folders/${folder.id}`}
-                    className="flex items-center gap-3 p-3 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-brown hover:bg-brand-cream shadow-[2px_2px_0px_0px_#BA5624] hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
+                    className="flex items-center gap-3 p-3 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-brown hover:bg-brand-cream shadow-brown-2 hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
                   >
                     <div className="w-8 h-8 bg-brand-peach border border-brand-violet/40 flex items-center justify-center shrink-0">
                       <FolderTree className="w-4 h-4 text-brand-brown" />
@@ -490,7 +589,7 @@ const DashboardContent = () => {
           </div>
 
           {/* Recent Files Table / Grid */}
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
             {/* Header & Filter Controls */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b-2 border-brand-border">
               <div className="flex items-center gap-2">
@@ -521,6 +620,7 @@ const DashboardContent = () => {
               {[
                 { id: "all", label: "All Items" },
                 { id: "document", label: "Documents" },
+                { id: "pdf", label: "PDFs" },
                 { id: "image", label: "Images" },
                 { id: "spreadsheet", label: "Spreadsheets" },
                 { id: "video", label: "Media" },
@@ -531,7 +631,7 @@ const DashboardContent = () => {
                   onClick={() => setActiveCategory(tab.id as CategoryFilter)}
                   className={`px-3 py-1 text-xs font-bold border-2 transition-all cursor-pointer ${
                     activeCategory === tab.id
-                      ? "bg-brand-brown text-brand-cream border-brand-brown shadow-[2px_2px_0px_0px_#381D2A]"
+                      ? "bg-brand-brown text-brand-cream border-brand-brown shadow-violet-2"
                       : "bg-brand-cream-muted text-brand-violet border-brand-border hover:bg-brand-cream"
                   }`}
                 >
@@ -558,14 +658,14 @@ const DashboardContent = () => {
               </div>
             ) : filteredFiles.length === 0 ? (
               <div className="py-12 px-4 text-center bg-brand-cream-muted border-2 border-dashed border-brand-border">
-                <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-[2px_2px_0px_0px_#381D2A]">
+                <div className="w-12 h-12 bg-brand-peach border-2 border-brand-violet mx-auto flex items-center justify-center mb-3 shadow-violet-2">
                   <UploadCloud className="w-6 h-6 text-brand-brown" />
                 </div>
                 <h3 className="text-sm font-extrabold text-brand-violet mb-1">
                   No files found
                 </h3>
                 <p className="text-xs text-brand-violet/70 max-w-sm mx-auto mb-4 font-medium">
-                  Upload a file using the panel on the right to fill your
+                  Use the Upload File button above to add files to your
                   workspace.
                 </p>
                 {searchTerm && (
@@ -588,15 +688,32 @@ const DashboardContent = () => {
           </div>
         </div>
 
-        {/* Right Side: Upload Box & Activity Stream (4 Cols) */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* File Upload Zone */}
-          <div className="space-y-2">
-            <FileUpload />
+        {/* Right Side: Security & Activity Stream (4 Cols) */}
+        <div className="lg:col-span-4 lg:sticky lg:top-4 self-start space-y-6">
+          {/* Compact Storage Distribution */}
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-brand-border">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-brand-brown" />
+                <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
+                  Storage Overview
+                </h2>
+              </div>
+              <span className="text-[10px] font-mono text-brand-violet/70">
+                {formatFileSize(remainingBytes)} free
+              </span>
+            </div>
+
+            <div className="flex justify-center">
+              <StorageDonutChart
+                segments={storageSegments}
+                totalBytes={categorizedBytes}
+              />
+            </div>
           </div>
 
           {/* Personal Vault State Insight Card */}
-          <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+          <div className="bg-brand-violet-dark text-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
             <div className="flex items-center justify-between pb-3 mb-3 border-b border-brand-violet-light">
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-brand-peach" />
@@ -640,7 +757,7 @@ const DashboardContent = () => {
                 <button
                   type="button"
                   onClick={() => setShowSetupModal(true)}
-                  className="w-full py-2 bg-brand-peach hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
+                  className="w-full py-2 bg-brand-peach hover:bg-brand-peach-vibrant text-brand-violet text-xs font-bold uppercase tracking-wider border-2 border-brand-violet shadow-violet-dark-2 transition-all cursor-pointer"
                 >
                   Setup Vault Key
                 </button>
@@ -648,7 +765,7 @@ const DashboardContent = () => {
                 <button
                   type="button"
                   onClick={() => setShowUnlockModal(true)}
-                  className="w-full py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold uppercase tracking-wider border border-brand-peach-vibrant shadow-[2px_2px_0px_0px_#26131D] transition-all cursor-pointer"
+                  className="w-full py-2 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold uppercase tracking-wider border border-brand-peach-vibrant shadow-violet-dark-2 transition-all cursor-pointer"
                 >
                   Enter Master Passphrase
                 </button>
@@ -657,7 +774,7 @@ const DashboardContent = () => {
           </div>
 
           {/* Activity Stream */}
-          <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+          <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
             <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-brand-border">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-brand-brown" />
@@ -727,6 +844,8 @@ const DashboardContent = () => {
           onClose={() => {
             if (!isCreatingFolder) {
               setNewFolderName("");
+              setNewFolderColor(FOLDER_COLOR_OPTIONS[0].value);
+              setNewFolderFavorite(false);
               setShowAddFolder(false);
             }
           }}
@@ -734,6 +853,11 @@ const DashboardContent = () => {
             if (e.key === "Enter") handleCreateFolder();
           }}
           isPending={isCreatingFolder}
+          showFolderOptions
+          color={newFolderColor}
+          onColorChange={setNewFolderColor}
+          isFavorite={newFolderFavorite}
+          onFavoriteChange={setNewFolderFavorite}
         />
       )}
 

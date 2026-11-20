@@ -30,7 +30,17 @@ type UploadState = {
   uploadComplete: boolean;
 };
 
-const FileUpload = () => {
+type FileUploadProps = {
+  folderId?: string | null;
+  onUploadComplete?: () => void;
+  embedded?: boolean;
+};
+
+const FileUpload = ({
+  folderId: folderIdProp,
+  onUploadComplete,
+  embedded = false,
+}: FileUploadProps) => {
   const [state, setState] = useState<UploadState>(INITIAL_STATE);
   const fileRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -40,6 +50,8 @@ const FileUpload = () => {
   const { folderId } = useParams<{
     folderId?: string;
   }>();
+  const targetFolderId =
+    folderIdProp !== undefined ? folderIdProp : folderId ?? null;
 
   const { user } = useAuth();
   const { vaultKey } = useVault();
@@ -151,7 +163,7 @@ const FileUpload = () => {
       await uploadEncryptedFile({
         file: renamedFile,
         displayName: state.fileName.trim(),
-        folderId,
+        folderId: targetFolderId,
         vaultKey,
         signal: controller.signal,
         onProgress: (progress) => {
@@ -168,7 +180,10 @@ const FileUpload = () => {
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
       toastSuccess("File encrypted and stored securely!");
 
-      timeoutRef.current = setTimeout(resetState, 1000);
+      timeoutRef.current = setTimeout(() => {
+        resetState();
+        onUploadComplete?.();
+      }, 1000);
     } catch (error) {
       console.error("File upload failed");
       const isAbort =
@@ -193,11 +208,12 @@ const FileUpload = () => {
     state.file,
     state.fileName,
     user,
-    folderId,
+    targetFolderId,
     vaultKey,
     queryClient,
     updateState,
     resetState,
+    onUploadComplete,
   ]);
 
   const handleCancelUpload = useCallback(() => {
@@ -214,14 +230,14 @@ const FileUpload = () => {
 
   if (!user || !user.emailVerified) {
     return (
-      <div className="p-4 bg-brand-cream-muted border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] text-center">
+      <div className="p-4 bg-brand-cream-muted border-2 border-brand-violet shadow-brown-4 text-center">
         <h2 className="text-sm font-bold text-brand-violet mb-3">
           Please verify your email address to upload files.
         </h2>
         <button
           type="button"
           onClick={() => router.push("/verify-email")}
-          className="bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold px-4 py-2 border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+          className="bg-brand-brown hover:bg-brand-brown-dark text-brand-cream text-xs font-bold px-4 py-2 border-2 border-brand-brown shadow-violet-2 transition-all cursor-pointer"
         >
           Resend Verification Email
         </button>
@@ -231,18 +247,26 @@ const FileUpload = () => {
 
   return (
     <div className="relative w-full mx-auto">
-      <div className="w-full bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-4 flex flex-col">
-        <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-brand-border">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-brand-brown inline-block" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-              Encrypted File Ingestion
-            </h2>
+      <div
+        className={`w-full bg-brand-cream flex flex-col ${
+          embedded
+            ? "p-0"
+            : "border-2 border-brand-violet shadow-brown-4 p-4"
+        }`}
+      >
+        {!embedded && (
+          <div className="flex items-center justify-between pb-3 mb-3 border-b-2 border-brand-border">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 bg-brand-brown inline-block" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
+                Encrypted File Ingestion
+              </h2>
+            </div>
+            <span className="text-[10px] font-mono font-bold bg-brand-peach text-brand-violet px-2 py-0.5 border border-brand-border">
+              Libsodium
+            </span>
           </div>
-          <span className="text-[10px] font-mono font-bold bg-brand-peach text-brand-violet px-2 py-0.5 border border-brand-border">
-            Libsodium
-          </span>
-        </div>
+        )}
 
         <div
           className={`relative border-2 border-dashed p-4 w-full cursor-pointer transition-all flex-1 min-h-[150px] flex items-center justify-center

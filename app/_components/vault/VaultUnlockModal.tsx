@@ -79,13 +79,13 @@ export default function VaultUnlockModal({
       }}
     >
       <div
-        className="w-full max-w-md bg-brand-cream border-2 border-brand-violet p-6 shadow-[8px_8px_0px_0px_#BA5624] text-brand-violet relative"
+        className="w-full max-w-md bg-brand-cream border-2 border-brand-violet p-6 shadow-brown-8 text-brand-violet relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b-2 border-brand-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-peach border-2 border-brand-violet flex items-center justify-center shadow-[2px_2px_0px_0px_#381D2A]">
+            <div className="w-10 h-10 bg-brand-peach border-2 border-brand-violet flex items-center justify-center shadow-violet-2">
               {mode === "passphrase" ? (
                 <Lock className="w-5 h-5 text-brand-brown" />
               ) : (
@@ -118,7 +118,7 @@ export default function VaultUnlockModal({
 
         <form onSubmit={handleUnlock} className="space-y-4 mt-5">
           {error && (
-            <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold flex items-start gap-2 shadow-[2px_2px_0px_0px_#e11d48]">
+            <div className="p-3 bg-rose-50 border-2 border-rose-500 text-rose-900 text-xs font-semibold flex items-start gap-2 shadow-rose-2">
               <AlertCircle size={16} className="shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
@@ -160,7 +160,7 @@ export default function VaultUnlockModal({
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 py-2.5 px-4 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-[2px_2px_0px_0px_#381D2A] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="flex-1 py-2.5 px-4 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-violet shadow-violet-2 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {isLoading ? (
                 <>

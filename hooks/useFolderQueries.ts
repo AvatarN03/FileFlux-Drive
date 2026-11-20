@@ -37,3 +37,41 @@ export const useFoldersAll = (parentId?: string | null) => {
     },
   });
 };
+
+export const useTrashFolders = () => {
+  const { vaultKey } = useVault();
+
+  return useQuery({
+    queryKey: ["trash-folders", vaultKey !== null],
+    queryFn: async () => {
+      const folders = await folderApi.getTrash();
+
+      return Promise.all(
+        folders.map(async (folder) => {
+          if (!folder.isEncrypted) return folder;
+
+          if (
+            !vaultKey ||
+            !folder.encryptedMetadataNonce ||
+            !folder.encryptedMetadataCiphertext
+          ) {
+            return { ...folder, name: "[Encrypted Folder]" };
+          }
+
+          try {
+            const metadata = await decryptFolderMetadata(
+              {
+                nonce: folder.encryptedMetadataNonce,
+                ciphertext: folder.encryptedMetadataCiphertext,
+              },
+              vaultKey,
+            );
+            return { ...folder, name: metadata.name };
+          } catch {
+            return { ...folder, name: "[Unable to decrypt folder]" };
+          }
+        }),
+      );
+    },
+  });
+};

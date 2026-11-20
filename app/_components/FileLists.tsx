@@ -95,10 +95,12 @@
 
 // export default FileLists;
 
-import { FileItem } from "@/types/file";
-import FileList from "./FileList";
 import { LayoutGrid } from "lucide-react";
-import { IsEmpty } from "./IsEmpty";
+
+import FileList from "./FileList";
+import { IsEmpty } from "@/components/folders/IsEmpty";
+
+import { FileItem } from "@/types/file";
 
 
 

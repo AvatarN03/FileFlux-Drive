@@ -16,7 +16,7 @@ const SettingsPage = () => {
   return (
     <div className="w-full min-h-full p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto text-brand-violet">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-2 px-2 py-0.5 bg-brand-peach text-brand-violet text-[10px] font-mono font-bold uppercase tracking-wider border border-brand-border">
             <Settings className="w-3 h-3 text-brand-brown" />
@@ -37,7 +37,7 @@ const SettingsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Section 1: Cryptographic Vault Settings */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b-2 border-brand-border">
             <Lock className="w-4 h-4 text-brand-brown" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
@@ -89,7 +89,7 @@ const SettingsPage = () => {
         </div>
 
         {/* Section 2: Storage & Ingestion Preferences */}
-        <div className="bg-brand-cream border-2 border-brand-violet shadow-[4px_4px_0px_0px_#BA5624] p-5 space-y-4">
+        <div className="bg-brand-cream border-2 border-brand-violet shadow-brown-4 p-5 space-y-4">
           <div className="flex items-center gap-2 pb-3 border-b-2 border-brand-border">
             <Sliders className="w-4 h-4 text-brand-brown" />
             <h2 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
@@ -132,7 +132,7 @@ const SettingsPage = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-brown shadow-[2px_2px_0px_0px_#381D2A] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-brown hover:bg-brand-brown-dark text-brand-cream font-bold text-xs uppercase tracking-wider border-2 border-brand-brown shadow-violet-2 transition-all cursor-pointer"
               >
                 <Save className="w-4 h-4 text-brand-peach" />
                 Save Settings
