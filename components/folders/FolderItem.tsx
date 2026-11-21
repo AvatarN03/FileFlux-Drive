@@ -17,9 +17,9 @@ import { useFolderDelete, useFolderUpdate } from "@/hooks/useFolderMutations";
 
 import { useVault } from "@/context/VaultContext";
 
-import AddFolderModal from "@/components/folders/AddFolderModal";
 import FileModal from "@/app/_components/FileModal";
 import FolderMoveModal from "@/app/_components/folders/FolderMoveModal";
+import AddFolderModal from "@/components/folders/AddFolderModal";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 import toastC from "@/lib/toast";
@@ -29,9 +29,15 @@ import type { GetAllFolders } from "@/types/folder";
 
 type FolderItemProps = {
   folder: GetAllFolders[number];
+  showSize?: boolean;
+  viewMode?: "list" | "grid";
 };
 
-export function FolderItem({ folder }: FolderItemProps) {
+export function FolderItem({
+  folder,
+  showSize = false,
+  viewMode = "list",
+}: FolderItemProps) {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [showMoveModal, setShowMoveModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -45,6 +51,7 @@ export function FolderItem({ folder }: FolderItemProps) {
   const { mutateAsync: deleteFolder, isPending: isDeleting } = useFolderDelete();
   const { isUnlocked } = useVault();
   const isBusy = isPending || isDeleting;
+  const isGridView = viewMode === "grid";
 
   const openRenameModal = () => {
     if (!isUnlocked || isBusy) return;
@@ -147,8 +154,20 @@ export function FolderItem({ folder }: FolderItemProps) {
   };
 
   return (
-    <TableRow className="border-brand-border bg-brand-cream hover:bg-brand-cream-muted">
-      <TableCell className="min-w-0 px-3 py-3 sm:px-4">
+    <TableRow
+      className={
+        isGridView
+          ? "flex min-w-0 flex-col border-2 border-brand-border bg-brand-cream p-4 shadow-brown-2 hover:border-brand-brown hover:bg-brand-cream"
+          : "border-brand-border bg-brand-cream hover:bg-brand-cream-muted"
+      }
+    >
+      <TableCell
+        className={
+          isGridView
+            ? "block min-w-0 px-0 py-0"
+            : "min-w-0 px-3 py-3 sm:px-4"
+        }
+      >
         <Link
           href={`/folders/${folder.id}`}
           className="flex min-w-0 items-center gap-3 overflow-hidden"
@@ -167,8 +186,31 @@ export function FolderItem({ folder }: FolderItemProps) {
           </div>
         </Link>
       </TableCell>
-      <TableCell className="w-0 px-3 py-3 text-right sm:px-4">
-        <div className="hidden items-center justify-end gap-2 md:flex">
+      {showSize && (
+        <TableCell
+          className={
+            isGridView
+              ? "block px-0 py-2 text-xs font-mono text-brand-violet/60"
+              : "whitespace-nowrap px-3 py-3 text-xs font-mono text-brand-violet/60 sm:px-4"
+          }
+        >
+          —
+        </TableCell>
+      )}
+      <TableCell
+        className={
+          isGridView
+            ? "block px-0 pt-3"
+            : "w-0 px-3 py-3 text-right sm:px-4"
+        }
+      >
+        <div
+          className={
+            isGridView
+              ? "flex flex-wrap items-center gap-2"
+              : "hidden items-center justify-end gap-2 md:flex"
+          }
+        >
         <button
           type="button"
           title={folder.isFavorite ? "Remove from favorites" : "Add to favorites"}

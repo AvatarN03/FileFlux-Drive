@@ -2,21 +2,173 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { HardDrive, FileText, Inbox, Lock } from "lucide-react";
+
+import { FileText, HardDrive, Inbox, Lock } from "lucide-react";
+
 import { useAuth } from "@/hooks/useAuth";
-import { useFiles } from "@/hooks/useFileQueries";
+import { useFiles, useTrashFiles } from "@/hooks/useFileQueries";
+
 import { formatFileSize } from "@/lib/file";
-import { getFileCategoryFilter } from "@/lib/file/operations";
+
+import type { FileItem } from "@/types/file";
+
+type StorageCategoryKey =
+  | "photos"
+  | "videos"
+  | "pdfs"
+  | "documents"
+  | "spreadsheets"
+  | "presentations"
+  | "audio"
+  | "archives"
+  | "other";
+
+type StorageBreakdownRow = {
+  key: StorageCategoryKey | "trash";
+  label: string;
+  color: string;
+  bytes: number;
+  count: number;
+  size: string;
+  percent: number;
+};
+
+const EXTENSION_CATEGORIES: Record<string, StorageCategoryKey> = {
+  // Photos
+  jpg: "photos",
+  jpeg: "photos",
+  png: "photos",
+  gif: "photos",
+  webp: "photos",
+  svg: "photos",
+  heic: "photos",
+  heif: "photos",
+  avif: "photos",
+  bmp: "photos",
+  tif: "photos",
+  tiff: "photos",
+  // Videos
+  mp4: "videos",
+  mov: "videos",
+  webm: "videos",
+  mkv: "videos",
+  avi: "videos",
+  m4v: "videos",
+  mpeg: "videos",
+  mpg: "videos",
+  // PDFs
+  pdf: "pdfs",
+  // Documents
+  doc: "documents",
+  docx: "documents",
+  txt: "documents",
+  rtf: "documents",
+  odt: "documents",
+  md: "documents",
+  pages: "documents",
+  // Spreadsheets
+  xls: "spreadsheets",
+  xlsx: "spreadsheets",
+  csv: "spreadsheets",
+  ods: "spreadsheets",
+  numbers: "spreadsheets",
+  // Presentations
+  ppt: "presentations",
+  pptx: "presentations",
+  odp: "presentations",
+  key: "presentations",
+  // Audio
+  mp3: "audio",
+  wav: "audio",
+  ogg: "audio",
+  flac: "audio",
+  m4a: "audio",
+  aac: "audio",
+  // Archives
+  zip: "archives",
+  rar: "archives",
+  "7z": "archives",
+  tar: "archives",
+  gz: "archives",
+  bz2: "archives",
+  xz: "archives",
+};
+
+const STORAGE_CATEGORY_ORDER: StorageCategoryKey[] = [
+  "photos",
+  "videos",
+  "pdfs",
+  "documents",
+  "spreadsheets",
+  "presentations",
+  "audio",
+  "archives",
+  "other",
+];
+
+const STORAGE_CATEGORY_META: Record<
+  StorageCategoryKey,
+  { label: string; color: string }
+> = {
+  photos: { label: "Photos", color: "bg-brand-peach-vibrant" },
+  videos: { label: "Videos", color: "bg-brand-violet" },
+  pdfs: { label: "PDFs", color: "bg-brand-peach" },
+  documents: { label: "Documents", color: "bg-brand-brown" },
+  spreadsheets: { label: "Spreadsheets", color: "bg-emerald-600" },
+  presentations: { label: "Presentations", color: "bg-amber-500" },
+  audio: { label: "Audio", color: "bg-blue-600" },
+  archives: { label: "Archives", color: "bg-slate-600" },
+  other: { label: "Other files", color: "bg-brand-violet-light" },
+};
+
+const getStorageCategory = (file: FileItem): StorageCategoryKey => {
+  const extension = file.extension.toLowerCase().replace(/^\./, "");
+  const byExtension = EXTENSION_CATEGORIES[extension];
+
+  if (byExtension) return byExtension;
+
+  const mimeType = file.mimeType.toLowerCase();
+
+  if (mimeType === "application/pdf") return "pdfs";
+  if (mimeType.startsWith("image/")) return "photos";
+  if (mimeType.startsWith("video/")) return "videos";
+  if (mimeType.startsWith("audio/")) return "audio";
+  if (mimeType.includes("spreadsheet") || mimeType.includes("excel")) {
+    return "spreadsheets";
+  }
+  if (mimeType.includes("presentation") || mimeType.includes("powerpoint")) {
+    return "presentations";
+  }
+  if (mimeType.includes("word") || mimeType.includes("opendocument.text")) {
+    return "documents";
+  }
+  if (
+    mimeType.includes("zip") ||
+    mimeType.includes("compressed") ||
+    mimeType.includes("archive")
+  ) {
+    return "archives";
+  }
+
+  return "other";
+};
 
 const StoragePage = () => {
   const { user } = useAuth();
   const {
     data: rawFiles = [],
-    isLoading,
+    isLoading: filesLoading,
     isError,
   } = useFiles({
     folderId: null,
   });
+  const {
+    data: trashFiles = [],
+    isLoading: trashLoading,
+    isError: trashError,
+  } = useTrashFiles();
+
+  const isLoading = filesLoading || trashLoading;
 
   const storageUsed = user?.storageUsed ?? 0;
   const storageLimit = user?.storageLimit ?? 50 * 1024 * 1024;
@@ -26,71 +178,61 @@ const StoragePage = () => {
   );
 
   const breakdowns = useMemo(() => {
-    let docBytes = 0;
-    let pdfBytes = 0;
-    let imgBytes = 0;
-    let sheetBytes = 0;
-    let otherBytes = 0;
+    const totals = new Map<
+      StorageCategoryKey,
+      { bytes: number; count: number }
+    >();
 
-    rawFiles.forEach((f) => {
-      const cat = getFileCategoryFilter(f);
-      if (cat === "document") {
-        docBytes += f.size;
-      } else if (cat === "pdf") {
-        pdfBytes += f.size;
-      } else if (cat === "image" || cat === "video") {
-        imgBytes += f.size;
-      } else if (cat === "spreadsheet") {
-        sheetBytes += f.size;
-      } else {
-        otherBytes += f.size;
-      }
+    rawFiles.forEach((file) => {
+      const key = getStorageCategory(file);
+      const current = totals.get(key) ?? { bytes: 0, count: 0 };
+      current.bytes += file.size;
+      current.count += 1;
+      totals.set(key, current);
     });
 
-    const totalBytes = docBytes + pdfBytes + imgBytes + sheetBytes + otherBytes;
+    const trashBytes = trashFiles.reduce((sum, file) => sum + file.size, 0);
+    const activeBytes = [...totals.values()].reduce(
+      (sum, total) => sum + total.bytes,
+      0
+    );
+    const accountedBytes = activeBytes + trashBytes;
 
-    if (totalBytes === 0) return [];
+    if (accountedBytes === 0) {
+      return { rows: [] as StorageBreakdownRow[], totalBytes: 0 };
+    }
 
-    const categories = [
-      {
-        type: "Documents",
-        bytes: docBytes,
-        size: formatFileSize(docBytes),
-        percent: Math.round((docBytes / totalBytes) * 100),
-        color: "bg-brand-brown",
-      },
-      {
-        type: "PDFs",
-        bytes: pdfBytes,
-        size: formatFileSize(pdfBytes),
-        percent: Math.round((pdfBytes / totalBytes) * 100),
-        color: "bg-brand-peach",
-      },
-      {
-        type: "Images & Media",
-        bytes: imgBytes,
-        size: formatFileSize(imgBytes),
-        percent: Math.round((imgBytes / totalBytes) * 100),
-        color: "bg-brand-peach-vibrant",
-      },
-      {
-        type: "Spreadsheets",
-        bytes: sheetBytes,
-        size: formatFileSize(sheetBytes),
-        percent: Math.round((sheetBytes / totalBytes) * 100),
-        color: "bg-emerald-600",
-      },
-      {
-        type: "Encrypted Keys & Archives",
-        bytes: otherBytes,
-        size: formatFileSize(otherBytes),
-        percent: Math.round((otherBytes / totalBytes) * 100),
-        color: "bg-brand-violet",
-      },
-    ];
+    const rows: StorageBreakdownRow[] = STORAGE_CATEGORY_ORDER.flatMap((key) => {
+      const total = totals.get(key);
+      if (!total || total.bytes === 0) return [];
 
-    return categories.filter((c) => c.bytes > 0);
-  }, [rawFiles]);
+      return [
+        {
+          key,
+          label: STORAGE_CATEGORY_META[key].label,
+          color: STORAGE_CATEGORY_META[key].color,
+          bytes: total.bytes,
+          count: total.count,
+          size: formatFileSize(total.bytes),
+          percent: Math.round((total.bytes / accountedBytes) * 100),
+        },
+      ];
+    });
+
+    if (trashBytes > 0) {
+      rows.push({
+        key: "trash",
+        label: "In Trash",
+        color: "bg-brand-violet-light",
+        bytes: trashBytes,
+        count: trashFiles.length,
+        size: formatFileSize(trashBytes),
+        percent: Math.round((trashBytes / accountedBytes) * 100),
+      });
+    }
+
+    return { rows, totalBytes: accountedBytes };
+  }, [rawFiles, trashFiles]);
 
   const largestFiles = useMemo(() => {
     return [...rawFiles]
@@ -159,9 +301,16 @@ const StoragePage = () => {
 
           {/* Allocation Breakdown */}
           <div className="space-y-3 pt-4 border-t border-brand-border">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
-              Allocation Breakdown
-            </h3>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-brand-violet">
+                Allocation Breakdown
+              </h3>
+              {!isLoading && !isError && breakdowns.totalBytes > 0 && (
+                <span className="text-[10px] font-mono text-brand-violet/60">
+                  {formatFileSize(breakdowns.totalBytes)} tracked
+                </span>
+              )}
+            </div>
 
             {isLoading ? (
               <div className="py-4 text-center text-xs text-brand-violet/60 font-mono">
@@ -174,7 +323,7 @@ const StoragePage = () => {
                   Refresh the page and try again.
                 </p>
               </div>
-            ) : breakdowns.length === 0 ? (
+            ) : breakdowns.rows.length === 0 ? (
               <div className="py-4 px-3 bg-brand-cream-muted border border-dashed border-brand-border text-center">
                 <p className="text-xs font-bold text-brand-violet">No storage allocation data</p>
                 <p className="text-[11px] font-mono text-brand-violet/60 mt-0.5">
@@ -182,18 +331,40 @@ const StoragePage = () => {
                 </p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {breakdowns.map((b) => (
-                  <div key={b.type} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-3 h-3 ${b.color} inline-block`} />
-                      <span className="font-semibold">{b.type}</span>
+              <div className="space-y-3">
+                <div className="flex h-4 w-full overflow-hidden border-2 border-brand-violet bg-brand-cream-muted">
+                  {breakdowns.rows.map((row) => (
+                    <div
+                      key={row.key}
+                      style={{ width: `${row.percent}%` }}
+                      className={row.color}
+                      title={`${row.label}: ${row.size} (${row.percent}%)`}
+                    />
+                  ))}
+                </div>
+
+                <div className="space-y-2">
+                  {breakdowns.rows.map((row) => (
+                    <div key={row.key} className="flex items-center justify-between gap-3 text-xs">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className={`w-3 h-3 ${row.color} inline-block shrink-0`} />
+                        <span className="truncate font-semibold">{row.label}</span>
+                        <span className="shrink-0 text-[10px] font-mono text-brand-violet/50">
+                          {row.count} file{row.count === 1 ? "" : "s"}
+                        </span>
+                      </div>
+                      <div className="shrink-0 font-mono text-brand-violet/80">
+                        {row.size} ({row.percent}%)
+                      </div>
                     </div>
-                    <div className="font-mono text-brand-violet/80">
-                      {b.size} ({b.percent}%)
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {trashError && (
+                  <p className="text-[10px] font-mono text-brand-brown">
+                    Trash usage is temporarily unavailable and is not included above.
+                  </p>
+                )}
               </div>
             )}
           </div>

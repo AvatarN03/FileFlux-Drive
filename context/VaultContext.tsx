@@ -1,30 +1,35 @@
 "use client";
 
-import React, {
+import {
   createContext,
   useContext,
   useState,
   useEffect,
   useCallback,
   useRef,
-  ReactNode,
+  type ReactNode,
 } from "react";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import vaultApi, { VaultRecord } from "@/services/vaultApi";
+import { useAuth } from "@/hooks/useAuth";
+
+import vaultApi, { type VaultRecord } from "@/services/vaultApi";
+
 import {
   createVault,
   unlockVaultWithPassphrase,
   unlockVaultWithRecoveryKey,
   rotateVaultPassphrase,
 } from "@/lib/crypto";
-import { useAuth } from "@/hooks/useAuth";
 import toastC from "@/lib/toast";
 
 const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 interface VaultContextType {
   isEnrolled: boolean | null;
+  isError: boolean;
+  error: Error | null;
   isUnlocked: boolean;
   isLoading: boolean;
   vaultRecord: VaultRecord | null;
@@ -38,6 +43,14 @@ interface VaultContextType {
 
 const VaultContext = createContext<VaultContextType | undefined>(undefined);
 
+const wipeKeyBestEffort = (key: Uint8Array) => {
+  try {
+    key.fill(0);
+  } catch {
+    // JavaScript cannot guarantee zeroization if the buffer is frozen or detached.
+  }
+};
+
 export function VaultProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const { isAuthenticated, user } = useAuth();
@@ -45,6 +58,10 @@ export function VaultProvider({ children }: { children: ReactNode }) {
   const [vaultKey, setVaultKey] = useState<Uint8Array | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const activeOperationCountRef = useRef(0);
+  const vaultOperationVersionRef = useRef(0);
+  const previousUserIdRef = useRef<string | null>(null);
+  const userId = user?.id ?? null;
 
   // Fetch vault record if authenticated (tied to specific user ID)
   const vaultQuery = useQuery({
@@ -57,22 +74,39 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
   const isEnrolled = vaultQuery.data ? vaultQuery.data.enrolled : null;
   const vaultRecord = vaultQuery.data ? vaultQuery.data.vault : null;
+  const vaultError = vaultQuery.error instanceof Error ? vaultQuery.error : null;
+
+  const startProcessing = useCallback(() => {
+    activeOperationCountRef.current += 1;
+    setIsProcessing(true);
+  }, []);
+
+  const stopProcessing = useCallback(() => {
+    activeOperationCountRef.current = Math.max(
+      0,
+      activeOperationCountRef.current - 1,
+    );
+    setIsProcessing(activeOperationCountRef.current > 0);
+  }, []);
 
   // Wipe keys from memory
   const lockVault = useCallback(() => {
+    vaultOperationVersionRef.current += 1;
+
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+
     if (vaultKey) {
-      // Overwrite bytes in memory before releasing reference
-      try {
-        vaultKey.fill(0);
-      } catch {
-        // Uint8Array might be frozen or detached in some runtimes
-      }
+      wipeKeyBestEffort(vaultKey);
     }
     setVaultKey(null);
     // Clear cached metadata that may contain decrypted file or folder names.
     queryClient.removeQueries({ queryKey: ["folders"] });
     queryClient.removeQueries({ queryKey: ["trash-folders"] });
     queryClient.removeQueries({ queryKey: ["files"] });
+    queryClient.removeQueries({ queryKey: ["trash-files"] });
     queryClient.removeQueries({ queryKey: ["file"] });
   }, [vaultKey, queryClient]);
 
@@ -110,13 +144,29 @@ export function VaultProvider({ children }: { children: ReactNode }) {
     };
   }, [vaultKey, resetInactivityTimer]);
 
-  // Lock vault and wipe vault cache on logout or user change
+  // Lock vault and wipe vault cache on logout or account change
   useEffect(() => {
-    if (!isAuthenticated || !user) {
+    const previousUserId = previousUserIdRef.current;
+
+    if (previousUserId && previousUserId !== userId) {
+      lockVault();
+      queryClient.removeQueries({
+        queryKey: ["vault", "status", previousUserId],
+      });
+    }
+
+    previousUserIdRef.current = userId;
+
+    if (!isAuthenticated || !userId) {
       lockVault();
       queryClient.removeQueries({ queryKey: ["vault"] });
     }
-  }, [isAuthenticated, user, lockVault, queryClient]);
+  }, [isAuthenticated, userId, lockVault, queryClient]);
+
+  const beginVaultOperation = useCallback(() => {
+    vaultOperationVersionRef.current += 1;
+    return vaultOperationVersionRef.current;
+  }, []);
 
   // 1. Initial Enrollment
   const enrollMutation = useMutation({
@@ -128,23 +178,34 @@ export function VaultProvider({ children }: { children: ReactNode }) {
 
   const setupVault = useCallback(
     async (passphrase: string): Promise<string> => {
-      setIsProcessing(true);
+      const operationVersion = beginVaultOperation();
+      startProcessing();
+      let newKey: Uint8Array | null = null;
+
       try {
-        const { vaultKey: newKey, enrollment } = await createVault(passphrase);
+        const enrollmentResult = await createVault(passphrase);
+        newKey = enrollmentResult.vaultKey;
 
         await enrollMutation.mutateAsync({
-          kdfParams: enrollment.kdfParams,
-          passphraseEnvelope: enrollment.passphraseEnvelope,
-          recoveryEnvelope: enrollment.recoveryEnvelope,
+          kdfParams: enrollmentResult.enrollment.kdfParams,
+          passphraseEnvelope: enrollmentResult.enrollment.passphraseEnvelope,
+          recoveryEnvelope: enrollmentResult.enrollment.recoveryEnvelope,
         });
 
+        if (operationVersion !== vaultOperationVersionRef.current) {
+          throw new Error("Vault setup was cancelled.");
+        }
+
         setVaultKey(newKey);
-        return enrollment.recoveryKeyDisplay;
+        const recoveryKeyDisplay = enrollmentResult.enrollment.recoveryKeyDisplay;
+        newKey = null;
+        return recoveryKeyDisplay;
       } finally {
-        setIsProcessing(false);
+        if (newKey) wipeKeyBestEffort(newKey);
+        stopProcessing();
       }
     },
-    [enrollMutation]
+    [beginVaultOperation, enrollMutation, startProcessing, stopProcessing]
   );
 
   // 2. Unlock with Passphrase
@@ -154,9 +215,12 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         throw new Error("No vault record found for this account.");
       }
 
-      setIsProcessing(true);
+      const operationVersion = beginVaultOperation();
+      startProcessing();
+      let unlockedKey: Uint8Array | null = null;
+
       try {
-        const unlockedKey = await unlockVaultWithPassphrase(
+        unlockedKey = await unlockVaultWithPassphrase(
           passphrase,
           {
             salt: vaultRecord.kdfSalt,
@@ -170,13 +234,19 @@ export function VaultProvider({ children }: { children: ReactNode }) {
           }
         );
 
+        if (operationVersion !== vaultOperationVersionRef.current) {
+          throw new Error("Vault unlock was cancelled.");
+        }
+
         setVaultKey(unlockedKey);
+        unlockedKey = null;
         return true;
       } finally {
-        setIsProcessing(false);
+        if (unlockedKey) wipeKeyBestEffort(unlockedKey);
+        stopProcessing();
       }
     },
-    [vaultRecord]
+    [beginVaultOperation, vaultRecord, startProcessing, stopProcessing]
   );
 
   // 3. Unlock with Recovery Key
@@ -186,20 +256,29 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         throw new Error("No vault record found for this account.");
       }
 
-      setIsProcessing(true);
+      const operationVersion = beginVaultOperation();
+      startProcessing();
+      let unlockedKey: Uint8Array | null = null;
+
       try {
-        const unlockedKey = await unlockVaultWithRecoveryKey(recoveryKey, {
+        unlockedKey = await unlockVaultWithRecoveryKey(recoveryKey, {
           nonce: vaultRecord.recoveryNonce,
           ciphertext: vaultRecord.recoveryCiphertext,
         });
 
+        if (operationVersion !== vaultOperationVersionRef.current) {
+          throw new Error("Vault unlock was cancelled.");
+        }
+
         setVaultKey(unlockedKey);
+        unlockedKey = null;
         return true;
       } finally {
-        setIsProcessing(false);
+        if (unlockedKey) wipeKeyBestEffort(unlockedKey);
+        stopProcessing();
       }
     },
-    [vaultRecord]
+    [beginVaultOperation, vaultRecord, startProcessing, stopProcessing]
   );
 
   // 4. Rotate Passphrase
@@ -216,25 +295,42 @@ export function VaultProvider({ children }: { children: ReactNode }) {
         throw new Error("Vault must be unlocked to rotate passphrase.");
       }
 
-      setIsProcessing(true);
+      const operationVersion = beginVaultOperation();
+      const keyForRotation = new Uint8Array(vaultKey);
+      startProcessing();
+
       try {
-        const updated = await rotateVaultPassphrase(vaultKey, newPassphrase);
+        const updated = await rotateVaultPassphrase(keyForRotation, newPassphrase);
+
+        if (operationVersion !== vaultOperationVersionRef.current) {
+          throw new Error("Passphrase rotation was cancelled.");
+        }
+
         await rotateMutation.mutateAsync({
           kdfParams: updated.kdfParams,
           passphraseEnvelope: updated.passphraseEnvelope,
         });
         return true;
       } finally {
-        setIsProcessing(false);
+        wipeKeyBestEffort(keyForRotation);
+        stopProcessing();
       }
     },
-    [vaultKey, rotateMutation]
+    [
+      beginVaultOperation,
+      vaultKey,
+      rotateMutation,
+      startProcessing,
+      stopProcessing,
+    ]
   );
 
   return (
     <VaultContext.Provider
       value={{
         isEnrolled,
+        isError: vaultQuery.isError,
+        error: vaultError,
         isUnlocked: !!vaultKey,
         isLoading: vaultQuery.isLoading || isProcessing,
         vaultRecord,

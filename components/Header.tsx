@@ -1,16 +1,22 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Menu, User, LogOut, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { PublicUser } from "@/types/auth";
-import VaultStatusBadge from "./vault/VaultStatusBadge";
-import { useAuth } from "@/hooks/useAuth";
-import { useVault } from "@/context/VaultContext";
+
+import { Menu, User, LogOut, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@/hooks/useAuth";
+
+import { useVault } from "@/context/VaultContext";
+
+import VaultStatusBadge from "@/app/_components/vault/VaultStatusBadge";
+
 import toastC from "@/lib/toast";
+
+import { PublicUser } from "@/types/auth";
 
 const Header = ({
   user,
@@ -104,10 +110,10 @@ const Header = ({
             aria-expanded={isOpen}
             aria-haspopup="true"
             aria-label="User account menu"
-            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-brown-2 hover:shadow-brown-1 hover:translate-x-[1px] hover:translate-y-[1px] transition-all cursor-pointer max-sm:p-0 max-sm:bg-transparent max-sm:border-0 max-sm:shadow-none"
+            className="flex gap-2.5 items-center px-2.5 py-1.5 bg-brand-cream-muted border-2 border-brand-border hover:border-brand-violet text-brand-violet shadow-brown-2 hover:shadow-brown-1 hover:translate-x-px hover:translate-y-px transition-all cursor-pointer max-sm:p-0 max-sm:bg-transparent max-sm:border-0 max-sm:shadow-none"
           >
             <span className="hidden lg:inline text-xs font-bold text-brand-violet">
-              {user?.name || "User"}
+              {user?.name}
             </span>
             <div className="relative w-8 h-8 sm:w-8 sm:h-8 border-2 border-brand-brown overflow-hidden bg-brand-peach max-sm:w-9 max-sm:h-9">
               <Image
@@ -133,10 +139,10 @@ const Header = ({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-extrabold text-brand-violet truncate">
-                    {user?.name || "FileFlux Explorer"}
+                    {user?.name}
                   </p>
                   <p className="text-[11px] font-mono text-brand-violet/70 truncate">
-                    {user?.email || "user@example.com"}
+                    {user?.email}
                   </p>
                 </div>
               </div>

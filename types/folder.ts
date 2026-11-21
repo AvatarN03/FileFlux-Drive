@@ -31,6 +31,19 @@ export type GetAllFolders = {
   encryptedMetadataCiphertext: string | null;
 }[];
 
+export type AllFolderItem = {
+  id: string;
+  name: string;
+  parentId: string | null;
+  color: string | null;
+  isFavorite: boolean;
+  isEncrypted: boolean;
+  encryptedMetadataNonce: string | null;
+  encryptedMetadataCiphertext: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type TrashFolder = {
   id: string;
   name: string;

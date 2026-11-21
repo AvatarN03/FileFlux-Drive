@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { UploadCloud, X } from "lucide-react";
 
-import FileUpload from "@/app/_components/FileUpload";
 import { useUploadModal } from "@/context/UploadModalContext";
+
+import FileUpload from "@/components/FileUpload";
 
 const UploadModal = () => {
   const { isOpen, folderId, closeUpload } = useUploadModal();

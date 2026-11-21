@@ -1,5 +1,6 @@
 import { ApiResponse } from "@/types";
 import {
+  AllFolderItem,
   GetAllFolders,
   TrashFolder,
   UpdateFolderPayload,
@@ -47,6 +48,18 @@ const folderApi = {
     }
 
     return data.data;
+  },
+
+  getAllFolders: async (): Promise<AllFolderItem[]> => {
+    const res = await fetch("/api/folders/getAll");
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error ?? "Failed to fetch all folders");
+    }
+
+    return (data.allFolders ?? []) as AllFolderItem[];
   },
 
   getTrash: async () => {

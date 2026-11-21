@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Mail, CheckCircle2, MailCheck, ArrowRight } from "lucide-react";
 
-import Logo from "@/app/_components/Logo";
+import Logo from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { formatTime } from "@/lib/email/formatTime";
 import type { ResendVerificationResponse } from "@/types/auth";

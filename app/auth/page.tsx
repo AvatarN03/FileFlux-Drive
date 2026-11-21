@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { GoogleLogin } from "@react-oauth/google";
 import { CredentialResponse } from "@react-oauth/google";
 
-import Logo from "../_components/Logo";
+import Logo from "../../components/Logo";
 import LoginForm from "../_components/auth/LoginForm";
 import SignupForm from "../_components/auth/SignupForm";
 

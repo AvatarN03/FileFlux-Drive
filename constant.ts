@@ -369,6 +369,12 @@ export const FILE_API_ENDPOINTS = {
   RESTORE: "/api/files/restore",
 } as const;
 
+export const VAULT_API_ENDPOINTS = {
+  GET: "/api/vault",
+  ENROLL: "/api/vault/enroll",
+  ROTATE_PASSPHRASE: "/api/vault/rotate-passphrase",
+} as const;
+
 // Authentication toast messages
 export const AUTH_TOAST_MESSAGES = {
   LOGIN_SUCCESS: "Login successful 🎉",

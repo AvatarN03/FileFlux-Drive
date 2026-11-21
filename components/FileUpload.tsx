@@ -4,21 +4,21 @@ import React, { useRef, useState, ChangeEvent, useCallback, useEffect } from "re
 import { useParams, useRouter } from "next/navigation";
 
 import axios from "axios";
-
-import UploadArea from "./files/UploadArea";
-import FilePreview from "./files/FilePreview";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useVault } from "@/context/VaultContext";
-import { useQueryClient } from "@tanstack/react-query";
-import { uploadEncryptedFile } from "@/lib/storage/encryptedFileTransfer";
 
+import { useVault } from "@/context/VaultContext";
+
+import UploadArea from "@/app/_components/files/UploadArea";
+import FilePreview from "@/app/_components/files/FilePreview";
+
+import { uploadEncryptedFile } from "@/lib/storage/encryptedFileTransfer";
 import { toastError, toastSuccess } from "@/lib/toast";
 import { createRenamedFile, getFileNameWithoutExtension } from "@/lib/file/operations";
+import { canUploadFile } from "@/lib/validations/file";
 
 import { INITIAL_STATE } from "@/constant";
-
-import { canUploadFile } from "@/lib/validations/file";
 
 type UploadState = {
   file: File | null;

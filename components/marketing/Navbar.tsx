@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/app/_components/Logo";
+import Logo from "@/components/Logo";
 
 const Navbar = () => {
   return (

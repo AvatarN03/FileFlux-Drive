@@ -3,12 +3,12 @@
 import { ReactNode, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import Header from "../_components/Header";
+import Header from "@/components/Header";
 import Loading from "@/components/marketing/Loading";
 
 import Sidebar from "@/components/Sidebar";
 import { useAuth } from "@/hooks/useAuth";
-import UploadModal from "@/app/_components/upload/UploadModal";
+import UploadModal from "@/components/upload/UploadModal";
 import { UploadModalProvider } from "@/context/UploadModalContext";
 
 const Layout = ({ children }: { children: ReactNode }) => {

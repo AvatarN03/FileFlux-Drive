@@ -4,7 +4,8 @@ import { X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import Logo from "@/app/_components/Logo";
+import Logo from "@/components/Logo";
+
 import { bottomSections, topSections } from "@/constant";
 
 type NavSection = {

@@ -1,5 +1,8 @@
-import { ApiResponse } from "@/types";
 import { EncryptedEnvelope, KdfParameters } from "@/lib/crypto/types";
+
+import { ApiResponse } from "@/types";
+
+import { VAULT_API_ENDPOINTS } from "@/constant";
 
 export interface VaultRecord {
   id: string;
@@ -32,7 +35,7 @@ export interface RotatePassphrasePayload {
 
 const vaultApi = {
   async getVault(): Promise<VaultStatusResponse> {
-    const res = await fetch("/api/vault", {
+    const res = await fetch(VAULT_API_ENDPOINTS.GET, {
       credentials: "include",
       cache: "no-store",
     });
@@ -49,7 +52,7 @@ const vaultApi = {
   },
 
   async enrollVault(payload: EnrollVaultPayload): Promise<void> {
-    const res = await fetch("/api/vault/enroll", {
+    const res = await fetch(VAULT_API_ENDPOINTS.ENROLL, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -65,7 +68,7 @@ const vaultApi = {
   },
 
   async rotatePassphrase(payload: RotatePassphrasePayload): Promise<void> {
-    const res = await fetch("/api/vault/rotate-passphrase", {
+    const res = await fetch(VAULT_API_ENDPOINTS.ROTATE_PASSPHRASE, {
       method: "PATCH",
       credentials: "include",
       headers: {

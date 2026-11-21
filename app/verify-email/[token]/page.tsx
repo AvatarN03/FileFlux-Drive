@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2, ArrowRight } from "lucide-react";
 
-import Logo from "@/app/_components/Logo";
+import Logo from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import toastC from "@/lib/toast";
 import { AUTH_TOAST_MESSAGES } from "@/constant";
